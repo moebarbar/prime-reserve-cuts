@@ -1,0 +1,191 @@
+'use client'
+
+import { useState } from 'react'
+import { MOCK_LEADS, Lead, LeadStatus } from '@/data/adminData'
+
+const STATUS_OPTS: LeadStatus[] = ['new', 'contacted', 'converted', 'lost']
+const BUILDINGS = ['All Buildings', 'Aspire Post Oak', 'The Driscoll', 'Market Square Tower', 'Parkside at Discovery Green', 'Elev8 Downtown', 'Hanover Autry Park']
+
+function Badge({ status }: { status: LeadStatus }) {
+  return <span className={`badge badge-${status}`}>{status}</span>
+}
+
+export default function LeadsPage() {
+  const [leads, setLeads]         = useState<Lead[]>(MOCK_LEADS)
+  const [search, setSearch]       = useState('')
+  const [statusF, setStatusF]     = useState('all')
+  const [buildingF, setBuildingF] = useState('All Buildings')
+  const [expanded, setExpanded]   = useState<string | null>(null)
+
+  const filtered = leads.filter(l => {
+    const q = search.toLowerCase()
+    const matchQ = !q || l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.unit.includes(q)
+    const matchS = statusF === 'all' || l.status === statusF
+    const matchB = buildingF === 'All Buildings' || l.building === buildingF
+    return matchQ && matchS && matchB
+  })
+
+  const updateStatus = (id: string, status: LeadStatus) =>
+    setLeads(ls => ls.map(l => l.id === id ? { ...l, status } : l))
+
+  const deleteLead = (id: string) =>
+    setLeads(ls => ls.filter(l => l.id !== id))
+
+  const counts = STATUS_OPTS.reduce((acc, s) => {
+    acc[s] = leads.filter(l => l.status === s).length
+    return acc
+  }, {} as Record<LeadStatus, number>)
+
+  return (
+    <>
+      {/* MINI STATS */}
+      <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: 20 }}>
+        {STATUS_OPTS.map(s => (
+          <div
+            key={s}
+            className={`stat-card${statusF === s ? ' gold-card' : ''}`}
+            style={{ cursor: 'pointer', padding: '14px 16px' }}
+            onClick={() => setStatusF(statusF === s ? 'all' : s)}
+          >
+            <div className="stat-eyebrow">{s}</div>
+            <div className="stat-value" style={{ fontSize: 30 }}>{counts[s]}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* FILTERS */}
+      <div className="filter-bar">
+        <input
+          className="filter-search"
+          placeholder="Search by name, email or unit…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        <select className="filter-select" value={statusF} onChange={e => setStatusF(e.target.value)}>
+          <option value="all">All Statuses</option>
+          {STATUS_OPTS.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+        </select>
+        <select className="filter-select" value={buildingF} onChange={e => setBuildingF(e.target.value)}>
+          {BUILDINGS.map(b => <option key={b}>{b}</option>)}
+        </select>
+        {(search || statusF !== 'all' || buildingF !== 'All Buildings') && (
+          <button className="btn-ghost" onClick={() => { setSearch(''); setStatusF('all'); setBuildingF('All Buildings') }}>
+            Clear
+          </button>
+        )}
+      </div>
+
+      {/* TABLE */}
+      <div className="table-wrap scrollable">
+        {filtered.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state-icon">◎</div>
+            <strong>No leads found</strong>
+            <p>Try adjusting your filters.</p>
+          </div>
+        ) : (
+          <table className="adm">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Building / Unit</th>
+                <th>Phone</th>
+                <th>Interested In</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(l => (
+                <>
+                  <tr
+                    key={l.id}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setExpanded(expanded === l.id ? null : l.id)}
+                  >
+                    <td className="td-mono">{l.id}</td>
+                    <td>
+                      <div style={{ fontWeight: 400 }}>{l.name}</div>
+                      <div className="td-dim">{l.email}</div>
+                    </td>
+                    <td>
+                      <div>{l.building}</div>
+                      <div className="td-dim">Unit {l.unit}</div>
+                    </td>
+                    <td className="td-dim">{l.phone}</td>
+                    <td className="td-dim">{l.cut ?? '—'}</td>
+                    <td className="td-dim">{l.date}</td>
+                    <td onClick={e => e.stopPropagation()}>
+                      <select
+                        className={`badge badge-${l.status} inline-sel`}
+                        value={l.status}
+                        onChange={e => updateStatus(l.id, e.target.value as LeadStatus)}
+                      >
+                        {STATUS_OPTS.map(s => (
+                          <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                        ))}
+                      </select>
+                    </td>
+                    <td onClick={e => e.stopPropagation()}>
+                      <div className="act-row">
+                        <button
+                          className="btn-icon"
+                          title="Expand"
+                          onClick={() => setExpanded(expanded === l.id ? null : l.id)}
+                        >{expanded === l.id ? '▲' : '▼'}</button>
+                        <button
+                          className="btn-icon danger"
+                          title="Delete"
+                          onClick={() => { if (confirm(`Delete lead ${l.name}?`)) deleteLead(l.id) }}
+                        >✕</button>
+                      </div>
+                    </td>
+                  </tr>
+                  {expanded === l.id && (
+                    <tr key={`${l.id}-detail`} className="detail-row">
+                      <td colSpan={8}>
+                        <div className="detail-box">
+                          <div className="detail-item"><label>Full Name</label><span>{l.name}</span></div>
+                          <div className="detail-item"><label>Email</label><span>{l.email}</span></div>
+                          <div className="detail-item"><label>Phone</label><span>{l.phone}</span></div>
+                          <div className="detail-item"><label>Unit</label><span>{l.unit}</span></div>
+                          <div className="detail-item"><label>Building</label><span>{l.building}</span></div>
+                          <div className="detail-item"><label>Interested In</label><span>{l.cut ?? '—'}</span></div>
+                          <div className="detail-item"><label>Date Submitted</label><span>{l.date}</span></div>
+                          <div className="detail-item"><label>Status</label><span><Badge status={l.status} /></span></div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                          {l.status !== 'converted' && (
+                            <button className="btn-gold" style={{ fontSize: 9, padding: '8px 14px' }}
+                              onClick={() => updateStatus(l.id, 'converted')}>
+                              ✓ Mark Converted
+                            </button>
+                          )}
+                          {l.status !== 'contacted' && l.status !== 'converted' && (
+                            <button className="btn-ghost" style={{ fontSize: 9, padding: '7px 13px' }}
+                              onClick={() => updateStatus(l.id, 'contacted')}>
+                              Mark Contacted
+                            </button>
+                          )}
+                          <a href={`mailto:${l.email}`} className="btn-ghost" style={{ fontSize: 9, padding: '7px 13px', textDecoration: 'none' }}>
+                            ✉ Email Lead
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      <div style={{ marginTop: 10, fontSize: 11, color: 'var(--muted)' }}>
+        Showing {filtered.length} of {leads.length} leads
+      </div>
+    </>
+  )
+}
