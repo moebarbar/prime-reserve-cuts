@@ -20,14 +20,24 @@
 }
 .bpDot { width: 7px; height: 7px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 6px rgba(184,134,58,.45); flex-shrink: 0; }
 .bpTxt { font-size: 12px; font-weight: 400; color: var(--cream); }
-.bpChg { font-size: 9px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); background: none; border: none; cursor: pointer; margin-left: 4px; opacity: .8; }
+.bpChg {
+  font-size: 9px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--gold); background: none; border: none; cursor: pointer; margin-left: 4px; opacity: .8;
+  touch-action: manipulation; padding: 4px 0;
+}
 .bpChg:hover { opacity: 1; }
 
 .field { border-bottom: 1px solid var(--border); transition: border-color .22s; }
 .field:focus-within { border-color: rgba(184,134,58,.55); }
 .field label { display: block; font-size: 8px; font-weight: 600; letter-spacing: .4em; text-transform: uppercase; color: var(--muted); padding-top: 18px; margin-bottom: 5px; transition: color .22s; }
 .field:focus-within label { color: var(--gold); }
-.field input { width: 100%; background: transparent; border: none; outline: none; color: var(--cream); font-family: 'Jost', sans-serif; font-size: 17px; font-weight: 300; padding-bottom: 11px; caret-color: var(--gold); cursor: text; }
+.field input {
+  width: 100%; background: transparent; border: none; outline: none; color: var(--cream);
+  font-family: 'Jost', sans-serif; font-size: 17px; font-weight: 300; padding-bottom: 11px;
+  caret-color: var(--gold); cursor: text;
+  /* prevent iOS zoom on focus (font-size must be >= 16px) */
+  font-size: max(16px, 17px);
+}
 .field input::placeholder { color: rgba(244,239,230,.2); font-style: italic; }
 .fieldRow { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .note { margin-top: 22px; padding: 13px 16px; border-left: 2px solid rgba(184,134,58,.28); font-size: 11px; color: var(--muted); line-height: 1.7; }
@@ -43,6 +53,7 @@
   align-items: stretch; cursor: pointer;
   border: 1.5px solid var(--border); background: var(--panel);
   transition: border-color .2s; overflow: hidden;
+  touch-action: manipulation;
 }
 .cc:hover { border-color: rgba(184,134,58,.38); }
 .ccSel { border-color: var(--gold) !important; }
@@ -72,11 +83,28 @@
   font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase;
   cursor: pointer; transition: background .2s;
   display: flex; align-items: center; justify-content: center; gap: 9px;
+  min-height: 44px; touch-action: manipulation;
 }
 .btnPay:hover { background: var(--gold2); }
 
+/* ── RESPONSIVE ── */
 @media (max-width: 900px) {
-  .wrap { grid-template-columns: 1fr; padding: 44px 22px 60px; gap: 44px; }
+  .wrap { grid-template-columns: 1fr; padding: 44px 24px 60px; gap: 44px; }
   .right { position: static; }
   .fieldRow { grid-template-columns: 1fr; gap: 0; }
+}
+
+@media (max-width: 480px) {
+  .wrap { padding: 28px 16px 48px; gap: 36px; }
+  .title { font-size: 30px; }
+  .sub { margin-bottom: 20px; }
+  .cc { grid-template-columns: 72px 1fr auto; }
+  .ccThumb { width: 72px; height: 72px; }
+  .ccBody { padding: 10px 10px; }
+  .ccRight { padding: 10px 10px; min-width: 64px; }
+  .ccPrice { font-size: 18px; }
+}
+
+@media (max-width: 360px) {
+  .wrap { padding: 24px 12px 40px; }
 }

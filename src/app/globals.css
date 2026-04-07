@@ -20,6 +20,8 @@ body {
   background: var(--dark);
   color: var(--cream);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ── NAV ── */
@@ -29,9 +31,10 @@ body {
   padding: 0 44px;
   background: rgba(13,11,8,0.9);
   backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
 }
-.nav-logo { font-family: 'Cormorant', serif; font-size: 20px; font-weight: 400; font-style: italic; color: var(--cream); }
+.nav-logo { font-family: 'Cormorant', serif; font-size: 20px; font-weight: 400; font-style: italic; color: var(--cream); white-space: nowrap; }
 .nav-logo span { color: var(--gold); }
 .nav-right { display: flex; align-items: center; gap: 18px; font-size: 9px; font-weight: 500; letter-spacing: .36em; text-transform: uppercase; color: var(--muted); }
 .steps { display: flex; align-items: center; gap: 5px; }
@@ -43,7 +46,12 @@ body {
 .step-sep { width: 16px; height: 1px; background: var(--border); }
 
 /* ── BACK BUTTON ── */
-.btn-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); padding: 0; margin-bottom: 28px; transition: color .2s; }
+.btn-back {
+  display: inline-flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer;
+  font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--muted); padding: 10px 0; margin-bottom: 28px; transition: color .2s;
+  min-height: 44px; touch-action: manipulation;
+}
 .btn-back:hover { color: var(--gold); }
 .b-arr { font-size: 14px; transition: transform .2s; display: inline-block; }
 .btn-back:hover .b-arr { transform: translateX(-3px); }
@@ -57,3 +65,12 @@ body {
 .anim-2 { animation: fadeUp .7s .25s both; }
 .anim-3 { animation: fadeUp .6s both; }
 .anim-4 { animation: fadeUp .6s .12s both; }
+
+/* ── RESPONSIVE NAV ── */
+@media (max-width: 600px) {
+  .nav { padding: 0 16px; }
+  .nav-right > span { display: none; }
+}
+@media (max-width: 380px) {
+  .nav-logo { font-size: 17px; }
+}

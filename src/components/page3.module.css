@@ -10,7 +10,7 @@
 .ocTop { display: flex; border-bottom: 1px solid var(--border); }
 .ocImg { width: 100px; flex-shrink: 0; overflow: hidden; }
 .ocImg img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(.8); }
-.ocInfo { padding: 18px; flex: 1; }
+.ocInfo { padding: 18px; flex: 1; min-width: 0; }
 .ocBld { font-size: 8px; font-weight: 600; letter-spacing: .32em; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
 .ocCut { font-family: 'Cormorant', serif; font-size: 20px; font-weight: 300; color: var(--cream); margin-bottom: 3px; }
 .ocDetail { font-size: 11px; color: var(--muted); line-height: 1.5; }
@@ -36,7 +36,11 @@
 .spAmt span { font-size: 18px; }
 .spBody { padding: 22px; }
 .spLbl { font-family: -apple-system, sans-serif; font-size: 12px; font-weight: 500; color: #3c4257; margin-bottom: 5px; display: block; }
-.spInp { width: 100%; height: 40px; border: 1.5px solid #e6ebf1; border-radius: 4px; padding: 0 11px; margin-bottom: 12px; font-family: -apple-system, sans-serif; font-size: 14px; color: #1a1f2e; background: #fff; outline: none; transition: border-color .2s, box-shadow .2s; }
+.spInp {
+  width: 100%; height: 40px; border: 1.5px solid #e6ebf1; border-radius: 4px; padding: 0 11px; margin-bottom: 12px;
+  font-family: -apple-system, sans-serif; font-size: max(16px, 14px); color: #1a1f2e; background: #fff;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+}
 .spInp:focus { border-color: #635bff; box-shadow: 0 0 0 3px rgba(99,91,255,.12); }
 .spInp::placeholder { color: #aab7c4; }
 .spRow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -44,7 +48,12 @@
 .spCardPh { font-family: -apple-system, sans-serif; font-size: 14px; color: #aab7c4; }
 .spCardIcons { display: flex; gap: 4px; align-items: center; }
 .spTerms { font-family: -apple-system, sans-serif; font-size: 11px; color: #8898aa; line-height: 1.6; margin-bottom: 14px; }
-.spBtn { width: 100%; height: 44px; background: #635bff; color: #fff; border: none; border-radius: 4px; font-family: -apple-system, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .2s; display: flex; align-items: center; justify-content: center; gap: 7px; }
+.spBtn {
+  width: 100%; height: 44px; background: #635bff; color: #fff; border: none; border-radius: 4px;
+  font-family: -apple-system, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: background .2s; display: flex; align-items: center; justify-content: center; gap: 7px;
+  touch-action: manipulation;
+}
 .spBtn:hover:not(:disabled) { background: #5147d4; }
 .spBtn:disabled { opacity: .7; cursor: not-allowed; }
 .spFoot { background: #f6f9fc; border-top: 1px solid #e6ebf1; padding: 11px 22px; display: flex; align-items: center; justify-content: center; font-family: -apple-system, sans-serif; font-size: 11px; color: #8898aa; }
@@ -56,7 +65,25 @@
 .payOkBody { font-size: 13px; color: var(--muted); line-height: 1.8; }
 .payOkBody strong { color: var(--cream); font-weight: 400; }
 
+/* ── RESPONSIVE ── */
 @media (max-width: 900px) {
-  .wrap { grid-template-columns: 1fr; padding: 44px 22px 60px; }
+  .wrap { grid-template-columns: 1fr; padding: 44px 24px 60px; gap: 36px; }
   .right { position: static; }
+}
+
+@media (max-width: 480px) {
+  .wrap { padding: 28px 16px 48px; gap: 28px; }
+  .title { font-size: 28px; margin-bottom: 20px; }
+  .ocTop { flex-wrap: wrap; }
+  .ocImg { width: 100%; height: 140px; }
+  .ocImg img { object-position: center 30%; }
+  .ocPrice { padding: 12px 18px; text-align: left; }
+  .ocVal { font-size: 24px; display: inline; }
+  .ocMo { display: inline; margin-left: 4px; }
+  .spRow { grid-template-columns: 1fr; gap: 0; }
+}
+
+@media (max-width: 360px) {
+  .wrap { padding: 24px 12px 40px; }
+  .spBody { padding: 16px; }
 }
