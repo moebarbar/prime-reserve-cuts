@@ -42,7 +42,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
           </div>
           <p className={styles.mission}>
             <strong>The best steak in Houston shouldn't require a reservation.</strong>{' '}
-            Prime Reserve delivers USDA Prime and A5 Wagyu directly to luxury residents —
+            Automatic Cow delivers USDA Prime and A5 Wagyu directly to luxury residents —
             every month, to your unit, zero effort.
           </p>
         </div>

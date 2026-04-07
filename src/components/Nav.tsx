@@ -7,7 +7,7 @@ interface NavProps {
 export default function Nav({ step }: NavProps) {
   return (
     <nav className="nav">
-      <div className="nav-logo">Prime <span>Reserve</span></div>
+      <div className="nav-logo">🐄 Automatic <span>Cow</span></div>
       <div className="nav-right">
         <div className="steps">
           <div className={`step ${step === 1 ? 'active' : step > 1 ? 'done' : ''}`}>

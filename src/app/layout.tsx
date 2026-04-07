@@ -9,18 +9,18 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'Prime Reserve · Houston',
+  title: '🐄 Automatic Cow · Houston',
   description: 'A private USDA Prime & A5 Wagyu steak membership exclusively for Houston luxury residents. Monthly delivery straight to your unit.',
   keywords: ['steak delivery Houston', 'USDA Prime', 'A5 Wagyu', 'luxury steak', 'Houston members'],
   openGraph: {
-    title: 'Prime Reserve · Houston',
+    title: '🐄 Automatic Cow · Houston',
     description: 'USDA Prime & A5 Wagyu delivered monthly to your luxury residence.',
     type: 'website',
     locale: 'en_US',
   },
   twitter: {
     card: 'summary',
-    title: 'Prime Reserve · Houston',
+    title: '🐄 Automatic Cow · Houston',
     description: 'USDA Prime & A5 Wagyu delivered monthly to your luxury residence.',
   },
   robots: { index: false, follow: false },
