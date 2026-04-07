@@ -27,9 +27,10 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: '🐄 Automatic Cow · Houston',
     description: 'USDA Prime & A5 Wagyu delivered monthly to your luxury residence.',
+    images: ['https://images.pexels.com/photos/12261087/pexels-photo-12261087.jpeg?auto=compress&cs=tinysrgb&w=1200&h=630&dpr=1'],
   },
   robots: { index: false, follow: false },
 }
