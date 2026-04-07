@@ -28,7 +28,16 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
 
       {/* HERO */}
       <div className={styles.hero}>
-        <div className={styles.heroBg} />
+        <video
+          className={styles.heroBg}
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="https://images.unsplash.com/photo-1562802378-063ec186a863?w=1400&q=80&fit=crop&crop=center"
+        >
+          <source src="https://videos.pexels.com/video-files/3209830/3209830-hd_1920_1080_25fps.mp4" type="video/mp4" />
+        </video>
         <div className={styles.heroOverlay} />
         <div className={styles.heroContent}>
           <div>
