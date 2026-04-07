@@ -17,6 +17,14 @@ export const metadata: Metadata = {
     description: 'USDA Prime & A5 Wagyu delivered monthly to your luxury residence.',
     type: 'website',
     locale: 'en_US',
+    images: [
+      {
+        url: 'https://images.pexels.com/photos/12261087/pexels-photo-12261087.jpeg?auto=compress&cs=tinysrgb&w=1200&h=630&dpr=1',
+        width: 1200,
+        height: 630,
+        alt: 'Tomahawk steak on a flaming grill — Automatic Cow',
+      },
+    ],
   },
   twitter: {
     card: 'summary',

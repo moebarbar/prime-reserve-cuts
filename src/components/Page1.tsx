@@ -60,10 +60,10 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
       {/* STEAK STRIP */}
       <div className={styles.steakStrip}>
         {[
-          { src: 'https://images.unsplash.com/photo-1562802378-063ec186a863?w=800&q=80&fit=crop&crop=center', name: 'Tomahawk Ribeye', price: '$229/mo', priority: true },
-          { src: 'https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=500&q=80&fit=crop&crop=center', name: 'Ribeye', price: '$89/mo' },
-          { src: 'https://images.unsplash.com/photo-1432139509613-5c4255815697?w=500&q=80&fit=crop&crop=center', name: 'Filet Mignon', price: '$119/mo' },
-          { src: 'https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=500&q=80&fit=crop&crop=center', name: 'A5 Wagyu', price: '$189/mo' },
+          { src: 'https://images.pexels.com/photos/12261087/pexels-photo-12261087.jpeg?auto=compress&cs=tinysrgb&w=800', name: 'Tomahawk Ribeye', price: '$229/mo', priority: true },
+          { src: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=500&q=80&fit=crop&crop=center', name: 'Ribeye', price: '$89/mo' },
+          { src: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=500&q=80&fit=crop&crop=center', name: 'Filet Mignon', price: '$119/mo' },
+          { src: 'https://images.unsplash.com/photo-1558030006-450675393462?w=500&q=80&fit=crop&crop=center', name: 'A5 Wagyu', price: '$189/mo' },
         ].map((cut, i) => (
           <div key={i} className={styles.sc}>
             <img
