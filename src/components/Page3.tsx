@@ -26,6 +26,8 @@ export default function Page3({ building, cut, form, onBack }: Page3Props) {
 
   const handlePay = async () => {
     setProcessing(true)
+
+    // 1. Capture lead in DB (best-effort, don't block checkout)
     try {
       await fetch('/api/leads', {
         method: 'POST',
@@ -39,11 +41,29 @@ export default function Page3({ building, cut, form, onBack }: Page3Props) {
           cut: cut.name,
         }),
       })
-    } catch {
-      // Lead capture is best-effort; don't block the subscription flow
-    }
-    // ── PRODUCTION: replace with Stripe Payment Link or Stripe.js ──
-    // window.location.href = `https://buy.stripe.com/your_link?prefilled_email=${form.email}`
+    } catch { /* best-effort */ }
+
+    // 2. Create Stripe Checkout session and redirect
+    try {
+      const res  = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name:     `${form.firstName} ${form.lastName}`.trim(),
+          email:    form.email,
+          cut:      cut.name,
+          building: building.name,
+          unit:     form.unit,
+        }),
+      })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+        return
+      }
+      // Stripe not configured yet — fall through to demo success
+    } catch { /* Stripe not configured — show demo success */ }
+
     setPaid(true)
     setProcessing(false)
   }
