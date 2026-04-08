@@ -49,7 +49,7 @@
 
 /* STEAK STRIP */
 .steakStrip {
-  display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr;
+  display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr 1fr;
   height: 210px; background: var(--dark);
 }
 .sc { position: relative; overflow: hidden; background: #1c1208; }
@@ -149,17 +149,18 @@
 @media (max-width: 900px) {
   .heroContent { padding: 0 24px 36px; }
   .mission { display: none; }
-  .steakStrip { grid-template-columns: 1fr 1fr; height: 260px; }
-  .sc:first-child { grid-column: span 2; height: 200px; }
+  /* 2-col grid: Tomahawk spans both, then 4 cuts fill 2×2 = no gaps */
+  .steakStrip { grid-template-columns: 1fr 1fr; height: auto; }
+  .sc { height: 170px; }
+  .sc:first-child { grid-column: span 2; height: 210px; }
   .bldSection { padding: 44px 24px 60px; }
   .bldGrid { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 580px) {
   .bldGrid { grid-template-columns: 1fr; }
-  .steakStrip { height: auto; }
-  .sc { height: 160px; }
-  .sc:first-child { grid-column: span 2; height: 190px; }
+  .sc { height: 150px; }
+  .sc:first-child { grid-column: span 2; height: 180px; }
 }
 
 @media (max-width: 480px) {

@@ -1,7 +1,20 @@
 'use client'
 
-import { useState } from 'react'
-import { MOCK_LEADS, Lead, LeadStatus } from '@/data/adminData'
+import { useState, useEffect } from 'react'
+
+type LeadStatus = 'new' | 'contacted' | 'converted' | 'lost'
+
+interface Lead {
+  id: string
+  name: string
+  email: string
+  phone: string | null
+  building: string
+  unit: string
+  cut: string | null
+  status: LeadStatus
+  created_at: string
+}
 
 const STATUS_OPTS: LeadStatus[] = ['new', 'contacted', 'converted', 'lost']
 const BUILDINGS = ['All Buildings', 'Aspire Post Oak', 'The Driscoll', 'Market Square Tower', 'Parkside at Discovery Green', 'Elev8 Downtown', 'Hanover Autry Park']
@@ -10,12 +23,24 @@ function Badge({ status }: { status: LeadStatus }) {
   return <span className={`badge badge-${status}`}>{status}</span>
 }
 
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
 export default function LeadsPage() {
-  const [leads, setLeads]         = useState<Lead[]>(MOCK_LEADS)
+  const [leads, setLeads]         = useState<Lead[]>([])
+  const [loading, setLoading]     = useState(true)
   const [search, setSearch]       = useState('')
   const [statusF, setStatusF]     = useState('all')
   const [buildingF, setBuildingF] = useState('All Buildings')
   const [expanded, setExpanded]   = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('/api/leads')
+      .then(r => r.json())
+      .then(data => { setLeads(data); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, [])
 
   const filtered = leads.filter(l => {
     const q = search.toLowerCase()
@@ -25,11 +50,19 @@ export default function LeadsPage() {
     return matchQ && matchS && matchB
   })
 
-  const updateStatus = (id: string, status: LeadStatus) =>
+  const updateStatus = async (id: string, status: LeadStatus) => {
     setLeads(ls => ls.map(l => l.id === id ? { ...l, status } : l))
+    await fetch(`/api/leads/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    })
+  }
 
-  const deleteLead = (id: string) =>
+  const deleteLead = async (id: string) => {
     setLeads(ls => ls.filter(l => l.id !== id))
+    await fetch(`/api/leads/${id}`, { method: 'DELETE' })
+  }
 
   const counts = STATUS_OPTS.reduce((acc, s) => {
     acc[s] = leads.filter(l => l.status === s).length
@@ -77,7 +110,12 @@ export default function LeadsPage() {
 
       {/* TABLE */}
       <div className="table-wrap scrollable">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="empty-state">
+            <div className="empty-state-icon">⋯</div>
+            <strong>Loading leads…</strong>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="empty-state">
             <div className="empty-state-icon">◎</div>
             <strong>No leads found</strong>
@@ -105,7 +143,7 @@ export default function LeadsPage() {
                     style={{ cursor: 'pointer' }}
                     onClick={() => setExpanded(expanded === l.id ? null : l.id)}
                   >
-                    <td className="td-mono">{l.id}</td>
+                    <td className="td-mono">{l.id.slice(0, 8)}</td>
                     <td>
                       <div style={{ fontWeight: 400 }}>{l.name}</div>
                       <div className="td-dim">{l.email}</div>
@@ -114,9 +152,9 @@ export default function LeadsPage() {
                       <div>{l.building}</div>
                       <div className="td-dim">Unit {l.unit}</div>
                     </td>
-                    <td className="td-dim">{l.phone}</td>
+                    <td className="td-dim">{l.phone ?? '—'}</td>
                     <td className="td-dim">{l.cut ?? '—'}</td>
-                    <td className="td-dim">{l.date}</td>
+                    <td className="td-dim">{fmtDate(l.created_at)}</td>
                     <td onClick={e => e.stopPropagation()}>
                       <select
                         className={`badge badge-${l.status} inline-sel`}
@@ -149,11 +187,11 @@ export default function LeadsPage() {
                         <div className="detail-box">
                           <div className="detail-item"><label>Full Name</label><span>{l.name}</span></div>
                           <div className="detail-item"><label>Email</label><span>{l.email}</span></div>
-                          <div className="detail-item"><label>Phone</label><span>{l.phone}</span></div>
+                          <div className="detail-item"><label>Phone</label><span>{l.phone ?? '—'}</span></div>
                           <div className="detail-item"><label>Unit</label><span>{l.unit}</span></div>
                           <div className="detail-item"><label>Building</label><span>{l.building}</span></div>
                           <div className="detail-item"><label>Interested In</label><span>{l.cut ?? '—'}</span></div>
-                          <div className="detail-item"><label>Date Submitted</label><span>{l.date}</span></div>
+                          <div className="detail-item"><label>Date Submitted</label><span>{fmtDate(l.created_at)}</span></div>
                           <div className="detail-item"><label>Status</label><span><Badge status={l.status} /></span></div>
                         </div>
                         <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>

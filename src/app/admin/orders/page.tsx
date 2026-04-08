@@ -1,19 +1,43 @@
 'use client'
 
-import { useState } from 'react'
-import { MOCK_ORDERS, Order, OrderStatus } from '@/data/adminData'
+import { useState, useEffect } from 'react'
+
+type OrderStatus = 'active' | 'paused' | 'cancelled' | 'pending'
+
+interface Order {
+  id: string
+  customer: string
+  email: string
+  building: string
+  unit: string
+  cut: string
+  price: number
+  status: OrderStatus
+  start_date: string | null
+  next_delivery: string | null
+  created_at: string
+}
 
 const STATUS_OPTS: OrderStatus[] = ['active', 'pending', 'paused', 'cancelled']
 
-function Badge({ status }: { status: OrderStatus }) {
-  return <span className={`badge badge-${status}`}>{status}</span>
+function fmtDate(d: string | null) {
+  if (!d) return '—'
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 export default function OrdersPage() {
-  const [orders, setOrders]   = useState<Order[]>(MOCK_ORDERS)
-  const [search, setSearch]   = useState('')
-  const [statusF, setStatusF] = useState('all')
+  const [orders, setOrders]     = useState<Order[]>([])
+  const [loading, setLoading]   = useState(true)
+  const [search, setSearch]     = useState('')
+  const [statusF, setStatusF]   = useState('all')
   const [expanded, setExpanded] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('/api/orders')
+      .then(r => r.json())
+      .then(data => { setOrders(data); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, [])
 
   const filtered = orders.filter(o => {
     const q = search.toLowerCase()
@@ -22,8 +46,14 @@ export default function OrdersPage() {
     return matchQ && matchS
   })
 
-  const updateStatus = (id: string, status: OrderStatus) =>
+  const updateStatus = async (id: string, status: OrderStatus) => {
     setOrders(os => os.map(o => o.id === id ? { ...o, status } : o))
+    await fetch(`/api/orders/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    })
+  }
 
   const activeOrders = orders.filter(o => o.status === 'active')
   const mrr = activeOrders.reduce((s, o) => s + o.price, 0)
@@ -69,7 +99,12 @@ export default function OrdersPage() {
 
       {/* TABLE */}
       <div className="table-wrap scrollable">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="empty-state">
+            <div className="empty-state-icon">⋯</div>
+            <strong>Loading orders…</strong>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="empty-state">
             <div className="empty-state-icon">▤</div>
             <strong>No orders found</strong>
@@ -98,7 +133,7 @@ export default function OrdersPage() {
                     style={{ cursor: 'pointer' }}
                     onClick={() => setExpanded(expanded === o.id ? null : o.id)}
                   >
-                    <td className="td-mono">{o.id}</td>
+                    <td className="td-mono">{o.id.slice(0, 8)}</td>
                     <td>
                       <div style={{ fontWeight: 400 }}>{o.customer}</div>
                       <div className="td-dim">{o.email}</div>
@@ -109,8 +144,8 @@ export default function OrdersPage() {
                     </td>
                     <td>{o.cut}</td>
                     <td style={{ fontFamily: 'Cormorant, serif', fontSize: 17, color: 'var(--gold2)' }}>${o.price}</td>
-                    <td className="td-dim">{o.startDate}</td>
-                    <td className="td-dim">{o.nextDelivery}</td>
+                    <td className="td-dim">{fmtDate(o.start_date)}</td>
+                    <td className="td-dim">{fmtDate(o.next_delivery)}</td>
                     <td onClick={e => e.stopPropagation()}>
                       <select
                         className={`badge badge-${o.status} inline-sel`}
@@ -140,8 +175,8 @@ export default function OrdersPage() {
                           <div className="detail-item"><label>Unit</label><span>{o.unit}</span></div>
                           <div className="detail-item"><label>Cut</label><span>{o.cut}</span></div>
                           <div className="detail-item"><label>Monthly Price</label><span>${o.price}</span></div>
-                          <div className="detail-item"><label>Start Date</label><span>{o.startDate}</span></div>
-                          <div className="detail-item"><label>Next Delivery</label><span>{o.nextDelivery}</span></div>
+                          <div className="detail-item"><label>Start Date</label><span>{fmtDate(o.start_date)}</span></div>
+                          <div className="detail-item"><label>Next Delivery</label><span>{fmtDate(o.next_delivery)}</span></div>
                         </div>
                         <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
                           {o.status !== 'active' && (

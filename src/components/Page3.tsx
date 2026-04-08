@@ -24,14 +24,28 @@ export default function Page3({ building, cut, form, onBack }: Page3Props) {
   const [paid, setPaid] = useState(false)
   const [processing, setProcessing] = useState(false)
 
-  const handlePay = () => {
+  const handlePay = async () => {
     setProcessing(true)
-    setTimeout(() => {
-      setProcessing(false)
-      setPaid(true)
-      // ── PRODUCTION: replace with Stripe Payment Link or Stripe.js ──
-      // window.location.href = `https://buy.stripe.com/your_link?prefilled_email=${form.email}`
-    }, 1800)
+    try {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `${form.firstName} ${form.lastName}`.trim(),
+          email: form.email,
+          phone: form.phone || null,
+          building: building.name,
+          unit: form.unit,
+          cut: cut.name,
+        }),
+      })
+    } catch {
+      // Lead capture is best-effort; don't block the subscription flow
+    }
+    // ── PRODUCTION: replace with Stripe Payment Link or Stripe.js ──
+    // window.location.href = `https://buy.stripe.com/your_link?prefilled_email=${form.email}`
+    setPaid(true)
+    setProcessing(false)
   }
 
   return (

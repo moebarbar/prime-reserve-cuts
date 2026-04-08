@@ -60,9 +60,10 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
       {/* STEAK STRIP */}
       <div className={styles.steakStrip}>
         {[
-          { src: 'https://images.pexels.com/photos/12261087/pexels-photo-12261087.jpeg?auto=compress&cs=tinysrgb&w=800', name: 'Tomahawk Ribeye', price: '$229/mo', priority: true },
+          { src: 'https://images.pexels.com/photos/12261087/pexels-photo-12261087.jpeg?auto=compress&cs=tinysrgb&w=800', name: 'Tomahawk Ribeye', price: '$229/mo' },
           { src: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=500&q=80&fit=crop&crop=center', name: 'Ribeye', price: '$89/mo' },
           { src: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=500&q=80&fit=crop&crop=center', name: 'Filet Mignon', price: '$119/mo' },
+          { src: 'https://images.pexels.com/photos/3535383/pexels-photo-3535383.jpeg?auto=compress&cs=tinysrgb&w=500', name: 'NY Strip', price: '$99/mo' },
           { src: 'https://images.unsplash.com/photo-1558030006-450675393462?w=500&q=80&fit=crop&crop=center', name: 'A5 Wagyu', price: '$189/mo' },
         ].map((cut, i) => (
           <div key={i} className={styles.sc}>

@@ -1,21 +1,43 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { MOCK_LEADS, MOCK_ORDERS } from '@/data/adminData'
 
-const activeOrders    = MOCK_ORDERS.filter(o => o.status === 'active')
-const mrr             = activeOrders.reduce((s, o) => s + o.price, 0)
-const newLeads        = MOCK_LEADS.filter(l => l.status === 'new').length
-const pendingOrders   = MOCK_ORDERS.filter(o => o.status === 'pending').length
-const recentLeads     = [...MOCK_LEADS].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5)
-const recentOrders    = MOCK_ORDERS.slice(0, 6)
+interface Lead {
+  id: string; name: string; email: string; building: string
+  unit: string; cut: string | null; status: string; created_at: string
+}
+
+interface Order {
+  id: string; customer: string; email: string; building: string
+  unit: string; cut: string; price: number; status: string
+  next_delivery: string | null
+}
 
 function Badge({ status }: { status: string }) {
   return <span className={`badge badge-${status}`}>{status}</span>
 }
 
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
 export default function AdminDashboard() {
   const router = useRouter()
+  const [leads, setLeads]   = useState<Lead[]>([])
+  const [orders, setOrders] = useState<Order[]>([])
+
+  useEffect(() => {
+    fetch('/api/leads').then(r => r.json()).then(setLeads).catch(() => {})
+    fetch('/api/orders').then(r => r.json()).then(setOrders).catch(() => {})
+  }, [])
+
+  const activeOrders  = orders.filter(o => o.status === 'active')
+  const mrr           = activeOrders.reduce((s, o) => s + o.price, 0)
+  const newLeads      = leads.filter(l => l.status === 'new').length
+  const pendingOrders = orders.filter(o => o.status === 'pending').length
+  const recentLeads   = [...leads].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 5)
+  const recentOrders  = orders.slice(0, 6)
 
   return (
     <>
@@ -29,12 +51,12 @@ export default function AdminDashboard() {
         <div className="stat-card">
           <div className="stat-eyebrow">Active Subscribers</div>
           <div className="stat-value">{activeOrders.length}</div>
-          <div className="stat-sub">{MOCK_ORDERS.filter(o => o.status === 'paused').length} paused</div>
+          <div className="stat-sub">{orders.filter(o => o.status === 'paused').length} paused</div>
         </div>
         <div className="stat-card">
           <div className="stat-eyebrow">New Leads</div>
           <div className="stat-value">{newLeads}</div>
-          <div className="stat-sub">{MOCK_LEADS.length} total leads</div>
+          <div className="stat-sub">{leads.length} total leads</div>
         </div>
         <div className="stat-card">
           <div className="stat-eyebrow">Pending Orders</div>
@@ -60,7 +82,9 @@ export default function AdminDashboard() {
             </tr>
           </thead>
           <tbody>
-            {recentLeads.map(l => (
+            {recentLeads.length === 0 ? (
+              <tr><td colSpan={5} className="td-dim" style={{ textAlign: 'center', padding: 20 }}>No leads yet</td></tr>
+            ) : recentLeads.map(l => (
               <tr key={l.id} style={{ cursor: 'pointer' }} onClick={() => router.push('/admin/leads')}>
                 <td>
                   <div style={{ fontWeight: 400 }}>{l.name}</div>
@@ -71,7 +95,7 @@ export default function AdminDashboard() {
                   <div className="td-dim">Unit {l.unit}</div>
                 </td>
                 <td className="td-dim">{l.cut ?? '—'}</td>
-                <td className="td-dim">{l.date}</td>
+                <td className="td-dim">{fmtDate(l.created_at)}</td>
                 <td><Badge status={l.status} /></td>
               </tr>
             ))}
@@ -98,9 +122,11 @@ export default function AdminDashboard() {
             </tr>
           </thead>
           <tbody>
-            {recentOrders.map(o => (
+            {recentOrders.length === 0 ? (
+              <tr><td colSpan={7} className="td-dim" style={{ textAlign: 'center', padding: 20 }}>No orders yet</td></tr>
+            ) : recentOrders.map(o => (
               <tr key={o.id} style={{ cursor: 'pointer' }} onClick={() => router.push('/admin/orders')}>
-                <td className="td-mono">{o.id}</td>
+                <td className="td-mono">{o.id.slice(0, 8)}</td>
                 <td>
                   <div style={{ fontWeight: 400 }}>{o.customer}</div>
                   <div className="td-dim">{o.email}</div>
@@ -111,7 +137,7 @@ export default function AdminDashboard() {
                 </td>
                 <td>{o.cut}</td>
                 <td style={{ color: 'var(--gold2)', fontFamily: 'Cormorant, serif', fontSize: 16 }}>${o.price}</td>
-                <td className="td-dim">{o.nextDelivery}</td>
+                <td className="td-dim">{o.next_delivery ? fmtDate(o.next_delivery) : '—'}</td>
                 <td><Badge status={o.status} /></td>
               </tr>
             ))}
@@ -124,7 +150,7 @@ export default function AdminDashboard() {
         <h2 className="sec-title">Revenue by <em>Cut</em></h2>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
-        {(['Ribeye','Filet Mignon','A5 Wagyu','Tomahawk'] as const).map(cut => {
+        {(['Ribeye', 'Filet Mignon', 'A5 Wagyu', 'Tomahawk'] as const).map(cut => {
           const cutOrders = activeOrders.filter(o => o.cut === cut)
           const rev = cutOrders.reduce((s, o) => s + o.price, 0)
           return (

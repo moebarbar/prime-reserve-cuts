@@ -1,35 +1,66 @@
 'use client'
 
-import { useState } from 'react'
-import { MOCK_ORDERS, Order, OrderStatus } from '@/data/adminData'
+import { useState, useEffect } from 'react'
+
+type OrderStatus = 'active' | 'paused' | 'cancelled' | 'pending'
+
+interface Order {
+  id: string
+  customer: string
+  email: string
+  building: string
+  unit: string
+  cut: string
+  price: number
+  status: OrderStatus
+  start_date: string | null
+  next_delivery: string | null
+  created_at: string
+}
 
 const CUT_PRICES: Record<string, number> = { Ribeye: 89, 'Filet Mignon': 119, 'A5 Wagyu': 189, Tomahawk: 229 }
 
+function fmtDate(d: string | null) {
+  if (!d) return '—'
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
 export default function SubscribersPage() {
-  const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS)
-  const [tab, setTab]       = useState<'active' | 'paused' | 'all'>('active')
-  const [search, setSearch] = useState('')
+  const [orders, setOrders]     = useState<Order[]>([])
+  const [loading, setLoading]   = useState(true)
+  const [tab, setTab]           = useState<'active' | 'paused' | 'all'>('active')
+  const [search, setSearch]     = useState('')
   const [expanded, setExpanded] = useState<string | null>(null)
 
-  const activeOrders  = orders.filter(o => o.status === 'active')
-  const pausedOrders  = orders.filter(o => o.status === 'paused')
-  const cancelledOrders = orders.filter(o => o.status === 'cancelled')
-  const mrr           = activeOrders.reduce((s, o) => s + o.price, 0)
-  const arr           = mrr * 12
+  useEffect(() => {
+    fetch('/api/orders')
+      .then(r => r.json())
+      .then(data => { setOrders(data); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, [])
 
-  const churnRate = orders.length > 0
-    ? Math.round((cancelledOrders.length / orders.length) * 100)
-    : 0
+  const activeOrders    = orders.filter(o => o.status === 'active')
+  const pausedOrders    = orders.filter(o => o.status === 'paused')
+  const cancelledOrders = orders.filter(o => o.status === 'cancelled')
+  const mrr             = activeOrders.reduce((s, o) => s + o.price, 0)
+  const arr             = mrr * 12
+  const churnRate       = orders.length > 0 ? Math.round((cancelledOrders.length / orders.length) * 100) : 0
 
   const displayed = orders.filter(o => {
-    if (tab === 'active' && o.status !== 'active')  return false
-    if (tab === 'paused' && o.status !== 'paused')  return false
+    if (tab === 'active' && o.status !== 'active') return false
+    if (tab === 'paused' && o.status !== 'paused') return false
     const q = search.toLowerCase()
     return !q || o.customer.toLowerCase().includes(q) || o.building.toLowerCase().includes(q) || o.email.toLowerCase().includes(q)
   })
 
-  const updateStatus = (id: string, status: OrderStatus) =>
+  const updateStatus = async (id: string, status: OrderStatus) => {
     setOrders(os => os.map(o => o.id === id ? { ...o, status } : o))
+    await fetch(`/api/orders/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    })
+  }
 
   // revenue by cut
   const cutBreakdown = Object.entries(CUT_PRICES).map(([cut, price]) => {
@@ -70,17 +101,10 @@ export default function SubscribersPage() {
 
       {/* BREAKDOWN CARDS */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 28 }}>
-        {/* By Cut */}
         <div className="table-wrap" style={{ marginBottom: 0 }}>
           <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', fontSize: 11, fontWeight: 600, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--muted)' }}>Revenue by Cut</div>
           <table className="adm" style={{ minWidth: 0 }}>
-            <thead>
-              <tr>
-                <th>Cut</th>
-                <th>Subscribers</th>
-                <th>Revenue / mo</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Cut</th><th>Subscribers</th><th>Revenue / mo</th></tr></thead>
             <tbody>
               {cutBreakdown.map(({ cut, count, rev }) => (
                 <tr key={cut}>
@@ -93,16 +117,10 @@ export default function SubscribersPage() {
           </table>
         </div>
 
-        {/* By Building */}
         <div className="table-wrap" style={{ marginBottom: 0 }}>
           <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', fontSize: 11, fontWeight: 600, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--muted)' }}>Revenue by Building</div>
           <table className="adm" style={{ minWidth: 0 }}>
-            <thead>
-              <tr>
-                <th>Building</th>
-                <th>Revenue / mo</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Building</th><th>Revenue / mo</th></tr></thead>
             <tbody>
               {buildingBreakdown.length === 0 ? (
                 <tr><td colSpan={2} className="td-dim" style={{ textAlign: 'center', padding: 20 }}>No data</td></tr>
@@ -122,7 +140,6 @@ export default function SubscribersPage() {
         <h2 className="sec-title">Subscriber <em>List</em></h2>
       </div>
 
-      {/* TABS + SEARCH */}
       <div className="filter-bar">
         <div style={{ display: 'flex', gap: 0, border: '1px solid var(--border)' }}>
           {(['active', 'paused', 'all'] as const).map(t => (
@@ -152,7 +169,12 @@ export default function SubscribersPage() {
       </div>
 
       <div className="table-wrap scrollable">
-        {displayed.length === 0 ? (
+        {loading ? (
+          <div className="empty-state">
+            <div className="empty-state-icon">⋯</div>
+            <strong>Loading subscribers…</strong>
+          </div>
+        ) : displayed.length === 0 ? (
           <div className="empty-state">
             <div className="empty-state-icon">◉</div>
             <strong>No subscribers</strong>
@@ -177,7 +199,7 @@ export default function SubscribersPage() {
               {displayed.map(o => (
                 <>
                   <tr key={o.id} style={{ cursor: 'pointer' }} onClick={() => setExpanded(expanded === o.id ? null : o.id)}>
-                    <td className="td-mono">{o.id}</td>
+                    <td className="td-mono">{o.id.slice(0, 8)}</td>
                     <td>
                       <div style={{ fontWeight: 400 }}>{o.customer}</div>
                       <div className="td-dim">{o.email}</div>
@@ -188,8 +210,8 @@ export default function SubscribersPage() {
                     </td>
                     <td>{o.cut}</td>
                     <td style={{ fontFamily: 'Cormorant, serif', fontSize: 17, color: 'var(--gold2)' }}>${o.price}</td>
-                    <td className="td-dim">{o.startDate}</td>
-                    <td className="td-dim">{o.nextDelivery}</td>
+                    <td className="td-dim">{fmtDate(o.start_date)}</td>
+                    <td className="td-dim">{fmtDate(o.next_delivery)}</td>
                     <td><span className={`badge badge-${o.status}`}>{o.status}</span></td>
                     <td onClick={e => e.stopPropagation()}>
                       <div className="act-row">
@@ -214,10 +236,12 @@ export default function SubscribersPage() {
                           <div className="detail-item"><label>Unit</label><span>{o.unit}</span></div>
                           <div className="detail-item"><label>Cut</label><span>{o.cut}</span></div>
                           <div className="detail-item"><label>Price</label><span>${o.price}/mo</span></div>
-                          <div className="detail-item"><label>Member Since</label><span>{o.startDate}</span></div>
-                          <div className="detail-item"><label>Next Delivery</label><span>{o.nextDelivery}</span></div>
+                          <div className="detail-item"><label>Member Since</label><span>{fmtDate(o.start_date)}</span></div>
+                          <div className="detail-item"><label>Next Delivery</label><span>{fmtDate(o.next_delivery)}</span></div>
                           <div className="detail-item"><label>Lifetime Value</label><span style={{ color: 'var(--gold)' }}>
-                            {o.startDate !== '—' ? `$${Math.round(o.price * ((new Date('2026-04-07').getTime() - new Date(o.startDate).getTime()) / (1000 * 60 * 60 * 24 * 30)))}` : '—'}
+                            {o.start_date
+                              ? `$${Math.round(o.price * ((Date.now() - new Date(o.start_date).getTime()) / (1000 * 60 * 60 * 24 * 30)))}`
+                              : '—'}
                           </span></div>
                         </div>
                         <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
