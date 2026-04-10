@@ -14,10 +14,9 @@ export default function Footer() {
             { icon: '🌡️', label: 'Cold Chain', sub: 'Maintained' },
             { icon: '🧪', label: 'Food Safety', sub: 'HACCP Compliant' },
             { icon: '🚫', label: 'No Hormones', sub: 'Added' },
-            { icon: '🌿', label: 'Sustainably', sub: 'Sourced' },
           ].map(b => (
             <div key={b.label} className={styles.badge}>
-              <span className={styles.badgeIcon}>{b.icon}</span>
+              <div className={styles.badgeIcon}>{b.icon}</div>
               <div className={styles.badgeText}>
                 <span className={styles.badgeLabel}>{b.label}</span>
                 <span className={styles.badgeSub}>{b.sub}</span>
@@ -32,23 +31,26 @@ export default function Footer() {
         <div className={styles.bottom}>
           <div className={styles.brand}>
             <img
-              src="/logo.png"
-              alt="Prime Reserve"
+              src="/logo.png?v=3"
+              alt="Automatic Cow"
               height={24}
-              style={{ height: 24, width: 'auto', filter: 'brightness(0) invert(1)', opacity: 0.5 }}
+              style={{ height: 24, width: 'auto', opacity: 0.5 }}
             />
-            <span className={styles.brandName}>Prime Reserve</span>
+            <div className={styles.brandText}>
+              <span className={styles.brandName}>Automatic Cow</span>
+              <span className={styles.brandSlogan}>Good Food From Now On</span>
+            </div>
           </div>
 
           <nav className={styles.links}>
             <Link href="/our-story">Our Story</Link>
             <Link href="/terms">Terms of Service</Link>
             <Link href="/privacy">Privacy Policy</Link>
-            <a href="mailto:hello@primereserve.co">Contact</a>
+            <a href="mailto:beef@automaticcow.com">Contact</a>
           </nav>
 
           <div className={styles.copy}>
-            © {new Date().getFullYear()} Prime Reserve · Houston, TX
+            © {new Date().getFullYear()} Automatic Cow · Houston, TX
           </div>
         </div>
 

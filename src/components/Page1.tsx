@@ -42,14 +42,20 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
         </video>
         <div className={styles.heroOverlay} />
         <div className={styles.heroContent}>
-          <div className={styles.eyebrow}>
-            <span className={styles.eyeDash} />
-            Houston · Members Only
+          <div>
+            <div className={styles.eyebrow}>
+              <span className={styles.eyeDash} />
+              Houston · Members Only
+            </div>
+    <h1 className={styles.h1}>
+              Finest Cuts.<br />To Your Door.<br /><em>Every Saturday.</em>
+            </h1>
           </div>
-          <p className={styles.heroEyebrowAlt}>Good Food From Now On</p>
-          <h1 className={styles.h1}>
-            Finest Cuts.<br />To Your Door.<br /><em>Every Saturday.</em>
-          </h1>
+          <p className={styles.mission}>
+            <strong>The best steak in Houston shouldn&apos;t require a reservation.</strong>{' '}
+            Automatic Cow delivers USDA Prime cuts directly to luxury residents —
+            every week, to your unit, zero effort.
+          </p>
         </div>
       </div>
 
@@ -83,22 +89,27 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
         ))}
       </div>
 
-      {/* VALUE BAR */}
-      <div className={styles.vbar}>
-        {[
-          { icon: '🚪', title: 'To your unit', sub: 'Via your concierge' },
-          { icon: '🥩', title: 'USDA Prime & A5 Wagyu', sub: 'No lower grades, ever' },
-          { icon: '❄️', title: 'Vacuum sealed + dry ice', sub: 'Restaurant packaging' },
-          { icon: '🔒', title: 'Cancel any time', sub: 'No commitment' },
-        ].map((v, i) => (
-          <div key={i} className={styles.vp}>
-            <span className={styles.vpIcon}>{v.icon}</span>
-            <div>
-              <strong>{v.title}</strong>
-              {v.sub}
+
+      {/* HOW IT WORKS */}
+      <div className={styles.howSection}>
+        <h2 className={styles.howHeading}>
+          Three Easy Steps.
+        </h2>
+        <div className={styles.howSteps}>
+          {[
+            { num: '01', title: 'Pick Your Place', desc: 'Scan the QR code in your building lobby. Your property is already set up — no searching, no setup.' },
+            { num: '02', title: 'Choose Your Cut', desc: 'NY Strip. Tenderloin. Ribeye. Three cuts, sourced from the best ranches. Pick the one that\'s yours.' },
+            { num: '03', title: 'Every Saturday, Done.', desc: 'Your order arrives vacuum-sealed, chilled, and ready. Every Saturday. No reminders. No reordering. It just happens.' },
+          ].map(s => (
+            <div key={s.num} className={styles.howCard}>
+              <div className={styles.howNum}>{s.num}</div>
+              <div className={styles.howCardBody}>
+                <div className={styles.howTitle}>{s.title}</div>
+                <div className={styles.howDesc}>{s.desc}</div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* BUILDING SELECTOR */}
@@ -140,18 +151,87 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
           ))}
         </div>
 
-        <div className={styles.bldAction}>
-          <div className={styles.bldStatus}>
-            {selectedKey && <div className={styles.sdot} />}
-            <span>
-              {selectedKey
-                ? `${BUILDINGS.find(b => b.key === selectedKey)?.name} selected`
-                : 'Select your building above'}
-            </span>
+      </div>
+
+      {/* SOURCING SECTION */}
+      <div className={styles.sourceSection}>
+        <div className={styles.sourceInner}>
+          <div className={styles.sourceHeader}>
+            <div className={styles.eyebrow}>
+              <span className={styles.eyeDash} />
+              Where It Comes From
+            </div>
+            <h2 className={styles.sourceTitle}>
+              Not every ranch<br />makes the <em>cut.</em>
+            </h2>
+            <p className={styles.sourceLead}>
+              We source exclusively from USDA-inspected facilities across the American Midwest and High Plains —
+              where cattle are raised on open pasture, grain-finished for peak marbling, and processed under the
+              strictest cold-chain standards. No middlemen. No compromises.
+            </p>
           </div>
-          <button className={styles.btnNext} onClick={handleContinue}>
-            Continue <span className={styles.arr}>→</span>
-          </button>
+
+          <div className={styles.sourceImgWrap}>
+            <img src="/source-ranch.jpg" alt="Open pasture cattle" className={styles.sourceImg} />
+            <div className={styles.sourceImgOverlay} />
+            <div className={styles.sourceImgCaption}>Open pasture · Texas High Plains</div>
+          </div>
+
+          <div className={styles.sourceGrid}>
+            {[
+              {
+                icon: (
+                  <svg className={styles.sourceIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                    <circle cx="12" cy="9" r="2.5"/>
+                  </svg>
+                ),
+                region: 'High Plains, Texas',
+                title: 'Grain-Finished Cattle',
+                body: 'Our NY Strip and Ribeye come from grain-finished Black Angus herds raised on the Texas High Plains — known for producing the most consistent marbling in the country.',
+              },
+              {
+                icon: (
+                  <svg className={styles.sourceIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="22" x2="12" y2="10"/>
+                    <path d="M12 10 C12 10 8 8 8 4.5 a4 4 0 0 1 4-4"/>
+                    <path d="M12 10 C12 10 16 8 16 4.5 a4 4 0 0 0-4-4"/>
+                    <path d="M12 15 C12 15 9 13.5 9 11"/>
+                    <path d="M12 15 C12 15 15 13.5 15 11"/>
+                    <path d="M12 20 C12 20 10 18.5 10 16.5"/>
+                    <path d="M12 20 C12 20 14 18.5 14 16.5"/>
+                  </svg>
+                ),
+                region: 'Midwest Cornbelt',
+                title: 'Corn-Fed Tenderloin',
+                body: 'Our Tenderloin is sourced from Midwest corn-fed programs with an average of 150+ days on feed — resulting in the buttery, clean finish that defines a true filet.',
+              },
+              {
+                icon: (
+                  <svg className={styles.sourceIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                  </svg>
+                ),
+                region: 'USDA-Certified Facilities',
+                title: 'Inspected. Every Time.',
+                body: 'Every cut passes through USDA-certified processing facilities with full cold-chain traceability from ranch to your building\'s concierge.',
+              },
+            ].map((s, i) => (
+              <div key={i} className={styles.sourceCard}>
+                {s.icon}
+                <div className={styles.sourceRegion}>{s.region}</div>
+                <div className={styles.sourceCardTitle}>{s.title}</div>
+                <p className={styles.sourceCardBody}>{s.body}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className={styles.sourceSeal}>
+            <div className={styles.sealLine} />
+            <span className={styles.sealText}>USDA Prime · Cold Chain Verified · Direct to Your Unit</span>
+            <div className={styles.sealLine} />
+          </div>
         </div>
       </div>
 
