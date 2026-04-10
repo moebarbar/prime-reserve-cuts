@@ -53,17 +53,8 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
         </div>
       </div>
 
-      {/* HERO IMAGE + CTA — sits below the hero, no clipping */}
+      {/* OUR STORY CTA */}
       <div className={styles.heroBelow}>
-        <div className={styles.heroImgWrap}>
-          <img
-            src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&q=80&fit=crop&crop=center"
-            alt="Premium steak plate"
-            className={styles.heroImg}
-            loading="eager"
-          />
-          <div className={styles.heroImgFade} />
-        </div>
         <Link href="/our-story" className={styles.btnStory}>
           Our Story <span>→</span>
         </Link>

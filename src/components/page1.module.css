@@ -190,10 +190,10 @@
   font-style: italic; margin: 0 0 10px;
 }
 
-/* Below-hero section: image + CTA, outside clipped hero */
+/* Below-hero section: CTA button */
 .heroBelow {
   background: var(--dark);
-  padding: 0 52px 0;
+  padding: 28px 52px 0;
   display: flex; flex-direction: column; align-items: flex-start;
 }
 .heroImgWrap {
@@ -223,11 +223,9 @@
 .btnStory:hover { border-color: var(--gold); color: #d4a855; }
 
 @media (max-width: 900px) {
-  .heroBelow { padding: 0 24px; }
-  .heroImg { max-height: 320px; }
+  .heroBelow { padding: 20px 24px 0; }
 }
 @media (max-width: 480px) {
-  .heroBelow { padding: 0 16px; }
-  .heroImg { max-height: 220px; }
-  .btnStory { width: 100%; justify-content: center; padding: 14px 24px; margin-bottom: 0; }
+  .heroBelow { padding: 16px 16px 0; }
+  .btnStory { width: 100%; justify-content: center; padding: 14px 24px; }
 }
