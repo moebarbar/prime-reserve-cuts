@@ -1,8 +1,9 @@
+import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import styles from '../legal.module.css'
 
-export const metadata = { title: 'Privacy Policy · Prime Reserve' }
+export const metadata = { title: 'Privacy Policy · Automatic Cow' }
 
 export default function PrivacyPage() {
   return (
@@ -10,6 +11,7 @@ export default function PrivacyPage() {
       <Nav step={1} hideSteps />
       <main className={styles.page}>
         <div className={styles.inner}>
+          <Link href="/" className={styles.backBtn}>← Back to Home</Link>
           <h1 className={styles.title}>Privacy <em>Policy</em></h1>
           <p className={styles.updated}>Last updated: April 2026</p>
 
@@ -45,7 +47,7 @@ export default function PrivacyPage() {
 
           <section className={styles.section}>
             <h2>7. Contact</h2>
-            <p>For privacy-related questions, contact us at <a href="mailto:hello@primereserve.co">hello@primereserve.co</a></p>
+            <p>For privacy-related questions, contact us at <a href="mailto:beef@automaticcow.com">beef@automaticcow.com</a></p>
           </section>
         </div>
       </main>

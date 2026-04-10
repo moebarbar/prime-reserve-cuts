@@ -15,6 +15,7 @@ export default function OurStoryPage() {
       {/* SECTION 1 — Opening */}
       <section className={styles.opening}>
         <div className={styles.openingInner}>
+          <Link href="/" className={styles.backBtn}>← Back to Home</Link>
           <h1 className={styles.openingHeadline}>
             We didn&apos;t start<br />with a restaurant.<br />
             <em>We started with<br />a Saturday.</em>
@@ -22,9 +23,16 @@ export default function OurStoryPage() {
           <p className={styles.openingBody}>
             Someone asked us once why the best steak in Houston always required a reservation,
             a drive, a table, and a bill that made you think twice. We didn&apos;t have a good answer.
-            So instead of answering, we built something. Prime Reserve is the result of a simple
-            belief: the finest cut of meat you&apos;ve ever had should arrive at your door —
-            not the other way around.
+            So instead of answering, we built something.
+          </p>
+          <p className={styles.openingBody} style={{ marginTop: '24px' }}>
+            The name says it all: <strong style={{ color: 'var(--cream)', fontWeight: 400 }}>Automatic.</strong> You
+            set it up once — your building, your cut, your unit — and it just runs. Every Saturday, without a
+            reminder, without a reorder, without a second thought. The cow does its job. You do yours.
+          </p>
+          <p className={styles.openingBody} style={{ marginTop: '24px' }}>
+            Automatic Cow is the result of a simple belief: the finest cut of meat you&apos;ve ever had
+            should arrive at your door — not the other way around.
           </p>
         </div>
       </section>
@@ -76,6 +84,7 @@ export default function OurStoryPage() {
           <Link href="/" className={styles.btnCta}>
             Choose Your Building →
           </Link>
+          <Link href="/" className={styles.backBtn}>← Back to Home</Link>
         </div>
       </section>
       <Footer />

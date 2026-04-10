@@ -10,11 +10,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: '🐄 Automatic Cow · Houston',
-  description: 'A private USDA Prime & A5 Wagyu steak membership exclusively for Houston luxury residents. Monthly delivery straight to your unit.',
-  keywords: ['steak delivery Houston', 'USDA Prime', 'A5 Wagyu', 'luxury steak', 'Houston members'],
+  description: 'A private USDA Prime steak membership exclusively for Houston luxury residents. Weekly delivery straight to your unit.',
+  keywords: ['steak delivery Houston', 'USDA Prime', 'luxury steak', 'Houston members', 'weekly steak delivery'],
   openGraph: {
     title: '🐄 Automatic Cow · Houston',
-    description: 'USDA Prime & A5 Wagyu delivered monthly to your luxury residence.',
+    description: 'USDA Prime steaks delivered weekly to your luxury residence.',
     type: 'website',
     locale: 'en_US',
     images: [
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: '🐄 Automatic Cow · Houston',
-    description: 'USDA Prime & A5 Wagyu delivered monthly to your luxury residence.',
+    description: 'USDA Prime steaks delivered weekly to your luxury residence.',
     images: ['https://images.pexels.com/photos/12261087/pexels-photo-12261087.jpeg?auto=compress&cs=tinysrgb&w=1200&h=630&dpr=1'],
   },
   robots: { index: false, follow: false },

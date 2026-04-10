@@ -100,6 +100,17 @@
   line-height: 1.8;
 }
 
+/* ── BACK BUTTON ─────────────────────────────────────────────────────────── */
+.backBtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Jost', sans-serif;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--muted); text-decoration: none;
+  margin-bottom: 40px;
+  transition: color .2s;
+}
+.backBtn:hover { color: var(--gold); }
+
 /* ── SECTION 3: Closing ──────────────────────────────────────────────────── */
 .closing {
   background: var(--dark);

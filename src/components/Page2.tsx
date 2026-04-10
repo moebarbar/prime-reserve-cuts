@@ -13,19 +13,41 @@ interface FormData {
   phone: string
 }
 
+export interface CutSelection {
+  cut: Cut
+  qty: number
+}
+
 interface Page2Props {
   buildingKey: string
   onBack: () => void
-  onContinue: (form: FormData, cut: Cut) => void
+  onContinue: (form: FormData, selections: CutSelection[]) => void
 }
 
 export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
   const building = BUILDINGS.find(b => b.key === buildingKey)
-  const [selectedCut, setSelectedCut] = useState<Cut | null>(null)
+  const [selections, setSelections] = useState<CutSelection[]>([])
   const [form, setForm] = useState<FormData>({ unit: '', firstName: '', lastName: '', email: '', phone: '' })
 
+  const getSelection = (cut: Cut) => selections.find(s => s.cut.name === cut.name)
+
+  const toggleCut = (cut: Cut) => {
+    setSelections(prev => {
+      const exists = prev.find(s => s.cut.name === cut.name)
+      if (exists) return prev.filter(s => s.cut.name !== cut.name)
+      return [...prev, { cut, qty: 1 }]
+    })
+  }
+
+  const setQty = (cut: Cut, qty: number) => {
+    if (qty < 1) return
+    setSelections(prev => prev.map(s => s.cut.name === cut.name ? { ...s, qty } : s))
+  }
+
+  const weeklyTotal = selections.reduce((sum, s) => sum + s.cut.pricePerWeek * s.qty, 0)
+
   const handleContinue = () => {
-    if (!selectedCut) {
+    if (selections.length === 0) {
       const el = document.getElementById('cut-list')
       if (el) {
         el.style.outline = '1.5px solid var(--gold)'
@@ -34,7 +56,7 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
       }
       return
     }
-    onContinue(form, selectedCut)
+    onContinue(form, selections)
   }
 
   return (
@@ -103,39 +125,57 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
           <h2 className={styles.cutsTitle}>Choose your<br /><em>cut.</em></h2>
 
           <div id="cut-list" className={styles.cutList}>
-            {CUTS.map((cut, i) => (
-              <div
-                key={i}
-                className={`${styles.cc} ${selectedCut?.name === cut.name ? styles.ccSel : ''}`}
-                onClick={() => setSelectedCut(cut)}
-              >
-                <div className={styles.ccThumb}>
-                  <img src={cut.img} alt={cut.name} loading="lazy"
-                    onError={e => { (e.target as HTMLImageElement).style.opacity = '0' }} />
-                </div>
-                <div className={styles.ccBody}>
-                  <div className={styles.ccGrade}>{cut.grade}</div>
-                  <div className={styles.ccName}>{cut.name}</div>
-                  <div className={styles.ccDetail}>{cut.detail}</div>
-                </div>
-                <div className={styles.ccRight}>
-                  <div>
-                    <span className={styles.ccPrice}>${cut.pricePerWeek}</span>
-                    <div className={styles.ccMo}>/week</div>
-                    <div className={styles.ccQty}>{cut.qtyPerWeek}</div>
+            {CUTS.map((cut, i) => {
+              const sel = getSelection(cut)
+              const isSelected = !!sel
+              return (
+                <div
+                  key={i}
+                  className={`${styles.cc} ${isSelected ? styles.ccSel : ''}`}
+                  onClick={() => toggleCut(cut)}
+                >
+                  <div className={styles.ccThumb}>
+                    <img src={cut.img} alt={cut.name} loading="lazy"
+                      onError={e => { (e.target as HTMLImageElement).style.opacity = '0' }} />
                   </div>
-                  <div className={`${styles.ccRadio} ${selectedCut?.name === cut.name ? styles.ccRadioSel : ''}`} />
+                  <div className={styles.ccBody}>
+                    <div className={styles.ccGrade}>{cut.grade}</div>
+                    <div className={styles.ccName}>{cut.name}</div>
+                    <div className={styles.ccDetail}>{cut.detail}</div>
+                    <div className={styles.ccWeight}>⚖ {cut.weight}</div>
+                  </div>
+                  <div className={styles.ccRight}>
+                    <div>
+                      <span className={styles.ccPrice}>${cut.pricePerWeek}</span>
+                      <div className={styles.ccMo}>/week each</div>
+                    </div>
+                    {isSelected ? (
+                      <div className={styles.qtyCtrl} onClick={e => e.stopPropagation()}>
+                        <button className={styles.qtyBtn} onClick={() => setQty(cut, sel.qty - 1)}>−</button>
+                        <span className={styles.qtyVal}>{sel.qty}</span>
+                        <button className={styles.qtyBtn} onClick={() => setQty(cut, sel.qty + 1)}>+</button>
+                      </div>
+                    ) : (
+                      <div className={styles.ccRadio} />
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           {/* Order mini summary */}
           <div className={styles.omini}>
-            <div className={styles.omRow}>
-              <span>{selectedCut ? `${selectedCut.name} (weekly)` : 'No cut selected'}</span>
-              <span>{selectedCut ? `$${selectedCut.pricePerWeek}` : '—'}</span>
-            </div>
+            {selections.length === 0 ? (
+              <div className={styles.omRow}><span>No cuts selected</span><span>—</span></div>
+            ) : (
+              selections.map(s => (
+                <div key={s.cut.name} className={styles.omRow}>
+                  <span>{s.cut.name} × {s.qty}</span>
+                  <span>${s.cut.pricePerWeek * s.qty}</span>
+                </div>
+              ))
+            )}
             <div className={styles.omRow}>
               <span>Delivery to <span style={{ color: 'var(--cream)' }}>{building?.name}</span></span>
               <span style={{ color: '#3a8a5a', fontWeight: 500 }}>Free</span>
@@ -146,7 +186,7 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
             </div>
             <div className={styles.omTotal}>
               <span className={styles.omTotalLbl}>Weekly Total</span>
-              <span className={styles.omTotalVal}>{selectedCut ? `$${selectedCut.pricePerWeek}` : '$0'}</span>
+              <span className={styles.omTotalVal}>${weeklyTotal}</span>
             </div>
           </div>
 
