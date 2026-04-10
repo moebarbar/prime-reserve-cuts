@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import styles from './page1.module.css'
 import { BUILDINGS } from '@/data/buildings'
+import Footer from './Footer'
 
 interface Page1Props {
   selectedKey: string | null
@@ -161,6 +162,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
         </div>
       </div>
 
+      <Footer />
     </div>
   )
 }

@@ -4,6 +4,7 @@
 
 import Link from 'next/link'
 import Nav from '@/components/Nav'
+import Footer from '@/components/Footer'
 import styles from './page.module.css'
 
 export default function OurStoryPage() {
@@ -77,6 +78,7 @@ export default function OurStoryPage() {
           </Link>
         </div>
       </section>
+      <Footer />
     </>
   )
 }

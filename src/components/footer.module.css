@@ -1,0 +1,101 @@
+.footer {
+  background: #080706;
+  border-top: 1px solid var(--border);
+  padding: 52px 0 36px;
+}
+.inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 44px;
+}
+
+/* TRUST BADGES */
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(184,134,58,0.06);
+  border: 1px solid rgba(184,134,58,0.14);
+  padding: 10px 18px;
+}
+.badgeIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.badgeText {
+  display: flex;
+  flex-direction: column;
+}
+.badgeLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cream);
+  line-height: 1.2;
+}
+.badgeSub {
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 28px;
+}
+
+/* BOTTOM ROW */
+.bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brandName {
+  font-family: 'Cormorant', serif;
+  font-size: 15px;
+  font-weight: 300;
+  color: rgba(244,239,230,0.4);
+  letter-spacing: 0.08em;
+}
+.links {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.links a {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  transition: color .2s;
+}
+.links a:hover { color: var(--gold); }
+.copy {
+  font-size: 10px;
+  color: rgba(244,239,230,0.2);
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 700px) {
+  .inner { padding: 0 20px; }
+  .bottom { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .badges { justify-content: flex-start; }
+  .badge { padding: 8px 14px; }
+}

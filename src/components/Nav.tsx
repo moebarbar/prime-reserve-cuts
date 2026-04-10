@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 interface NavProps {
   step: 1 | 2 | 3
   hideSteps?: boolean
@@ -8,14 +10,14 @@ interface NavProps {
 export default function Nav({ step, hideSteps }: NavProps) {
   return (
     <nav className="nav">
-      <div className="nav-logo">
+      <Link href="/" className="nav-logo" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
         <img
           src="/logo.png"
           alt="Prime Reserve"
           height={36}
           style={{ height: 36, width: 'auto', display: 'block', filter: 'brightness(0) invert(1)' }}
         />
-      </div>
+      </Link>
       {!hideSteps && (
         <div className="nav-right">
           <div className="steps">
