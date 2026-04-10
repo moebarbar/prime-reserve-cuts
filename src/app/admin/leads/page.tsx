@@ -69,6 +69,23 @@ export default function LeadsPage() {
     return acc
   }, {} as Record<LeadStatus, number>)
 
+  const exportCSV = () => {
+    const rows = [
+      ['ID', 'Name', 'Email', 'Phone', 'Building', 'Unit', 'Interested In', 'Status', 'Date'],
+      ...filtered.map(l => [
+        l.id, l.name, l.email, l.phone ?? '', l.building, l.unit, l.cut ?? '', l.status, fmtDate(l.created_at)
+      ])
+    ]
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `leads-${new Date().toISOString().slice(0,10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <>
       {/* MINI STATS */}
@@ -87,7 +104,7 @@ export default function LeadsPage() {
       </div>
 
       {/* FILTERS */}
-      <div className="filter-bar">
+      <div className="filter-bar" style={{ justifyContent: 'space-between' }}>
         <input
           className="filter-search"
           placeholder="Search by name, email or unit…"
@@ -106,6 +123,9 @@ export default function LeadsPage() {
             Clear
           </button>
         )}
+        <button className="btn-ghost" onClick={exportCSV} style={{ marginLeft: 'auto' }}>
+          ⬇ Export CSV
+        </button>
       </div>
 
       {/* TABLE */}

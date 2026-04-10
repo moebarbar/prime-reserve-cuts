@@ -55,6 +55,33 @@ export default function OrdersPage() {
     })
   }
 
+  const updateDelivery = async (id: string, next_delivery: string) => {
+    setOrders(os => os.map(o => o.id === id ? { ...o, next_delivery } : o))
+    await fetch(`/api/orders/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ next_delivery }),
+    })
+  }
+
+  const exportCSV = () => {
+    const rows = [
+      ['Order ID', 'Customer', 'Email', 'Building', 'Unit', 'Cut', 'Price', 'Status', 'Start Date', 'Next Delivery'],
+      ...filtered.map(o => [
+        o.id, o.customer, o.email, o.building, o.unit, o.cut, `$${o.price}`,
+        o.status, fmtDate(o.start_date), fmtDate(o.next_delivery)
+      ])
+    ]
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `orders-${new Date().toISOString().slice(0,10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const activeOrders = orders.filter(o => o.status === 'active')
   const mrr = activeOrders.reduce((s, o) => s + o.price, 0)
 
@@ -95,6 +122,9 @@ export default function OrdersPage() {
         {(search || statusF !== 'all') && (
           <button className="btn-ghost" onClick={() => { setSearch(''); setStatusF('all') }}>Clear</button>
         )}
+        <button className="btn-ghost" onClick={exportCSV} style={{ marginLeft: 'auto' }}>
+          ⬇ Export CSV
+        </button>
       </div>
 
       {/* TABLE */}
@@ -145,7 +175,15 @@ export default function OrdersPage() {
                     <td>{o.cut}</td>
                     <td style={{ fontFamily: 'Cormorant, serif', fontSize: 17, color: 'var(--gold2)' }}>${o.price}</td>
                     <td className="td-dim">{fmtDate(o.start_date)}</td>
-                    <td className="td-dim">{fmtDate(o.next_delivery)}</td>
+                    <td onClick={e => e.stopPropagation()}>
+                      <input
+                        type="date"
+                        className="date-inline"
+                        value={o.next_delivery ? o.next_delivery.slice(0, 10) : ''}
+                        onChange={e => updateDelivery(o.id, e.target.value)}
+                        title="Edit next delivery date"
+                      />
+                    </td>
                     <td onClick={e => e.stopPropagation()}>
                       <select
                         className={`badge badge-${o.status} inline-sel`}
