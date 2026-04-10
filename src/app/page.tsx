@@ -46,6 +46,9 @@ export default function Home() {
     const url = new URL(window.location.href)
     url.searchParams.set('b', key)
     window.history.replaceState({}, '', url.toString())
+    // Immediately advance to step 2
+    window.scrollTo(0, 0)
+    setStep(2)
   }
 
   const goTo2 = () => {

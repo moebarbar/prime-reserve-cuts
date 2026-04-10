@@ -1,0 +1,148 @@
+/* OUR STORY PAGE */
+
+/* ── SECTION 1: Opening ───────────────────────────────────────────────────── */
+.opening {
+  min-height: 100vh;
+  background: var(--dark);
+  display: flex; align-items: center; justify-content: center;
+  padding: 120px 44px 80px;
+  text-align: center;
+}
+.openingInner {
+  max-width: 720px;
+}
+.openingHeadline {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(36px, 6vw, 76px);
+  font-weight: 300;
+  line-height: 1.05;
+  color: var(--cream);
+  margin: 0 0 36px;
+  letter-spacing: -0.01em;
+}
+.openingHeadline em {
+  font-style: italic;
+  color: var(--gold);
+}
+.openingBody {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 560px;
+  margin: 0 auto;
+  line-height: 2;
+}
+
+/* ── SECTION 2: How It Works ─────────────────────────────────────────────── */
+.how {
+  background: #0a0908;
+  padding: 100px 44px;
+  border-top: 1px solid var(--border);
+}
+.howInner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+.howHeading {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(32px, 5vw, 60px);
+  font-weight: 300;
+  line-height: 1.1;
+  color: var(--cream);
+  border-left: 3px solid #b8863a;
+  padding-left: 24px;
+  margin: 0 0 56px;
+}
+.howHeading em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.stepCard {
+  background: #111009;
+  border: 1px solid rgba(184,134,58,0.12);
+  padding: 36px;
+  position: relative;
+  overflow: hidden;
+}
+.stepNumBg {
+  font-family: 'Cormorant', serif;
+  font-size: 80px;
+  font-weight: 300;
+  color: var(--gold);
+  opacity: 0.15;
+  position: absolute;
+  top: -8px; right: 16px;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+.stepContent {
+  position: relative; z-index: 1;
+}
+.stepTitle {
+  font-family: 'Cormorant', serif;
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--cream);
+  margin-bottom: 14px;
+  line-height: 1.2;
+}
+.stepDesc {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+/* ── SECTION 3: Closing ──────────────────────────────────────────────────── */
+.closing {
+  background: var(--dark);
+  padding: 100px 44px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+.closingInner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex; flex-direction: column; align-items: center; gap: 40px;
+}
+.closingQuote {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--cream);
+  line-height: 1.25;
+  margin: 0;
+}
+.btnCta {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--gold); color: var(--dark);
+  font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 15px 42px; text-decoration: none;
+  transition: background .2s, transform .18s;
+}
+.btnCta:hover { background: var(--gold2); transform: translateY(-1px); }
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .opening { padding: 100px 24px 60px; }
+  .how { padding: 72px 24px; }
+  .closing { padding: 72px 24px; }
+  .steps { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 480px) {
+  .opening { padding: 80px 16px 48px; }
+  .how { padding: 56px 16px; }
+  .closing { padding: 56px 16px; }
+  .howHeading { font-size: 30px; }
+  .stepCard { padding: 28px 24px; }
+  .btnCta { width: 100%; justify-content: center; }
+}

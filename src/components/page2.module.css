@@ -67,6 +67,7 @@
 .ccRight { padding: 13px 14px; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; flex-shrink: 0; min-width: 76px; }
 .ccPrice { font-family: 'Cormorant', serif; font-size: 22px; font-weight: 300; color: var(--cream); line-height: 1; }
 .ccMo { font-size: 9px; color: var(--muted); }
+.ccQty { font-size: 8px; color: var(--gold); opacity: 0.7; margin-top: 3px; white-space: nowrap; }
 .ccRadio { width: 19px; height: 19px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; transition: all .2s; }
 .ccRadioSel { border-color: var(--gold); background: var(--gold); }
 .ccRadioSel::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--dark); display: block; }

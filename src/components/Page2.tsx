@@ -120,8 +120,9 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
                 </div>
                 <div className={styles.ccRight}>
                   <div>
-                    <span className={styles.ccPrice}>${cut.price}</span>
-                    <div className={styles.ccMo}>/mo</div>
+                    <span className={styles.ccPrice}>${cut.pricePerWeek}</span>
+                    <div className={styles.ccMo}>/week</div>
+                    <div className={styles.ccQty}>{cut.qtyPerWeek}</div>
                   </div>
                   <div className={`${styles.ccRadio} ${selectedCut?.name === cut.name ? styles.ccRadioSel : ''}`} />
                 </div>
@@ -132,16 +133,20 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
           {/* Order mini summary */}
           <div className={styles.omini}>
             <div className={styles.omRow}>
-              <span>{selectedCut ? `${selectedCut.name} (monthly)` : 'No cut selected'}</span>
-              <span>{selectedCut ? `$${selectedCut.price}` : '—'}</span>
+              <span>{selectedCut ? `${selectedCut.name} (weekly)` : 'No cut selected'}</span>
+              <span>{selectedCut ? `$${selectedCut.pricePerWeek}` : '—'}</span>
             </div>
             <div className={styles.omRow}>
               <span>Delivery to <span style={{ color: 'var(--cream)' }}>{building?.name}</span></span>
               <span style={{ color: '#3a8a5a', fontWeight: 500 }}>Free</span>
             </div>
+            <div className={styles.omRow}>
+              <span>Schedule</span>
+              <span style={{ color: 'var(--cream)' }}>Every Saturday</span>
+            </div>
             <div className={styles.omTotal}>
-              <span className={styles.omTotalLbl}>Monthly Total</span>
-              <span className={styles.omTotalVal}>{selectedCut ? `$${selectedCut.price}` : '$0'}</span>
+              <span className={styles.omTotalLbl}>Weekly Total</span>
+              <span className={styles.omTotalVal}>{selectedCut ? `$${selectedCut.pricePerWeek}` : '$0'}</span>
             </div>
           </div>
 

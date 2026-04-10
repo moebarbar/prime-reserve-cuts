@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import styles from './page1.module.css'
 import { BUILDINGS } from '@/data/buildings'
 
@@ -40,31 +41,37 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
         </video>
         <div className={styles.heroOverlay} />
         <div className={styles.heroContent}>
-          <div>
+          <div className={styles.heroMain}>
             <div className={styles.eyebrow}>
               <span className={styles.eyeDash} />
               Houston · Members Only
             </div>
+            <p className={styles.heroEyebrowAlt}>Good Food From Now On</p>
             <h1 className={styles.h1}>
-              The finest<br />cuts, <em>at<br />your door.</em>
+              Finest Cuts.<br />To Your Door.<br /><em>Every Saturday.</em>
             </h1>
+            <div className={styles.heroImgWrap}>
+              <img
+                src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&q=80&fit=crop&crop=center"
+                alt="Premium steak plate"
+                className={styles.heroImg}
+                loading="eager"
+              />
+              <div className={styles.heroImgFade} />
+            </div>
+            <Link href="/our-story" className={styles.btnStory}>
+              Our Story <span>→</span>
+            </Link>
           </div>
-          <p className={styles.mission}>
-            <strong>The best steak in Houston shouldn't require a reservation.</strong>{' '}
-            Automatic Cow delivers USDA Prime and A5 Wagyu directly to luxury residents —
-            every month, to your unit, zero effort.
-          </p>
         </div>
       </div>
 
       {/* STEAK STRIP */}
       <div className={styles.steakStrip}>
         {[
-          { src: 'https://images.pexels.com/photos/12261087/pexels-photo-12261087.jpeg?auto=compress&cs=tinysrgb&w=800', name: 'Tomahawk Ribeye', price: '$229/mo' },
-          { src: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=500&q=80&fit=crop&crop=center', name: 'Ribeye', price: '$89/mo' },
-          { src: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=500&q=80&fit=crop&crop=center', name: 'Filet Mignon', price: '$119/mo' },
-          { src: 'https://images.pexels.com/photos/3535383/pexels-photo-3535383.jpeg?auto=compress&cs=tinysrgb&w=500', name: 'NY Strip', price: '$99/mo' },
-          { src: 'https://images.unsplash.com/photo-1558030006-450675393462?w=500&q=80&fit=crop&crop=center', name: 'A5 Wagyu', price: '$189/mo' },
+          { src: 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=800&q=80&fit=crop&crop=center', name: 'NY Strip', price: '$49/week' },
+          { src: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=800&q=80&fit=crop&crop=center', name: 'Tenderloin', price: '$59/week' },
+          { src: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&q=80&fit=crop&crop=center', name: 'Ribeye', price: '$55/week' },
         ].map((cut, i) => (
           <div key={i} className={styles.sc}>
             <img
