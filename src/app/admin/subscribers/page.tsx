@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 
 type OrderStatus = 'active' | 'paused' | 'cancelled' | 'pending'
 
@@ -53,13 +53,23 @@ export default function SubscribersPage() {
     return !q || o.customer.toLowerCase().includes(q) || o.building.toLowerCase().includes(q) || o.email.toLowerCase().includes(q)
   })
 
+  const [error, setError] = useState<string | null>(null)
+
   const updateStatus = async (id: string, status: OrderStatus) => {
+    const prev = orders.find(o => o.id === id)?.status
     setOrders(os => os.map(o => o.id === id ? { ...o, status } : o))
-    await fetch(`/api/orders/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    })
+    try {
+      const res = await fetch(`/api/orders/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      })
+      if (!res.ok) throw new Error('Failed')
+    } catch {
+      if (prev) setOrders(os => os.map(o => o.id === id ? { ...o, status: prev } : o))
+      setError('Failed to update subscription. Please try again.')
+      setTimeout(() => setError(null), 3000)
+    }
   }
 
   // revenue by cut
@@ -75,6 +85,12 @@ export default function SubscribersPage() {
 
   return (
     <>
+      {error && (
+        <div style={{ background: 'rgba(192,57,43,0.12)', border: '1px solid rgba(192,57,43,0.3)', color: '#e05c4d', padding: '10px 16px', marginBottom: 14, fontSize: 12 }}>
+          {error}
+        </div>
+      )}
+
       {/* KPI STATS */}
       <div className="stat-grid" style={{ marginBottom: 20 }}>
         <div className="stat-card gold-card">
@@ -197,8 +213,8 @@ export default function SubscribersPage() {
             </thead>
             <tbody>
               {displayed.map(o => (
-                <>
-                  <tr key={o.id} style={{ cursor: 'pointer' }} onClick={() => setExpanded(expanded === o.id ? null : o.id)}>
+                <Fragment key={o.id}>
+                  <tr style={{ cursor: 'pointer' }} onClick={() => setExpanded(expanded === o.id ? null : o.id)}>
                     <td className="td-mono">{o.id.slice(0, 8)}</td>
                     <td>
                       <div style={{ fontWeight: 400 }}>{o.customer}</div>
@@ -228,7 +244,7 @@ export default function SubscribersPage() {
                     </td>
                   </tr>
                   {expanded === o.id && (
-                    <tr key={`${o.id}-x`} className="detail-row">
+                    <tr className="detail-row">
                       <td colSpan={9}>
                         <div className="detail-box">
                           <div className="detail-item"><label>Email</label><span>{o.email}</span></div>
@@ -268,7 +284,7 @@ export default function SubscribersPage() {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))}
             </tbody>
           </table>

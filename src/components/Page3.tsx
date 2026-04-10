@@ -51,11 +51,11 @@ export default function Page3({ building, selections, form, onBack }: Page3Props
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name:     `${form.firstName} ${form.lastName}`.trim(),
-          email:    form.email,
-          cut:      selections.map(s => `${s.cut.name} ×${s.qty}`).join(', '),
-          building: building.name,
-          unit:     form.unit,
+          name:       `${form.firstName} ${form.lastName}`.trim(),
+          email:      form.email,
+          selections: selections.map(s => ({ name: s.cut.name, qty: s.qty })),
+          building:   building.name,
+          unit:       form.unit,
         }),
       })
       const data = await res.json()
@@ -165,29 +165,8 @@ export default function Page3({ building, selections, form, onBack }: Page3Props
                   By subscribing you agree to automatic weekly billing. Cancel any time.
                 </div>
 
-                {/* ── ACCOUNT CREATION ── */}
-                <div className={styles.acDivider}>
-                  <span className={styles.acDividerLine} />
-                  <span className={styles.acDividerText}>Create Your Member Account</span>
-                  <span className={styles.acDividerLine} />
-                </div>
-
-                <label className={styles.spLbl}>Username</label>
-                <input className={styles.spInp} type="text" placeholder="choose a username" />
-
-                <label className={styles.spLbl}>Password</label>
-                <input className={styles.spInp} type="password" placeholder="create a password" />
-
-                <label className={styles.spLbl}>Confirm Password</label>
-                <input className={styles.spInp} type="password" placeholder="confirm your password" />
-
-                <p className={styles.acNote}>
-                  You&apos;ll use these to access your member dashboard and manage your deliveries.
-                </p>
-
-                {/* ── PRODUCTION: swap onClick for Stripe Payment Link redirect ── */}
                 <button className={styles.spBtn} onClick={handlePay} disabled={processing}>
-                  {processing ? '⏳ Processing…' : `🔒  Complete Order & Create Account`}
+                  {processing ? '⏳ Processing…' : '🔒  Complete Subscription'}
                 </button>
               </div>
 
@@ -204,7 +183,7 @@ export default function Page3({ building, selections, form, onBack }: Page3Props
               <div className={styles.payOkIcon}>✅</div>
               <div className={styles.payOkTitle}>You&apos;re in.</div>
               <div className={styles.payOkBody}>
-                Membership confirmed. First delivery <strong>the this Saturday</strong>, straight to unit {form.unit} at {building.name}.
+                Membership confirmed. First delivery <strong>this Saturday</strong>, straight to unit {form.unit} at {building.name}.
               </div>
             </div>
           )}

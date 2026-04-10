@@ -6,46 +6,55 @@ const PRICE_IDS: Record<string, string> = {
   'Ribeye':       process.env.STRIPE_PRICE_RIBEYE   ?? '',
   'Filet Mignon': process.env.STRIPE_PRICE_FILET    ?? '',
   'NY Strip':     process.env.STRIPE_PRICE_NYSTRIP  ?? '',
+  'Tenderloin':   process.env.STRIPE_PRICE_FILET    ?? '',  // maps to filet price
   'A5 Wagyu':     process.env.STRIPE_PRICE_WAGYU    ?? '',
   'Tomahawk':     process.env.STRIPE_PRICE_TOMAHAWK ?? '',
 }
 
-// Use the configured base URL — never trust the client Origin header for redirects
 const BASE_URL = process.env.NEXT_PUBLIC_URL ?? 'http://localhost:3000'
 
+interface Selection { name: string; qty: number }
+
 export async function POST(req: NextRequest) {
-  // 5 checkout attempts per IP per 10 minutes
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
   if (!rateLimit(`checkout:${ip}`, 5, 10 * 60 * 1000)) {
     return rateLimitResponse()
   }
 
-  let body: { name?: unknown; email?: unknown; cut?: unknown; building?: unknown; unit?: unknown }
+  let body: { name?: unknown; email?: unknown; selections?: unknown; building?: unknown; unit?: unknown }
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const { name, email, cut, building, unit } = body
+  const { name, email, selections, building, unit } = body
 
-  if (!name || !email || !cut || !building || !unit) {
+  if (!name || !email || !building || !unit || !Array.isArray(selections) || selections.length === 0) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
-  const priceId = PRICE_IDS[cut as string]
-  if (!priceId) {
-    return NextResponse.json({ error: `No Stripe price configured for "${cut}"` }, { status: 400 })
+  // Build Stripe line_items from selections array
+  const line_items: { price: string; quantity: number }[] = []
+  for (const sel of selections as Selection[]) {
+    const priceId = PRICE_IDS[sel.name]
+    if (!priceId) {
+      return NextResponse.json({ error: `No Stripe price configured for "${sel.name}"` }, { status: 400 })
+    }
+    line_items.push({ price: priceId, quantity: sel.qty })
   }
+
+  // Compact cut label for metadata / DB
+  const cutLabel = (selections as Selection[]).map(s => s.qty > 1 ? `${s.name} ×${s.qty}` : s.name).join(', ')
 
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       customer_email: email as string,
-      line_items: [{ price: priceId, quantity: 1 }],
-      metadata: { name: name as string, building: building as string, unit: unit as string, cut: cut as string },
+      line_items,
+      metadata: { name: name as string, building: building as string, unit: unit as string, cut: cutLabel },
       subscription_data: {
-        metadata: { name: name as string, building: building as string, unit: unit as string, cut: cut as string },
+        metadata: { name: name as string, building: building as string, unit: unit as string, cut: cutLabel },
       },
       success_url: `${BASE_URL}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:  `${BASE_URL}/?checkout=cancelled`,

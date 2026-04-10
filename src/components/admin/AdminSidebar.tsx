@@ -9,6 +9,7 @@ interface AdminSidebarProps {
 
 function getNextSaturday() {
   const d = new Date()
+  d.setHours(0, 0, 0, 0)
   const diff = (6 - d.getDay() + 7) % 7 || 7
   d.setDate(d.getDate() + diff)
   return d
@@ -44,7 +45,8 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
   const router = useRouter()
 
   const saturday = getNextSaturday()
-  const daysLeft = Math.ceil((saturday.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  const daysLeft = Math.round((saturday.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
   const go = (href: string) => {
     router.push(href)

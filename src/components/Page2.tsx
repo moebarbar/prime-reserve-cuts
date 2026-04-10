@@ -56,6 +56,22 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
       }
       return
     }
+
+    // Validate required fields before proceeding to checkout
+    if (!form.firstName.trim() || !form.lastName.trim()) {
+      alert('Please enter your first and last name.')
+      return
+    }
+    if (!form.unit.trim()) {
+      alert('Please enter your unit number.')
+      return
+    }
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!form.email.trim() || !emailRe.test(form.email)) {
+      alert('Please enter a valid email address.')
+      return
+    }
+
     onContinue(form, selections)
   }
 

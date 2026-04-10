@@ -20,6 +20,7 @@ function fmtDate(iso: string) {
 
 function getNextSaturday() {
   const d = new Date()
+  d.setHours(0, 0, 0, 0)
   const diff = (6 - d.getDay() + 7) % 7 || 7
   d.setDate(d.getDate() + diff)
   return d
@@ -50,12 +51,13 @@ export default function AdminDashboard() {
   }, [])
 
   const saturday = getNextSaturday()
-  const daysLeft = Math.ceil((saturday.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  const daysLeft = Math.round((saturday.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
   const activeOrders   = orders.filter(o => o.status === 'active')
   const pausedOrders   = orders.filter(o => o.status === 'paused')
   const mrr            = activeOrders.reduce((s, o) => s + o.price, 0)
-  const arr            = mrr * 52  // weekly × 52
+  const arr            = mrr * 12  // monthly × 12
   const newLeads       = leads.filter(l => l.status === 'new').length
   const contactedLeads = leads.filter(l => l.status === 'contacted').length
   const convertedLeads = leads.filter(l => l.status === 'converted').length
@@ -86,7 +88,7 @@ export default function AdminDashboard() {
       {/* TOP KPI STRIP */}
       <div className="stat-grid" style={{ marginBottom: 20 }}>
         <div className="stat-card gold-card">
-          <div className="stat-eyebrow">Weekly Revenue</div>
+          <div className="stat-eyebrow">Monthly Revenue</div>
           <div className="stat-value gold">${mrr.toLocaleString()}</div>
           <div className="stat-sub">
             <span className="up">↑</span> ${arr.toLocaleString()} ARR
