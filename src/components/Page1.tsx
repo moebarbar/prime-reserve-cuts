@@ -28,7 +28,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
   return (
     <div className={styles.page}>
 
-      {/* HERO */}
+      {/* HERO — video + headline only, overflow:hidden safe */}
       <div className={styles.hero}>
         <video
           className={styles.heroBg}
@@ -42,29 +42,31 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
         </video>
         <div className={styles.heroOverlay} />
         <div className={styles.heroContent}>
-          <div className={styles.heroMain}>
-            <div className={styles.eyebrow}>
-              <span className={styles.eyeDash} />
-              Houston · Members Only
-            </div>
-            <p className={styles.heroEyebrowAlt}>Good Food From Now On</p>
-            <h1 className={styles.h1}>
-              Finest Cuts.<br />To Your Door.<br /><em>Every Saturday.</em>
-            </h1>
-            <div className={styles.heroImgWrap}>
-              <img
-                src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&q=80&fit=crop&crop=center"
-                alt="Premium steak plate"
-                className={styles.heroImg}
-                loading="eager"
-              />
-              <div className={styles.heroImgFade} />
-            </div>
-            <Link href="/our-story" className={styles.btnStory}>
-              Our Story <span>→</span>
-            </Link>
+          <div className={styles.eyebrow}>
+            <span className={styles.eyeDash} />
+            Houston · Members Only
           </div>
+          <p className={styles.heroEyebrowAlt}>Good Food From Now On</p>
+          <h1 className={styles.h1}>
+            Finest Cuts.<br />To Your Door.<br /><em>Every Saturday.</em>
+          </h1>
         </div>
+      </div>
+
+      {/* HERO IMAGE + CTA — sits below the hero, no clipping */}
+      <div className={styles.heroBelow}>
+        <div className={styles.heroImgWrap}>
+          <img
+            src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&q=80&fit=crop&crop=center"
+            alt="Premium steak plate"
+            className={styles.heroImg}
+            loading="eager"
+          />
+          <div className={styles.heroImgFade} />
+        </div>
+        <Link href="/our-story" className={styles.btnStory}>
+          Our Story <span>→</span>
+        </Link>
       </div>
 
       {/* STEAK STRIP */}

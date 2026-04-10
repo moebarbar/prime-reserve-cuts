@@ -23,7 +23,6 @@
   position: relative; z-index: 10;
   padding: 0 52px 44px;
   display: flex; flex-direction: column; align-items: flex-start;
-  gap: 0;
   animation: fadeUp .7s .1s both;
 }
 .eyebrow {
@@ -147,8 +146,7 @@
 
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
-  .heroContent { padding: 0 24px 36px; }
-  .mission { display: none; }
+  .heroContent { padding: 0 24px 32px; }
   .steakStrip { grid-template-columns: 1fr 1fr 1fr; height: auto; }
   .sc { height: 170px; }
   .bldSection { padding: 44px 24px 60px; }
@@ -186,17 +184,20 @@
 }
 
 /* ── NEW HERO ADDITIONS (Task 2) ── */
-.heroMain {
-  display: flex; flex-direction: column;
-  align-items: flex-start; gap: 0;
-}
 .heroEyebrowAlt {
   font-size: 11px; font-weight: 400; letter-spacing: 0.3em;
   text-transform: uppercase; color: var(--gold);
   font-style: italic; margin: 0 0 10px;
 }
+
+/* Below-hero section: image + CTA, outside clipped hero */
+.heroBelow {
+  background: var(--dark);
+  padding: 0 52px 0;
+  display: flex; flex-direction: column; align-items: flex-start;
+}
 .heroImgWrap {
-  position: relative; width: 100%; margin-top: 28px;
+  position: relative; width: 100%;
   border: 1px solid rgba(184,134,58,0.2); overflow: hidden;
 }
 .heroImg {
@@ -210,7 +211,7 @@
 }
 .btnStory {
   display: inline-flex; align-items: center; gap: 8px;
-  margin-top: 20px;
+  margin: 20px 0 0;
   background: transparent;
   border: 1px solid rgba(184,134,58,0.4);
   color: var(--gold);
@@ -222,10 +223,11 @@
 .btnStory:hover { border-color: var(--gold); color: #d4a855; }
 
 @media (max-width: 900px) {
-  .heroImgWrap { margin-top: 20px; }
+  .heroBelow { padding: 0 24px; }
   .heroImg { max-height: 320px; }
 }
 @media (max-width: 480px) {
+  .heroBelow { padding: 0 16px; }
   .heroImg { max-height: 220px; }
-  .btnStory { width: 100%; justify-content: center; padding: 14px 24px; }
+  .btnStory { width: 100%; justify-content: center; padding: 14px 24px; margin-bottom: 0; }
 }
