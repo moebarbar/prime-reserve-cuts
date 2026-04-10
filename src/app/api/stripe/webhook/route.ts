@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
       const session  = event.data.object
       const meta     = session.metadata ?? {}
       const email    = session.customer_email ?? ''
-      const name     = meta.name     ?? 'Member'
+      // Strip newlines/CR to prevent email header injection
+      const name     = (meta.name ?? 'Member').replace(/[\r\n]/g, ' ').trim()
       const building = meta.building ?? ''
       const unit     = meta.unit     ?? ''
       const cut      = meta.cut      ?? ''

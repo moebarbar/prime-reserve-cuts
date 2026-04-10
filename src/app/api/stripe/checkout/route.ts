@@ -34,6 +34,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
+  // String length limits
+  if (
+    typeof name     !== 'string' || name.length     > 200 ||
+    typeof email    !== 'string' || email.length    > 254 ||
+    typeof building !== 'string' || building.length > 200 ||
+    typeof unit     !== 'string' || unit.length     > 50
+  ) {
+    return NextResponse.json({ error: 'Invalid field values' }, { status: 400 })
+  }
+
+  // Validate each selection: name must be a non-empty string, qty a positive integer ≤ 20
+  for (const sel of selections as Selection[]) {
+    if (typeof sel.name !== 'string' || !sel.name.trim() || sel.name.length > 100) {
+      return NextResponse.json({ error: 'Invalid selection name' }, { status: 400 })
+    }
+    if (!Number.isInteger(sel.qty) || sel.qty < 1 || sel.qty > 20) {
+      return NextResponse.json({ error: 'Invalid selection quantity' }, { status: 400 })
+    }
+  }
+
   // Build Stripe line_items from selections array
   const line_items: { price: string; quantity: number }[] = []
   for (const sel of selections as Selection[]) {

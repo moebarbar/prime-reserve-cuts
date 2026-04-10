@@ -32,6 +32,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
+  // String length limits (guard against oversized payloads reaching the DB)
+  if (
+    typeof name     !== 'string' || name.length     > 200 ||
+    typeof email    !== 'string' || email.length    > 254 ||
+    typeof building !== 'string' || building.length > 200 ||
+    typeof unit     !== 'string' || unit.length     > 50  ||
+    (phone && (typeof phone !== 'string' || (phone as string).length > 30)) ||
+    (cut   && (typeof cut   !== 'string' || (cut   as string).length > 500))
+  ) {
+    return NextResponse.json({ error: 'Invalid field values' }, { status: 400 })
+  }
+
   try {
     const [lead] = await query(`
       INSERT INTO leads (name, email, phone, building, unit, cut)

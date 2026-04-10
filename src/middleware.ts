@@ -5,6 +5,17 @@ const ADMIN_PASS = process.env.ADMIN_PASS ?? ''
 
 const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_URL ?? ''
 
+// Constant-time string comparison to prevent timing attacks on admin credentials
+function constantTimeEqual(a: string, b: string): boolean {
+  const enc = new TextEncoder()
+  const aBytes = enc.encode(a)
+  const bBytes = enc.encode(b)
+  if (aBytes.length !== bBytes.length) return false
+  let diff = 0
+  for (let i = 0; i < aBytes.length; i++) diff |= aBytes[i] ^ bBytes[i]
+  return diff === 0
+}
+
 // Routes that require admin Basic Auth
 function isAdminRoute(pathname: string) {
   return (
@@ -55,7 +66,7 @@ export function middleware(req: NextRequest) {
         const colon = decoded.indexOf(':')
         const user = decoded.slice(0, colon)
         const pass = decoded.slice(colon + 1)
-        authorised = user === ADMIN_USER && pass === ADMIN_PASS
+        authorised = constantTimeEqual(user, ADMIN_USER) && constantTimeEqual(pass, ADMIN_PASS)
       } catch {
         // malformed base64 — stay unauthorised
       }
