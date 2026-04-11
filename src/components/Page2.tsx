@@ -1,9 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './page2.module.css'
 import { BUILDINGS } from '@/data/buildings'
-import { CUTS, Cut } from '@/data/cuts'
 
 interface FormData {
   unit: string
@@ -11,6 +10,18 @@ interface FormData {
   lastName: string
   email: string
   phone: string
+}
+
+export interface Cut {
+  id: string
+  name: string
+  grade: string
+  detail: string
+  weight: string
+  price: number
+  price_per_week: number
+  img: string
+  available: boolean
 }
 
 export interface CutSelection {
@@ -26,25 +37,33 @@ interface Page2Props {
 
 export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
   const building = BUILDINGS.find(b => b.key === buildingKey)
+  const [cuts, setCuts]             = useState<Cut[]>([])
   const [selections, setSelections] = useState<CutSelection[]>([])
-  const [form, setForm] = useState<FormData>({ unit: '', firstName: '', lastName: '', email: '', phone: '' })
+  const [form, setForm]             = useState<FormData>({ unit: '', firstName: '', lastName: '', email: '', phone: '' })
 
-  const getSelection = (cut: Cut) => selections.find(s => s.cut.name === cut.name)
+  useEffect(() => {
+    fetch('/api/products')
+      .then(r => r.json())
+      .then((data: Cut[]) => setCuts(data.filter(c => c.available)))
+      .catch(() => setCuts([]))
+  }, [])
+
+  const getSelection = (cut: Cut) => selections.find(s => s.cut.id === cut.id)
 
   const toggleCut = (cut: Cut) => {
     setSelections(prev => {
-      const exists = prev.find(s => s.cut.name === cut.name)
-      if (exists) return prev.filter(s => s.cut.name !== cut.name)
+      const exists = prev.find(s => s.cut.id === cut.id)
+      if (exists) return prev.filter(s => s.cut.id !== cut.id)
       return [...prev, { cut, qty: 1 }]
     })
   }
 
   const setQty = (cut: Cut, qty: number) => {
     if (qty < 1) return
-    setSelections(prev => prev.map(s => s.cut.name === cut.name ? { ...s, qty } : s))
+    setSelections(prev => prev.map(s => s.cut.id === cut.id ? { ...s, qty } : s))
   }
 
-  const weeklyTotal = selections.reduce((sum, s) => sum + s.cut.pricePerWeek * s.qty, 0)
+  const weeklyTotal = selections.reduce((sum, s) => sum + s.cut.price_per_week * s.qty, 0)
 
   const handleContinue = () => {
     if (selections.length === 0) {
@@ -57,7 +76,6 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
       return
     }
 
-    // Validate required fields before proceeding to checkout
     if (!form.firstName.trim() || !form.lastName.trim()) {
       alert('Please enter your first and last name.')
       return
@@ -88,7 +106,7 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
           <div className={styles.label}>Step 2 of 3</div>
           <h2 className={styles.title}>Your details<br />&amp; <em>cut.</em></h2>
           <p className={styles.sub}>
-            Confirm your address and choose your monthly cut. We coordinate delivery
+            Confirm your address and choose your weekly cut. We coordinate delivery
             through your concierge — <strong>no hassle</strong>.
           </p>
 
@@ -141,12 +159,16 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
           <h2 className={styles.cutsTitle}>Choose your<br /><em>cut.</em></h2>
 
           <div id="cut-list" className={styles.cutList}>
-            {CUTS.map((cut, i) => {
+            {cuts.length === 0 ? (
+              <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
+                Loading cuts…
+              </div>
+            ) : cuts.map(cut => {
               const sel = getSelection(cut)
               const isSelected = !!sel
               return (
                 <div
-                  key={i}
+                  key={cut.id}
                   className={`${styles.cc} ${isSelected ? styles.ccSel : ''}`}
                   onClick={() => toggleCut(cut)}
                 >
@@ -158,11 +180,11 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
                     <div className={styles.ccGrade}>{cut.grade}</div>
                     <div className={styles.ccName}>{cut.name}</div>
                     <div className={styles.ccDetail}>{cut.detail}</div>
-                    <div className={styles.ccWeight}>⚖ {cut.weight}</div>
+                    {cut.weight && <div className={styles.ccWeight}>⚖ {cut.weight}</div>}
                   </div>
                   <div className={styles.ccRight}>
                     <div>
-                      <span className={styles.ccPrice}>${cut.pricePerWeek}</span>
+                      <span className={styles.ccPrice}>${cut.price_per_week}</span>
                       <div className={styles.ccMo}>/week each</div>
                     </div>
                     {isSelected ? (
@@ -186,9 +208,9 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
               <div className={styles.omRow}><span>No cuts selected</span><span>—</span></div>
             ) : (
               selections.map(s => (
-                <div key={s.cut.name} className={styles.omRow}>
+                <div key={s.cut.id} className={styles.omRow}>
                   <span>{s.cut.name} × {s.qty}</span>
-                  <span>${s.cut.pricePerWeek * s.qty}</span>
+                  <span>${s.cut.price_per_week * s.qty}</span>
                 </div>
               ))
             )}

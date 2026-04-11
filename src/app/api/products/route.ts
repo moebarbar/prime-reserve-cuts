@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/db'
 
+// Public GET — main site uses this to show products
 export async function GET() {
   try {
     const products = await query(`SELECT * FROM products ORDER BY created_at ASC`)
@@ -11,6 +12,7 @@ export async function GET() {
   }
 }
 
+// Admin POST — protected by middleware
 export async function POST(req: NextRequest) {
   let body: Record<string, unknown>
   try {
@@ -19,18 +21,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const { name, grade, detail, price, img, available } = body
+  const { name, grade, detail, weight, price, price_per_week, img, available } = body
 
-  if (!name || !grade || !detail || !price || !img) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+  if (!name || !grade || !detail) {
+    return NextResponse.json({ error: 'name, grade, and detail are required' }, { status: 400 })
   }
 
   try {
     const [product] = await query(`
-      INSERT INTO products (name, grade, detail, price, img, available)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO products (name, grade, detail, weight, price, price_per_week, img, available)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
-    `, [name, grade, detail, Number(price), img, available !== false])
+    `, [name, grade, detail, weight ?? '', Number(price) || 0, Number(price_per_week) || 0, img ?? '', available !== false])
 
     return NextResponse.json(product, { status: 201 })
   } catch (err) {

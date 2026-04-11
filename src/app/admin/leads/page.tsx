@@ -27,6 +27,8 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
+const emptyLead = { name: '', email: '', phone: '', building: BUILDINGS[1], unit: '', cut: '', status: 'new' as LeadStatus }
+
 export default function LeadsPage() {
   const [leads, setLeads]         = useState<Lead[]>([])
   const [loading, setLoading]     = useState(true)
@@ -35,6 +37,9 @@ export default function LeadsPage() {
   const [buildingF, setBuildingF] = useState('All Buildings')
   const [expanded, setExpanded]   = useState<string | null>(null)
   const [error, setError]         = useState<string | null>(null)
+  const [addModal, setAddModal]   = useState(false)
+  const [addForm, setAddForm]     = useState({ ...emptyLead })
+  const [adding, setAdding]       = useState(false)
 
   useEffect(() => {
     fetch('/api/leads')
@@ -82,6 +87,29 @@ export default function LeadsPage() {
     }
   }
 
+  const addLead = async () => {
+    if (!addForm.name.trim() || !addForm.email.trim() || !addForm.unit.trim()) {
+      setError('Name, email, and unit are required.'); return
+    }
+    setAdding(true)
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...addForm, phone: addForm.phone || null, cut: addForm.cut || null }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      const created = await res.json()
+      setLeads(ls => [created, ...ls])
+      setAddModal(false)
+      setAddForm({ ...emptyLead })
+    } catch {
+      setError('Failed to add lead.')
+    } finally {
+      setAdding(false)
+    }
+  }
+
   const counts = STATUS_OPTS.reduce((acc, s) => {
     acc[s] = leads.filter(l => l.status === s).length
     return acc
@@ -111,6 +139,12 @@ export default function LeadsPage() {
           {error}
         </div>
       )}
+
+      {/* HEADER */}
+      <div className="sec-head" style={{ marginBottom: 20 }}>
+        <h2 className="sec-title">Manage <em>Leads</em></h2>
+        <button className="btn-gold" onClick={() => { setAddModal(true); setError(null) }}>+ Add Lead</button>
+      </div>
 
       {/* MINI STATS */}
       <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: 20 }}>
@@ -267,6 +301,63 @@ export default function LeadsPage() {
       <div style={{ marginTop: 10, fontSize: 11, color: 'var(--muted)' }}>
         Showing {filtered.length} of {leads.length} leads
       </div>
+
+      {/* ADD LEAD MODAL */}
+      {addModal && (
+        <div className="modal-bg" onClick={() => setAddModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <span className="modal-title">Add <em>Lead</em></span>
+              <button className="btn-icon" onClick={() => setAddModal(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              {error && <div style={{ background: 'rgba(192,57,43,0.1)', border: '1px solid rgba(192,57,43,0.3)', color: '#e05c4d', fontSize: 11, padding: '9px 13px', marginBottom: 16 }}>{error}</div>}
+              <div className="f-row">
+                <div className="f-field">
+                  <label className="f-label">Full Name *</label>
+                  <input className="f-input" placeholder="James Hartley" value={addForm.name} onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))} />
+                </div>
+                <div className="f-field">
+                  <label className="f-label">Email *</label>
+                  <input className="f-input" type="email" placeholder="james@email.com" value={addForm.email} onChange={e => setAddForm(f => ({ ...f, email: e.target.value }))} />
+                </div>
+              </div>
+              <div className="f-row">
+                <div className="f-field">
+                  <label className="f-label">Phone</label>
+                  <input className="f-input" type="tel" placeholder="+1 (713) 000-0000" value={addForm.phone} onChange={e => setAddForm(f => ({ ...f, phone: e.target.value }))} />
+                </div>
+                <div className="f-field">
+                  <label className="f-label">Unit *</label>
+                  <input className="f-input" placeholder="1204" value={addForm.unit} onChange={e => setAddForm(f => ({ ...f, unit: e.target.value }))} />
+                </div>
+              </div>
+              <div className="f-row">
+                <div className="f-field">
+                  <label className="f-label">Building</label>
+                  <select className="f-select" value={addForm.building} onChange={e => setAddForm(f => ({ ...f, building: e.target.value }))}>
+                    {BUILDINGS.slice(1).map(b => <option key={b}>{b}</option>)}
+                  </select>
+                </div>
+                <div className="f-field">
+                  <label className="f-label">Interested In</label>
+                  <input className="f-input" placeholder="e.g. Ribeye" value={addForm.cut} onChange={e => setAddForm(f => ({ ...f, cut: e.target.value }))} />
+                </div>
+              </div>
+              <div className="f-field">
+                <label className="f-label">Status</label>
+                <select className="f-select" value={addForm.status} onChange={e => setAddForm(f => ({ ...f, status: e.target.value as LeadStatus }))}>
+                  {STATUS_OPTS.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="modal-foot">
+              <button className="btn-ghost" onClick={() => setAddModal(false)}>Cancel</button>
+              <button className="btn-gold" onClick={addLead} disabled={adding}>{adding ? 'Adding…' : '+ Add Lead'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

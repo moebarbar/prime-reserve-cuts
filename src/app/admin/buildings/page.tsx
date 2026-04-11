@@ -1,175 +1,306 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BUILDINGS } from '@/data/buildings'
+
+interface Building {
+  key: string
+  name: string
+  name_html: string
+  nbhd: string
+  img: string
+  hero_img: string
+  active: boolean
+}
 
 interface Order {
-  id: string
   building: string
-  cut: string
   price: number
   status: string
 }
 
-interface BuildingStat {
-  key: string
-  name: string
-  nbhd: string
-  img: string
-  active: number
-  paused: number
-  cancelled: number
-  mrr: number
-  topCut: string
-  cuts: Record<string, number>
-}
+const empty: Omit<Building, 'key'> = { name: '', name_html: '', nbhd: '', img: '', hero_img: '', active: true }
 
 export default function BuildingsPage() {
-  const [orders, setOrders] = useState<Order[]>([])
-  const [loading, setLoading] = useState(true)
+  const [buildings, setBuildings] = useState<Building[]>([])
+  const [orders, setOrders]       = useState<Order[]>([])
+  const [loading, setLoading]     = useState(true)
+  const [modal, setModal]         = useState<'add' | 'edit' | null>(null)
+  const [editing, setEditing]     = useState<Building | null>(null)
+  const [form, setForm]           = useState<Omit<Building, 'key'>>(empty)
+  const [keyInput, setKeyInput]   = useState('')
+  const [saving, setSaving]       = useState(false)
+  const [error, setError]         = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/orders')
-      .then(r => r.json())
-      .then((data: Order[]) => { setOrders(data); setLoading(false) })
-      .catch(() => setLoading(false))
+    Promise.all([
+      fetch('/api/buildings').then(r => r.json()),
+      fetch('/api/orders').then(r => r.json()).catch(() => []),
+    ]).then(([b, o]) => {
+      setBuildings(b)
+      setOrders(o)
+      setLoading(false)
+    }).catch(() => setLoading(false))
   }, [])
 
-  const stats: BuildingStat[] = BUILDINGS.map(b => {
-    const bOrders = orders.filter(o => o.building === b.name)
+  const openAdd = () => {
+    setEditing(null); setForm(empty); setKeyInput(''); setError(null); setModal('add')
+  }
+
+  const openEdit = (b: Building) => {
+    setEditing(b)
+    setForm({ name: b.name, name_html: b.name_html, nbhd: b.nbhd, img: b.img, hero_img: b.hero_img, active: b.active })
+    setKeyInput(b.key)
+    setError(null)
+    setModal('edit')
+  }
+
+  const closeModal = () => { setModal(null); setEditing(null) }
+
+  const submit = async () => {
+    if (!form.name.trim() || !form.nbhd.trim()) {
+      setError('Name and neighborhood are required.'); return
+    }
+    if (modal === 'add' && !keyInput.trim()) {
+      setError('Key is required.'); return
+    }
+
+    setSaving(true); setError(null)
+    try {
+      if (modal === 'add') {
+        const res = await fetch('/api/buildings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...form, key: keyInput.trim().toLowerCase().replace(/\s+/g, '-'), name_html: form.name_html || form.name }),
+        })
+        if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? 'Failed to create building') }
+        const created = await res.json()
+        setBuildings(bs => [...bs, created])
+      } else if (editing) {
+        const res = await fetch(`/api/buildings/${editing.key}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...form, name_html: form.name_html || form.name }),
+        })
+        if (!res.ok) throw new Error('Failed to update building')
+        const updated = await res.json()
+        setBuildings(bs => bs.map(b => b.key === editing.key ? updated : b))
+      }
+      closeModal()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const deleteBuilding = async (key: string, name: string) => {
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return
+    setBuildings(bs => bs.filter(b => b.key !== key))
+    try {
+      await fetch(`/api/buildings/${key}`, { method: 'DELETE' })
+    } catch {
+      setError('Failed to delete building.')
+    }
+  }
+
+  const toggleActive = async (b: Building) => {
+    const updated = { ...b, active: !b.active }
+    setBuildings(bs => bs.map(x => x.key === b.key ? updated : x))
+    await fetch(`/api/buildings/${b.key}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active: updated.active }),
+    })
+  }
+
+  const getBuildingStats = (name: string) => {
+    const bOrders = orders.filter(o => o.building === name)
     const active = bOrders.filter(o => o.status === 'active')
-    const paused = bOrders.filter(o => o.status === 'paused').length
-    const cancelled = bOrders.filter(o => o.status === 'cancelled').length
-    const mrr = active.reduce((s, o) => s + o.price, 0)
+    return {
+      active: active.length,
+      mrr: active.reduce((s, o) => s + o.price, 0),
+    }
+  }
 
-    const cuts: Record<string, number> = {}
-    active.forEach(o => { cuts[o.cut] = (cuts[o.cut] || 0) + 1 })
-    const topCut = Object.entries(cuts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—'
-
-    return { key: b.key, name: b.name, nbhd: b.nbhd, img: b.img, active: active.length, paused, cancelled, mrr, topCut, cuts }
-  }).sort((a, b) => b.mrr - a.mrr)
-
-  const totalMrr    = stats.reduce((s, b) => s + b.mrr, 0)
-  const totalActive = stats.reduce((s, b) => s + b.active, 0)
-  const topBuilding = stats[0]
+  const totalMrr = buildings.reduce((s, b) => s + getBuildingStats(b.name).mrr, 0)
 
   return (
     <>
       {/* HEADER */}
-      <div style={{ marginBottom: 28 }}>
-        <div className="stat-eyebrow" style={{ marginBottom: 6 }}>Property Network</div>
-        <h2 style={{ fontFamily: 'Cormorant, serif', fontSize: 28, fontWeight: 300, color: 'var(--cream)' }}>
-          Houston <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>Buildings</em>
-        </h2>
+      <div className="sec-head" style={{ marginBottom: 20 }}>
+        <div>
+          <h2 className="sec-title">Manage <em>Buildings</em></h2>
+          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 3 }}>
+            {buildings.filter(b => b.active).length} active · {buildings.filter(b => !b.active).length} hidden
+          </div>
+        </div>
+        <button className="btn-gold" onClick={openAdd}>+ Add Building</button>
       </div>
 
-      {/* OVERVIEW STATS */}
-      <div className="stat-grid" style={{ marginBottom: 28 }}>
+      {/* STATS */}
+      <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(3,1fr)', marginBottom: 24 }}>
         <div className="stat-card gold-card">
           <div className="stat-eyebrow">Network MRR</div>
           <div className="stat-value gold">${totalMrr.toLocaleString()}</div>
-          <div className="stat-sub">Across {stats.length} buildings</div>
+          <div className="stat-sub">Across {buildings.length} buildings</div>
         </div>
         <div className="stat-card">
-          <div className="stat-eyebrow">Active Members</div>
-          <div className="stat-value">{totalActive}</div>
+          <div className="stat-eyebrow">Total Buildings</div>
+          <div className="stat-value">{buildings.length}</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-eyebrow">Active Subscribers</div>
+          <div className="stat-value">{buildings.reduce((s, b) => s + getBuildingStats(b.name).active, 0)}</div>
           <div className="stat-sub">Across all properties</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-eyebrow">Top Property</div>
-          <div className="stat-value" style={{ fontSize: 18, paddingTop: 8, lineHeight: 1.3 }}>
-            {loading ? '…' : topBuilding?.name ?? '—'}
-          </div>
-          <div className="stat-sub">${loading ? '—' : topBuilding?.mrr ?? 0}/mo</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-eyebrow">Avg / Building</div>
-          <div className="stat-value">${stats.length ? Math.round(totalMrr / stats.length) : 0}</div>
-          <div className="stat-sub">Per month</div>
         </div>
       </div>
 
-      {/* BUILDING CARDS */}
+      {/* BUILDING TABLE */}
       {loading ? (
         <div className="empty-state">
           <div className="empty-state-icon">⋯</div>
-          <strong>Loading building data…</strong>
+          <strong>Loading buildings…</strong>
+        </div>
+      ) : buildings.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-state-icon">🏢</div>
+          <strong>No buildings yet</strong>
+          <p>Click "Add Building" to add your first property.</p>
         </div>
       ) : (
-        <div className="bld-admin-grid">
-          {stats.map((b, i) => {
-            const pct = totalMrr > 0 ? (b.mrr / totalMrr) * 100 : 0
-            return (
-              <div key={b.key} className="bld-admin-card">
-                {/* RANK */}
-                <div className="bld-admin-rank">
-                  {i === 0 ? '★' : `#${i + 1}`}
-                </div>
-
-                {/* IMAGE */}
-                <div className="bld-admin-img">
-                  <img src={b.img} alt={b.name} onError={e => { (e.target as HTMLImageElement).style.opacity = '0' }} />
-                  <div className="bld-admin-img-overlay" />
-                  <div className="bld-admin-nbhd">{b.nbhd}</div>
-                </div>
-
-                {/* BODY */}
-                <div className="bld-admin-body">
-                  <div className="bld-admin-name">{b.name}</div>
-
-                  {/* MRR BAR */}
-                  <div style={{ marginBottom: 14 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5, fontSize: 9, color: 'var(--muted)', letterSpacing: '0.3em', textTransform: 'uppercase' }}>
-                      <span>Monthly Revenue</span>
-                      <span style={{ color: 'var(--gold2)', fontFamily: 'Cormorant, serif', fontSize: 16 }}>${b.mrr}</span>
-                    </div>
-                    <div style={{ height: 2, background: 'var(--border)' }}>
-                      <div style={{ height: '100%', width: `${pct}%`, background: 'var(--gold)', transition: 'width 0.6s ease' }} />
-                    </div>
-                    <div style={{ fontSize: 9, color: 'var(--muted)', marginTop: 3 }}>{pct.toFixed(1)}% of network</div>
-                  </div>
-
-                  {/* MEMBER STATS */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 14 }}>
-                    {[
-                      { label: 'Active', value: b.active, color: '#4db376' },
-                      { label: 'Paused', value: b.paused, color: 'var(--muted)' },
-                      { label: 'Cancelled', value: b.cancelled, color: '#e05c4d' },
-                    ].map(({ label, value, color }) => (
-                      <div key={label} style={{ textAlign: 'center', padding: '8px 0', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border)' }}>
-                        <div style={{ fontFamily: 'Cormorant, serif', fontSize: 22, fontWeight: 300, color, lineHeight: 1 }}>{value}</div>
-                        <div style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.32em', textTransform: 'uppercase', color: 'var(--muted)', marginTop: 3 }}>{label}</div>
+        <div className="table-wrap scrollable">
+          <table className="adm">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Building</th>
+                <th>Neighborhood</th>
+                <th>Key</th>
+                <th>Subscribers</th>
+                <th>MRR</th>
+                <th>Visible</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {buildings.map(b => {
+                const stats = getBuildingStats(b.name)
+                return (
+                  <tr key={b.key}>
+                    <td>
+                      <div style={{ width: 52, height: 36, background: '#1c1208', overflow: 'hidden', flexShrink: 0 }}>
+                        {b.img && (
+                          <img src={b.img} alt={b.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'brightness(0.7)' }}
+                            onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                        )}
                       </div>
-                    ))}
-                  </div>
-
-                  {/* CUT BREAKDOWN */}
-                  {Object.keys(b.cuts).length > 0 && (
-                    <div>
-                      <div style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.4em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 8 }}>Cuts This Building</div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                        {Object.entries(b.cuts).sort((a, b) => b[1] - a[1]).map(([cut, count]) => (
-                          <span key={cut} style={{
-                            fontSize: 9, padding: '3px 8px',
-                            background: cut === b.topCut ? 'rgba(184,134,58,0.15)' : 'rgba(244,239,230,0.05)',
-                            border: `1px solid ${cut === b.topCut ? 'rgba(184,134,58,0.35)' : 'var(--border)'}`,
-                            color: cut === b.topCut ? 'var(--gold2)' : 'var(--muted)',
-                            letterSpacing: '0.1em',
-                          }}>
-                            {cut} × {count}
-                          </span>
-                        ))}
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 400 }}>{b.name}</div>
+                    </td>
+                    <td className="td-dim">{b.nbhd}</td>
+                    <td className="td-mono">{b.key}</td>
+                    <td>{stats.active}</td>
+                    <td style={{ fontFamily: 'Cormorant, serif', fontSize: 17, color: 'var(--gold2)' }}>${stats.mrr}</td>
+                    <td>
+                      <label className="toggle" title={b.active ? 'Hide' : 'Show'}>
+                        <input type="checkbox" checked={b.active} onChange={() => toggleActive(b)} />
+                        <span className="tog-slider" />
+                      </label>
+                    </td>
+                    <td>
+                      <div className="act-row">
+                        <button className="btn-icon" title="Edit" onClick={() => openEdit(b)}>✎</button>
+                        <button className="btn-icon danger" title="Delete" onClick={() => deleteBuilding(b.key, b.name)}>✕</button>
                       </div>
-                    </div>
-                  )}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-                  {b.active === 0 && (
-                    <div style={{ fontSize: 11, color: 'var(--muted)', fontStyle: 'italic', marginTop: 8 }}>No active subscribers yet</div>
-                  )}
+      {/* MODAL */}
+      {modal && (
+        <div className="modal-bg" onClick={closeModal}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
+            <div className="modal-head">
+              <span className="modal-title">{modal === 'add' ? <>Add <em>Building</em></> : <>Edit <em>Building</em></>}</span>
+              <button className="btn-icon" onClick={closeModal}>✕</button>
+            </div>
+            <div className="modal-body">
+              {error && (
+                <div style={{ background: 'rgba(192,57,43,0.1)', border: '1px solid rgba(192,57,43,0.3)', color: '#e05c4d', fontSize: 11, padding: '9px 13px', marginBottom: 16 }}>
+                  {error}
+                </div>
+              )}
+
+              {/* Image preview */}
+              <div className="f-img-preview">
+                {form.img ? <img src={form.img} alt="preview" onError={e => { (e.target as HTMLImageElement).style.opacity = '0' }} /> : <span>Image preview</span>}
+              </div>
+              <div style={{ height: 16 }} />
+
+              <div className="f-row">
+                <div className="f-field">
+                  <label className="f-label">Building Name *</label>
+                  <input className="f-input" placeholder="e.g. Aspire Post Oak" value={form.name}
+                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+                </div>
+                <div className="f-field">
+                  <label className="f-label">Unique Key {modal === 'add' && '*'}</label>
+                  <input className="f-input" placeholder="e.g. aspire-post-oak" value={keyInput}
+                    disabled={modal === 'edit'}
+                    onChange={e => setKeyInput(e.target.value)}
+                    style={{ opacity: modal === 'edit' ? 0.5 : 1 }} />
                 </div>
               </div>
-            )
-          })}
+
+              <div className="f-field">
+                <label className="f-label">Neighborhood *</label>
+                <input className="f-input" placeholder="e.g. Uptown · The Galleria" value={form.nbhd}
+                  onChange={e => setForm(f => ({ ...f, nbhd: e.target.value }))} />
+              </div>
+
+              <div className="f-field">
+                <label className="f-label">Card Image URL</label>
+                <input className="f-input" placeholder="https://…" value={form.img}
+                  onChange={e => setForm(f => ({ ...f, img: e.target.value }))} />
+              </div>
+
+              <div className="f-field">
+                <label className="f-label">Hero Image URL <span style={{ opacity: 0.5, fontSize: 9 }}>(large banner — defaults to card image)</span></label>
+                <input className="f-input" placeholder="https://… (optional)" value={form.hero_img}
+                  onChange={e => setForm(f => ({ ...f, hero_img: e.target.value }))} />
+              </div>
+
+              <div className="f-field">
+                <label className="f-label">Custom Display Name HTML <span style={{ opacity: 0.5, fontSize: 9 }}>(optional — for line breaks)</span></label>
+                <input className="f-input" placeholder='e.g. Aspire<br /><em>Post Oak</em>' value={form.name_html}
+                  onChange={e => setForm(f => ({ ...f, name_html: e.target.value }))} />
+              </div>
+
+              <div className="f-field">
+                <label className="f-label">Visibility</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingTop: 10 }}>
+                  <label className="toggle">
+                    <input type="checkbox" checked={form.active}
+                      onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} />
+                    <span className="tog-slider" />
+                  </label>
+                  <span style={{ fontSize: 12, color: 'var(--muted)' }}>{form.active ? 'Visible on site' : 'Hidden'}</span>
+                </div>
+              </div>
+            </div>
+            <div className="modal-foot">
+              <button className="btn-ghost" onClick={closeModal}>Cancel</button>
+              <button className="btn-gold" onClick={submit} disabled={saving}>
+                {saving ? 'Saving…' : modal === 'add' ? '+ Add Building' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </>

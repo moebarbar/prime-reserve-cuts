@@ -7,13 +7,15 @@ interface Product {
   name: string
   grade: string
   detail: string
+  weight: string
   price: number
+  price_per_week: number
   img: string
   available: boolean
 }
 
 const GRADES = ['USDA Prime', 'A5 Wagyu', 'Heritage', 'USDA Choice', 'Grass-Fed']
-const empty: Omit<Product, 'id'> = { name: '', grade: 'USDA Prime', detail: '', price: 0, img: '', available: true }
+const empty: Omit<Product, 'id'> = { name: '', grade: 'USDA Prime', detail: '', weight: '', price: 0, price_per_week: 0, img: '', available: true }
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -36,7 +38,7 @@ export default function ProductsPage() {
 
   const openEdit = (p: Product) => {
     setEditing(p)
-    setForm({ name: p.name, grade: p.grade, detail: p.detail, price: p.price, img: p.img, available: p.available })
+    setForm({ name: p.name, grade: p.grade, detail: p.detail, weight: p.weight ?? '', price: p.price, price_per_week: p.price_per_week ?? 0, img: p.img, available: p.available })
     setImgErr(false)
     setModal('edit')
   }
@@ -45,7 +47,8 @@ export default function ProductsPage() {
 
   const submit = async () => {
     if (!form.name.trim()) return alert('Product name is required.')
-    if (form.price <= 0)   return alert('Price must be greater than 0.')
+    if (form.price <= 0)   return alert('Monthly price must be greater than 0.')
+    if (form.price_per_week <= 0) return alert('Weekly price must be greater than 0.')
 
     try {
       if (modal === 'add') {
@@ -84,12 +87,10 @@ export default function ProductsPage() {
   }
 
   const deleteProduct = async (id: string) => {
-    if (!confirm('Delete this product?')) return
+    if (!confirm('Delete this product? It will be removed from the website immediately.')) return
     setProducts(ps => ps.filter(p => p.id !== id))
     await fetch(`/api/products/${id}`, { method: 'DELETE' })
   }
-
-  const mrr = products.filter(p => p.available).reduce((s, p) => s + p.price, 0)
 
   return (
     <>
@@ -98,28 +99,10 @@ export default function ProductsPage() {
         <div>
           <h2 className="sec-title">Manage <em>Products</em></h2>
           <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 3 }}>
-            {products.filter(p => p.available).length} active · {products.filter(p => !p.available).length} hidden
+            {products.filter(p => p.available).length} active · {products.filter(p => !p.available).length} hidden · changes reflect on the site instantly
           </div>
         </div>
         <button className="btn-gold" onClick={openAdd}>+ Add Product</button>
-      </div>
-
-      {/* STATS ROW */}
-      <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(3,1fr)', marginBottom: 24 }}>
-        <div className="stat-card gold-card">
-          <div className="stat-eyebrow">Potential MRR</div>
-          <div className="stat-value gold">${mrr}</div>
-          <div className="stat-sub">All active plans</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-eyebrow">Total Products</div>
-          <div className="stat-value">{products.length}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-eyebrow">Avg Price</div>
-          <div className="stat-value">{products.length ? `$${Math.round(products.reduce((s,p) => s+p.price,0)/products.length)}` : '—'}</div>
-          <div className="stat-sub">Per month</div>
-        </div>
       </div>
 
       {/* PRODUCT GRID */}
@@ -132,7 +115,7 @@ export default function ProductsPage() {
         <div className="empty-state">
           <div className="empty-state-icon">◧</div>
           <strong>No products yet</strong>
-          <p>Click "Add Product" to create your first cut.</p>
+          <p>Click &ldquo;Add Product&rdquo; to create your first cut. It will appear on the website immediately.</p>
         </div>
       ) : (
         <div className="prod-grid">
@@ -150,15 +133,19 @@ export default function ProductsPage() {
                 <div className="prod-grade">{p.grade}</div>
                 <div className="prod-name">{p.name}</div>
                 <div className="prod-detail">{p.detail}</div>
-                <div className="prod-price"><sup>$</sup>{p.price}<sub>/mo</sub></div>
+                {p.weight && <div style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 6 }}>⚖ {p.weight}</div>}
+                <div style={{ display: 'flex', gap: 12, alignItems: 'baseline' }}>
+                  <div className="prod-price"><sup>$</sup>{p.price_per_week}<sub>/wk</sub></div>
+                  <div style={{ fontSize: 10, color: 'var(--muted)' }}>${p.price}/mo</div>
+                </div>
               </div>
               <div className="prod-foot">
                 <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                  <label className="toggle" title={p.available ? 'Hide product' : 'Show product'}>
+                  <label className="toggle" title={p.available ? 'Hide from website' : 'Show on website'}>
                     <input type="checkbox" checked={p.available} onChange={() => toggleAvail(p)} />
                     <span className="tog-slider" />
                   </label>
-                  <span className="prod-foot-label">{p.available ? 'Visible' : 'Hidden'}</span>
+                  <span className="prod-foot-label">{p.available ? 'Live on site' : 'Hidden'}</span>
                 </div>
                 <div className="act-row">
                   <button className="btn-icon" title="Edit" onClick={() => openEdit(p)}>✎</button>
@@ -204,27 +191,39 @@ export default function ProductsPage() {
                   </select>
                 </div>
               </div>
-              <div className="f-field">
-                <label className="f-label">Description / Cut Detail</label>
-                <input className="f-input" placeholder="e.g. 16oz bone-in · 21-day dry-aged" value={form.detail}
-                  onChange={e => setForm(f => ({ ...f, detail: e.target.value }))} />
+              <div className="f-row">
+                <div className="f-field">
+                  <label className="f-label">Description / Cut Detail</label>
+                  <input className="f-input" placeholder="e.g. 16oz bone-in · 21-day dry-aged" value={form.detail}
+                    onChange={e => setForm(f => ({ ...f, detail: e.target.value }))} />
+                </div>
+                <div className="f-field">
+                  <label className="f-label">Weight</label>
+                  <input className="f-input" placeholder="e.g. 16 oz (454g)" value={form.weight}
+                    onChange={e => setForm(f => ({ ...f, weight: e.target.value }))} />
+                </div>
               </div>
               <div className="f-row">
                 <div className="f-field">
-                  <label className="f-label">Monthly Price ($) *</label>
-                  <input className="f-input" type="number" min={1} placeholder="89" value={form.price || ''}
-                    onChange={e => setForm(f => ({ ...f, price: parseInt(e.target.value) || 0 }))} />
+                  <label className="f-label">Weekly Price ($) * <span style={{ opacity: 0.5, fontSize: 9 }}>shown at checkout</span></label>
+                  <input className="f-input" type="number" min={1} placeholder="49" value={form.price_per_week || ''}
+                    onChange={e => setForm(f => ({ ...f, price_per_week: parseInt(e.target.value) || 0 }))} />
                 </div>
                 <div className="f-field">
-                  <label className="f-label">Visibility</label>
-                  <div style={{ display:'flex', alignItems:'center', gap:10, paddingTop:10 }}>
-                    <label className="toggle">
-                      <input type="checkbox" checked={form.available}
-                        onChange={e => setForm(f => ({ ...f, available: e.target.checked }))} />
-                      <span className="tog-slider" />
-                    </label>
-                    <span style={{ fontSize:12, color:'var(--muted)' }}>{form.available ? 'Visible on site' : 'Hidden'}</span>
-                  </div>
+                  <label className="f-label">Monthly Price ($) * <span style={{ opacity: 0.5, fontSize: 9 }}>shown on homepage</span></label>
+                  <input className="f-input" type="number" min={1} placeholder="189" value={form.price || ''}
+                    onChange={e => setForm(f => ({ ...f, price: parseInt(e.target.value) || 0 }))} />
+                </div>
+              </div>
+              <div className="f-field">
+                <label className="f-label">Visibility</label>
+                <div style={{ display:'flex', alignItems:'center', gap:10, paddingTop:10 }}>
+                  <label className="toggle">
+                    <input type="checkbox" checked={form.available}
+                      onChange={e => setForm(f => ({ ...f, available: e.target.checked }))} />
+                    <span className="tog-slider" />
+                  </label>
+                  <span style={{ fontSize:12, color:'var(--muted)' }}>{form.available ? 'Visible on site' : 'Hidden'}</span>
                 </div>
               </div>
             </div>

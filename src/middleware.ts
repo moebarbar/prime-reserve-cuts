@@ -16,13 +16,27 @@ function constantTimeEqual(a: string, b: string): boolean {
   return diff === 0
 }
 
-function isAdminRoute(pathname: string) {
-  return (
-    pathname.startsWith('/admin') ||
-    pathname.startsWith('/api/leads') ||
-    pathname.startsWith('/api/orders') ||
-    pathname.startsWith('/api/products')
-  )
+function isAdminRoute(pathname: string, method: string) {
+  // Admin pages always protected
+  if (pathname.startsWith('/admin')) return true
+  // All write operations on data APIs are admin-only
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+    if (
+      pathname.startsWith('/api/leads') ||
+      pathname.startsWith('/api/orders') ||
+      pathname.startsWith('/api/products') ||
+      pathname.startsWith('/api/buildings')
+    ) return true
+  }
+  // All reads on leads/orders/products are admin-only (sensitive data)
+  if (['GET'].includes(method)) {
+    if (
+      pathname.startsWith('/api/leads') ||
+      pathname.startsWith('/api/orders') ||
+      pathname.startsWith('/api/products')
+    ) return true
+  }
+  return false
 }
 
 // Routes that don't require auth (login page + login API)
@@ -68,7 +82,7 @@ export function middleware(req: NextRequest) {
   }
 
   // Protect admin pages and admin API routes
-  if (isAdminRoute(pathname)) {
+  if (isAdminRoute(pathname, req.method)) {
     if (!ADMIN_PASS) {
       // No password configured — redirect to login which will show the error
       return NextResponse.redirect(new URL('/admin/login', req.url))

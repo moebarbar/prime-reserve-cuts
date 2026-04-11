@@ -25,6 +25,8 @@ function fmtDate(d: string | null) {
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
+const emptyOrder = { customer: '', email: '', building: '', unit: '', cut: '', price: 0, status: 'active' as OrderStatus, next_delivery: '' }
+
 export default function OrdersPage() {
   const [orders, setOrders]     = useState<Order[]>([])
   const [loading, setLoading]   = useState(true)
@@ -32,6 +34,9 @@ export default function OrdersPage() {
   const [statusF, setStatusF]   = useState('all')
   const [expanded, setExpanded] = useState<string | null>(null)
   const [error, setError]       = useState<string | null>(null)
+  const [addModal, setAddModal] = useState(false)
+  const [addForm, setAddForm]   = useState({ ...emptyOrder })
+  const [adding, setAdding]     = useState(false)
 
   useEffect(() => {
     fetch('/api/orders')
@@ -84,6 +89,29 @@ export default function OrdersPage() {
     }
   }
 
+  const addOrder = async () => {
+    if (!addForm.customer.trim() || !addForm.email.trim() || !addForm.building.trim() || !addForm.unit.trim() || !addForm.cut.trim() || !addForm.price) {
+      showError('All fields except next delivery are required.'); return
+    }
+    setAdding(true)
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...addForm, price: Number(addForm.price), next_delivery: addForm.next_delivery || null }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      const created = await res.json()
+      setOrders(os => [created, ...os])
+      setAddModal(false)
+      setAddForm({ ...emptyOrder })
+    } catch {
+      showError('Failed to add order.')
+    } finally {
+      setAdding(false)
+    }
+  }
+
   const exportCSV = () => {
     const rows = [
       ['Order ID', 'Customer', 'Email', 'Building', 'Unit', 'Cut', 'Price', 'Status', 'Start Date', 'Next Delivery'],
@@ -112,6 +140,12 @@ export default function OrdersPage() {
           {error}
         </div>
       )}
+
+      {/* HEADER */}
+      <div className="sec-head" style={{ marginBottom: 20 }}>
+        <h2 className="sec-title">Manage <em>Orders</em></h2>
+        <button className="btn-gold" onClick={() => setAddModal(true)}>+ Add Order</button>
+      </div>
 
       {/* STATS */}
       <div className="stat-grid" style={{ marginBottom: 20 }}>
@@ -278,6 +312,66 @@ export default function OrdersPage() {
         Showing {filtered.length} of {orders.length} orders
         {statusF === 'active' && ` · $${filtered.reduce((s, o) => s + o.price, 0)}/mo revenue`}
       </div>
+
+      {/* ADD ORDER MODAL */}
+      {addModal && (
+        <div className="modal-bg" onClick={() => setAddModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <span className="modal-title">Add <em>Order</em></span>
+              <button className="btn-icon" onClick={() => setAddModal(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <div className="f-row">
+                <div className="f-field">
+                  <label className="f-label">Customer Name *</label>
+                  <input className="f-input" placeholder="James Hartley" value={addForm.customer} onChange={e => setAddForm(f => ({ ...f, customer: e.target.value }))} />
+                </div>
+                <div className="f-field">
+                  <label className="f-label">Email *</label>
+                  <input className="f-input" type="email" placeholder="james@email.com" value={addForm.email} onChange={e => setAddForm(f => ({ ...f, email: e.target.value }))} />
+                </div>
+              </div>
+              <div className="f-row">
+                <div className="f-field">
+                  <label className="f-label">Building *</label>
+                  <input className="f-input" placeholder="Aspire Post Oak" value={addForm.building} onChange={e => setAddForm(f => ({ ...f, building: e.target.value }))} />
+                </div>
+                <div className="f-field">
+                  <label className="f-label">Unit *</label>
+                  <input className="f-input" placeholder="1204" value={addForm.unit} onChange={e => setAddForm(f => ({ ...f, unit: e.target.value }))} />
+                </div>
+              </div>
+              <div className="f-row">
+                <div className="f-field">
+                  <label className="f-label">Cut *</label>
+                  <input className="f-input" placeholder="e.g. Ribeye" value={addForm.cut} onChange={e => setAddForm(f => ({ ...f, cut: e.target.value }))} />
+                </div>
+                <div className="f-field">
+                  <label className="f-label">Monthly Price ($) *</label>
+                  <input className="f-input" type="number" min={1} placeholder="89" value={addForm.price || ''} onChange={e => setAddForm(f => ({ ...f, price: parseInt(e.target.value) || 0 }))} />
+                </div>
+              </div>
+              <div className="f-row">
+                <div className="f-field">
+                  <label className="f-label">Status</label>
+                  <select className="f-select" value={addForm.status} onChange={e => setAddForm(f => ({ ...f, status: e.target.value as OrderStatus }))}>
+                    {STATUS_OPTS.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+                  </select>
+                </div>
+                <div className="f-field">
+                  <label className="f-label">Next Delivery</label>
+                  <input className="f-input date-inline" type="date" value={addForm.next_delivery} onChange={e => setAddForm(f => ({ ...f, next_delivery: e.target.value }))} style={{ fontSize: 14, padding: '8px 0' }} />
+                </div>
+              </div>
+            </div>
+            <div className="modal-foot">
+              <button className="btn-ghost" onClick={() => setAddModal(false)}>Cancel</button>
+              <button className="btn-gold" onClick={addOrder} disabled={adding}>{adding ? 'Adding…' : '+ Add Order'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
