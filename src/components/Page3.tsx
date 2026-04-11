@@ -23,8 +23,8 @@ interface Page3Props {
 export default function Page3({ building, selections, form, onBack }: Page3Props) {
   const [paid, setPaid] = useState(false)
   const [processing, setProcessing] = useState(false)
-  const weeklyTotal = selections.reduce((sum, s) => sum + s.cut.pricePerWeek * s.qty, 0)
-  const firstCut = selections[0].cut
+  const weeklyTotal = selections.reduce((sum, s) => sum + s.cut.price_per_week * s.qty, 0)
+  const firstCut = selections[0]?.cut
 
   const handlePay = async () => {
     setProcessing(true)
@@ -106,7 +106,7 @@ export default function Page3({ building, selections, form, onBack }: Page3Props
               {selections.map(s => (
                 <div key={s.cut.name} className={styles.orow}>
                   <span>{s.cut.name} × {s.qty} <span style={{ color: 'var(--muted)', fontSize: 10 }}>({s.cut.weight} each)</span></span>
-                  <span>${s.cut.pricePerWeek * s.qty}</span>
+                  <span>${s.cut.price_per_week * s.qty}</span>
                 </div>
               ))}
               <div className={styles.orow}><span>Unit</span><span>{form.unit || '—'}</span></div>

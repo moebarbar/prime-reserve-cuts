@@ -95,10 +95,13 @@ export default function BuildingsPage() {
 
   const deleteBuilding = async (key: string, name: string) => {
     if (!confirm(`Delete "${name}"? This cannot be undone.`)) return
+    const snapshot = buildings.find(b => b.key === key)
     setBuildings(bs => bs.filter(b => b.key !== key))
     try {
-      await fetch(`/api/buildings/${key}`, { method: 'DELETE' })
+      const res = await fetch(`/api/buildings/${key}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed')
     } catch {
+      if (snapshot) setBuildings(bs => [...bs, snapshot])
       setError('Failed to delete building.')
     }
   }

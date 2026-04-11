@@ -28,12 +28,12 @@ function isAdminRoute(pathname: string, method: string) {
       pathname.startsWith('/api/buildings')
     ) return true
   }
-  // All reads on leads/orders/products are admin-only (sensitive data)
-  if (['GET'].includes(method)) {
+  // Leads and orders reads are admin-only (sensitive customer data)
+  // Products GET is intentionally public — main site checkout uses it
+  if (method === 'GET') {
     if (
       pathname.startsWith('/api/leads') ||
-      pathname.startsWith('/api/orders') ||
-      pathname.startsWith('/api/products')
+      pathname.startsWith('/api/orders')
     ) return true
   }
   return false

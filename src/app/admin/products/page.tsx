@@ -79,17 +79,31 @@ export default function ProductsPage() {
   const toggleAvail = async (p: Product) => {
     const updated = { ...p, available: !p.available }
     setProducts(ps => ps.map(x => x.id === p.id ? updated : x))
-    await fetch(`/api/products/${p.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updated),
-    })
+    try {
+      const res = await fetch(`/api/products/${p.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      })
+      if (!res.ok) throw new Error('Failed')
+    } catch {
+      // Revert on failure
+      setProducts(ps => ps.map(x => x.id === p.id ? p : x))
+      alert('Failed to update product visibility.')
+    }
   }
 
   const deleteProduct = async (id: string) => {
     if (!confirm('Delete this product? It will be removed from the website immediately.')) return
+    const snapshot = products.find(p => p.id === id)
     setProducts(ps => ps.filter(p => p.id !== id))
-    await fetch(`/api/products/${id}`, { method: 'DELETE' })
+    try {
+      const res = await fetch(`/api/products/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed')
+    } catch {
+      if (snapshot) setProducts(ps => [...ps, snapshot])
+      alert('Failed to delete product.')
+    }
   }
 
   return (

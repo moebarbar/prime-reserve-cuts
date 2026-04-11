@@ -10,19 +10,20 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ key:
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const { name, name_html, nbhd, img, hero_img } = body
+  const { name, name_html, nbhd, img, hero_img, active } = body
 
   try {
     const [building] = await query(`
       UPDATE buildings
-      SET name = COALESCE($1, name),
+      SET name      = COALESCE($1, name),
           name_html = COALESCE($2, name_html),
-          nbhd = COALESCE($3, nbhd),
-          img = COALESCE($4, img),
-          hero_img = COALESCE($5, hero_img)
-      WHERE key = $6
+          nbhd      = COALESCE($3, nbhd),
+          img       = COALESCE($4, img),
+          hero_img  = COALESCE($5, hero_img),
+          active    = COALESCE($6, active)
+      WHERE key = $7
       RETURNING *
-    `, [name ?? null, name_html ?? null, nbhd ?? null, img ?? null, hero_img ?? null, key])
+    `, [name ?? null, name_html ?? null, nbhd ?? null, img ?? null, hero_img ?? null, active ?? null, key])
 
     if (!building) return NextResponse.json({ error: 'Building not found' }, { status: 404 })
     return NextResponse.json(building)
