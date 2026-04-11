@@ -69,20 +69,25 @@ async function run() {
   // ── ORDERS ─────────────────────────────────────────────────────────────────
   await pool.query(`
     CREATE TABLE IF NOT EXISTS orders (
-      id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      customer       TEXT NOT NULL,
-      email          TEXT NOT NULL,
-      building       TEXT NOT NULL,
-      unit           TEXT NOT NULL,
-      cut            TEXT NOT NULL,
-      price          INTEGER NOT NULL,
-      status         TEXT NOT NULL DEFAULT 'pending'
-                       CHECK (status IN ('active','paused','cancelled','pending')),
-      start_date     DATE,
-      next_delivery  DATE,
-      created_at     TIMESTAMPTZ DEFAULT NOW(),
-      updated_at     TIMESTAMPTZ DEFAULT NOW()
+      id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      customer           TEXT NOT NULL,
+      email              TEXT NOT NULL,
+      building           TEXT NOT NULL,
+      unit               TEXT NOT NULL,
+      cut                TEXT NOT NULL,
+      price              INTEGER NOT NULL,
+      status             TEXT NOT NULL DEFAULT 'pending'
+                           CHECK (status IN ('active','paused','cancelled','pending')),
+      start_date         DATE,
+      next_delivery      DATE,
+      stripe_session_id  TEXT UNIQUE,
+      created_at         TIMESTAMPTZ DEFAULT NOW(),
+      updated_at         TIMESTAMPTZ DEFAULT NOW()
     )
+  `)
+  // Add stripe_session_id to existing tables that predate this migration
+  await pool.query(`
+    ALTER TABLE orders ADD COLUMN IF NOT EXISTS stripe_session_id TEXT UNIQUE
   `)
   console.log('✓ orders table')
 

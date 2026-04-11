@@ -81,7 +81,7 @@ export default function SubscriptionConfirmed({
                 </tr>
                 <tr>
                   <td style={rowLabel}>Billing</td>
-                  <td style={rowValue}>Monthly · 1st of each month</td>
+                  <td style={rowValue}>Weekly · Every Saturday</td>
                 </tr>
               </tbody>
             </table>
@@ -91,8 +91,8 @@ export default function SubscriptionConfirmed({
             <table style={{ width: '100%' }}>
               <tbody>
                 <tr>
-                  <td style={{ ...rowLabel, fontSize: 13 }}>Monthly Total</td>
-                  <td style={priceCell}>${price}/mo</td>
+                  <td style={{ ...rowLabel, fontSize: 13 }}>Weekly Total</td>
+                  <td style={priceCell}>${price}/week</td>
                 </tr>
               </tbody>
             </table>
@@ -102,7 +102,7 @@ export default function SubscriptionConfirmed({
           <Section style={deliveryNote}>
             <Text style={deliveryIcon}>🚪</Text>
             <Text style={deliveryText}>
-              <strong style={{ color: '#e8d8b0' }}>Delivered to your door, the 1st of every month.</strong>
+              <strong style={{ color: '#e8d8b0' }}>Delivered to your door, Every Saturday.</strong>
               {' '}Vacuum-sealed with dry ice, coordinated with your concierge at {buildingName}. No signature required.
             </Text>
           </Section>

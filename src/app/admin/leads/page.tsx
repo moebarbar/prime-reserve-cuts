@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 
 type LeadStatus = 'new' | 'contacted' | 'converted' | 'lost'
 
@@ -34,6 +34,7 @@ export default function LeadsPage() {
   const [statusF, setStatusF]     = useState('all')
   const [buildingF, setBuildingF] = useState('All Buildings')
   const [expanded, setExpanded]   = useState<string | null>(null)
+  const [error, setError]         = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/api/leads')
@@ -51,17 +52,34 @@ export default function LeadsPage() {
   })
 
   const updateStatus = async (id: string, status: LeadStatus) => {
+    const prev = leads.find(l => l.id === id)?.status
     setLeads(ls => ls.map(l => l.id === id ? { ...l, status } : l))
-    await fetch(`/api/leads/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    })
+    try {
+      const res = await fetch(`/api/leads/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      })
+      if (!res.ok) throw new Error('Failed')
+    } catch {
+      // Revert on failure
+      if (prev) setLeads(ls => ls.map(l => l.id === id ? { ...l, status: prev } : l))
+      setError('Failed to update status. Please try again.')
+      setTimeout(() => setError(null), 3000)
+    }
   }
 
   const deleteLead = async (id: string) => {
+    const snapshot = leads.find(l => l.id === id)
     setLeads(ls => ls.filter(l => l.id !== id))
-    await fetch(`/api/leads/${id}`, { method: 'DELETE' })
+    try {
+      const res = await fetch(`/api/leads/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed')
+    } catch {
+      if (snapshot) setLeads(ls => [...ls, snapshot].sort((a, b) => b.created_at.localeCompare(a.created_at)))
+      setError('Failed to delete lead. Please try again.')
+      setTimeout(() => setError(null), 3000)
+    }
   }
 
   const counts = STATUS_OPTS.reduce((acc, s) => {
@@ -69,8 +87,31 @@ export default function LeadsPage() {
     return acc
   }, {} as Record<LeadStatus, number>)
 
+  const exportCSV = () => {
+    const rows = [
+      ['ID', 'Name', 'Email', 'Phone', 'Building', 'Unit', 'Interested In', 'Status', 'Date'],
+      ...filtered.map(l => [
+        l.id, l.name, l.email, l.phone ?? '', l.building, l.unit, l.cut ?? '', l.status, fmtDate(l.created_at),
+      ]),
+    ]
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `leads-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <>
+      {error && (
+        <div style={{ background: 'rgba(192,57,43,0.12)', border: '1px solid rgba(192,57,43,0.3)', color: '#e05c4d', padding: '10px 16px', marginBottom: 14, fontSize: 12 }}>
+          {error}
+        </div>
+      )}
+
       {/* MINI STATS */}
       <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: 20 }}>
         {STATUS_OPTS.map(s => (
@@ -106,6 +147,9 @@ export default function LeadsPage() {
             Clear
           </button>
         )}
+        <button className="btn-ghost" onClick={exportCSV} style={{ marginLeft: 'auto' }}>
+          ⬇ Export CSV
+        </button>
       </div>
 
       {/* TABLE */}
@@ -137,9 +181,8 @@ export default function LeadsPage() {
             </thead>
             <tbody>
               {filtered.map(l => (
-                <>
+                <Fragment key={l.id}>
                   <tr
-                    key={l.id}
                     style={{ cursor: 'pointer' }}
                     onClick={() => setExpanded(expanded === l.id ? null : l.id)}
                   >
@@ -182,7 +225,7 @@ export default function LeadsPage() {
                     </td>
                   </tr>
                   {expanded === l.id && (
-                    <tr key={`${l.id}-detail`} className="detail-row">
+                    <tr className="detail-row">
                       <td colSpan={8}>
                         <div className="detail-box">
                           <div className="detail-item"><label>Full Name</label><span>{l.name}</span></div>
@@ -214,7 +257,7 @@ export default function LeadsPage() {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))}
             </tbody>
           </table>

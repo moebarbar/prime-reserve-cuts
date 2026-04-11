@@ -7,6 +7,7 @@ import Page2 from '@/components/Page2'
 import Page3 from '@/components/Page3'
 import { BUILDINGS, Building } from '@/data/buildings'
 import { Cut } from '@/data/cuts'
+import { CutSelection } from '@/components/Page2'
 
 interface FormData {
   unit: string
@@ -21,6 +22,7 @@ export default function Home() {
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null)
   const [selectedCut, setSelectedCut] = useState<Cut | null>(null)
+  const [selections, setSelections] = useState<CutSelection[]>([])
   const [formData, setFormData] = useState<FormData>({
     unit: '', firstName: '', lastName: '', email: '', phone: ''
   })
@@ -46,6 +48,9 @@ export default function Home() {
     const url = new URL(window.location.href)
     url.searchParams.set('b', key)
     window.history.replaceState({}, '', url.toString())
+    // Immediately advance to step 2
+    window.scrollTo(0, 0)
+    setStep(2)
   }
 
   const goTo2 = () => {
@@ -53,9 +58,10 @@ export default function Home() {
     setStep(2)
   }
 
-  const goTo3 = (fd: FormData, cut: Cut) => {
+  const goTo3 = (fd: FormData, sels: CutSelection[]) => {
     setFormData(fd)
-    setSelectedCut(cut)
+    setSelections(sels)
+    setSelectedCut(sels[0]?.cut ?? null)
     window.scrollTo(0, 0)
     setStep(3)
   }
@@ -72,7 +78,7 @@ export default function Home() {
 
   return (
     <>
-      <Nav step={step} />
+      <Nav step={step} onLogoClick={goTo1} />
       {step === 1 && (
         <Page1
           selectedKey={selectedKey}
@@ -87,10 +93,10 @@ export default function Home() {
           onContinue={goTo3}
         />
       )}
-      {step === 3 && selectedBuilding && selectedCut && (
+      {step === 3 && selectedBuilding && selections.length > 0 && (
         <Page3
           building={selectedBuilding}
-          cut={selectedCut}
+          selections={selections}
           form={formData}
           onBack={goTo2Back}
         />

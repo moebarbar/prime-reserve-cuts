@@ -56,6 +56,27 @@
 }
 .spBtn:hover:not(:disabled) { background: #5147d4; }
 .spBtn:disabled { opacity: .7; cursor: not-allowed; }
+/* Account creation */
+.acDivider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 18px 0 16px;
+}
+.acDividerLine {
+  flex: 1; height: 1px; background: #e6ebf1;
+}
+.acDividerText {
+  font-family: -apple-system, sans-serif;
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  color: #8898aa; white-space: nowrap;
+}
+.acNote {
+  font-family: -apple-system, sans-serif;
+  font-size: 10px; color: #8898aa;
+  font-style: italic; line-height: 1.5;
+  margin: 6px 0 14px;
+}
+
 .spFoot { background: #f6f9fc; border-top: 1px solid #e6ebf1; padding: 11px 22px; display: flex; align-items: center; justify-content: center; font-family: -apple-system, sans-serif; font-size: 11px; color: #8898aa; }
 
 /* Success */

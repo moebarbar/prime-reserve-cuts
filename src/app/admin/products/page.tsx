@@ -47,24 +47,30 @@ export default function ProductsPage() {
     if (!form.name.trim()) return alert('Product name is required.')
     if (form.price <= 0)   return alert('Price must be greater than 0.')
 
-    if (modal === 'add') {
-      const res = await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      const created = await res.json()
-      setProducts(ps => [...ps, created])
-    } else if (editing) {
-      const res = await fetch(`/api/products/${editing.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      const updated = await res.json()
-      setProducts(ps => ps.map(p => p.id === editing.id ? updated : p))
+    try {
+      if (modal === 'add') {
+        const res = await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        })
+        if (!res.ok) throw new Error('Failed to create product')
+        const created = await res.json()
+        setProducts(ps => [...ps, created])
+      } else if (editing) {
+        const res = await fetch(`/api/products/${editing.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        })
+        if (!res.ok) throw new Error('Failed to update product')
+        const updated = await res.json()
+        setProducts(ps => ps.map(p => p.id === editing.id ? updated : p))
+      }
+      closeModal()
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'An error occurred. Please try again.')
     }
-    closeModal()
   }
 
   const toggleAvail = async (p: Product) => {

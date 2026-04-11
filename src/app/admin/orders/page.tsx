@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 
 type OrderStatus = 'active' | 'paused' | 'cancelled' | 'pending'
 
@@ -31,6 +31,7 @@ export default function OrdersPage() {
   const [search, setSearch]     = useState('')
   const [statusF, setStatusF]   = useState('all')
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [error, setError]       = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/api/orders')
@@ -46,13 +47,59 @@ export default function OrdersPage() {
     return matchQ && matchS
   })
 
+  const showError = (msg: string) => {
+    setError(msg)
+    setTimeout(() => setError(null), 3000)
+  }
+
   const updateStatus = async (id: string, status: OrderStatus) => {
+    const prev = orders.find(o => o.id === id)?.status
     setOrders(os => os.map(o => o.id === id ? { ...o, status } : o))
-    await fetch(`/api/orders/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    })
+    try {
+      const res = await fetch(`/api/orders/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      })
+      if (!res.ok) throw new Error('Failed')
+    } catch {
+      if (prev) setOrders(os => os.map(o => o.id === id ? { ...o, status: prev } : o))
+      showError('Failed to update order status. Please try again.')
+    }
+  }
+
+  const updateDelivery = async (id: string, value: string) => {
+    // Send null for empty string — PostgreSQL rejects empty string as ::date
+    const next_delivery = value || null
+    setOrders(os => os.map(o => o.id === id ? { ...o, next_delivery } : o))
+    try {
+      const res = await fetch(`/api/orders/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ next_delivery }),
+      })
+      if (!res.ok) throw new Error('Failed')
+    } catch {
+      showError('Failed to update delivery date. Please try again.')
+    }
+  }
+
+  const exportCSV = () => {
+    const rows = [
+      ['Order ID', 'Customer', 'Email', 'Building', 'Unit', 'Cut', 'Price', 'Status', 'Start Date', 'Next Delivery'],
+      ...filtered.map(o => [
+        o.id, o.customer, o.email, o.building, o.unit, o.cut, `$${o.price}`,
+        o.status, fmtDate(o.start_date), fmtDate(o.next_delivery),
+      ]),
+    ]
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `orders-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   const activeOrders = orders.filter(o => o.status === 'active')
@@ -60,6 +107,12 @@ export default function OrdersPage() {
 
   return (
     <>
+      {error && (
+        <div style={{ background: 'rgba(192,57,43,0.12)', border: '1px solid rgba(192,57,43,0.3)', color: '#e05c4d', padding: '10px 16px', marginBottom: 14, fontSize: 12 }}>
+          {error}
+        </div>
+      )}
+
       {/* STATS */}
       <div className="stat-grid" style={{ marginBottom: 20 }}>
         <div className="stat-card gold-card">
@@ -95,6 +148,9 @@ export default function OrdersPage() {
         {(search || statusF !== 'all') && (
           <button className="btn-ghost" onClick={() => { setSearch(''); setStatusF('all') }}>Clear</button>
         )}
+        <button className="btn-ghost" onClick={exportCSV} style={{ marginLeft: 'auto' }}>
+          ⬇ Export CSV
+        </button>
       </div>
 
       {/* TABLE */}
@@ -127,9 +183,8 @@ export default function OrdersPage() {
             </thead>
             <tbody>
               {filtered.map(o => (
-                <>
+                <Fragment key={o.id}>
                   <tr
-                    key={o.id}
                     style={{ cursor: 'pointer' }}
                     onClick={() => setExpanded(expanded === o.id ? null : o.id)}
                   >
@@ -145,7 +200,15 @@ export default function OrdersPage() {
                     <td>{o.cut}</td>
                     <td style={{ fontFamily: 'Cormorant, serif', fontSize: 17, color: 'var(--gold2)' }}>${o.price}</td>
                     <td className="td-dim">{fmtDate(o.start_date)}</td>
-                    <td className="td-dim">{fmtDate(o.next_delivery)}</td>
+                    <td onClick={e => e.stopPropagation()}>
+                      <input
+                        type="date"
+                        className="date-inline"
+                        value={o.next_delivery ? o.next_delivery.slice(0, 10) : ''}
+                        onChange={e => updateDelivery(o.id, e.target.value)}
+                        title="Edit next delivery date"
+                      />
+                    </td>
                     <td onClick={e => e.stopPropagation()}>
                       <select
                         className={`badge badge-${o.status} inline-sel`}
@@ -166,7 +229,7 @@ export default function OrdersPage() {
                     </td>
                   </tr>
                   {expanded === o.id && (
-                    <tr key={`${o.id}-detail`} className="detail-row">
+                    <tr className="detail-row">
                       <td colSpan={9}>
                         <div className="detail-box">
                           <div className="detail-item"><label>Customer</label><span>{o.customer}</span></div>
@@ -204,7 +267,7 @@ export default function OrdersPage() {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))}
             </tbody>
           </table>
@@ -213,7 +276,7 @@ export default function OrdersPage() {
 
       <div style={{ marginTop: 10, fontSize: 11, color: 'var(--muted)' }}>
         Showing {filtered.length} of {orders.length} orders
-        {statusF === 'active' && ` · $${filtered.reduce((s,o) => s+o.price, 0)}/mo revenue`}
+        {statusF === 'active' && ` · $${filtered.reduce((s, o) => s + o.price, 0)}/mo revenue`}
       </div>
     </>
   )

@@ -545,6 +545,106 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
 .detail-item label { font-size: 7px; font-weight: 700; letter-spacing: 0.4em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 3px; }
 .detail-item span { font-size: 12px; color: var(--cream); }
 
+/* DELIVERY MANIFEST */
+.delivery-building { }
+.delivery-bld-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  background: rgba(184,134,58,0.05);
+  border: 1px solid rgba(184,134,58,0.18);
+  border-bottom: none;
+}
+.delivery-bld-name {
+  font-family: 'Cormorant', serif;
+  font-size: 20px; font-weight: 300; color: var(--cream);
+}
+
+/* Delivery checkmark */
+.delivery-check { position: relative; display: inline-block; width: 20px; height: 20px; cursor: pointer; }
+.delivery-check input { position: absolute; opacity: 0; width: 0; height: 0; }
+.delivery-check-box {
+  position: absolute; inset: 0;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  transition: all 0.18s;
+  display: flex; align-items: center; justify-content: center;
+}
+.delivery-check input:checked + .delivery-check-box {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.delivery-check input:checked + .delivery-check-box::after {
+  content: '✓';
+  color: var(--dark);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* BUILDINGS ADMIN GRID */
+.bld-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+.bld-admin-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: border-color 0.2s;
+  position: relative;
+}
+.bld-admin-card:hover { border-color: rgba(184,134,58,0.3); }
+.bld-admin-rank {
+  position: absolute; top: 10px; left: 10px; z-index: 5;
+  font-size: 10px; font-weight: 700; color: var(--gold);
+  background: rgba(13,11,8,0.82);
+  padding: 3px 8px;
+  letter-spacing: 0.1em;
+}
+.bld-admin-img {
+  height: 140px; position: relative; overflow: hidden; background: #1c1208;
+}
+.bld-admin-img img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: brightness(0.55) saturate(0.7);
+  transition: filter 0.3s, transform 0.4s;
+}
+.bld-admin-card:hover .bld-admin-img img { filter: brightness(0.72) saturate(0.85); transform: scale(1.04); }
+.bld-admin-img-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 50%, rgba(13,11,8,0.9) 100%);
+}
+.bld-admin-nbhd {
+  position: absolute; bottom: 10px; left: 14px;
+  font-size: 8px; font-weight: 700; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--gold); opacity: 0.9;
+}
+.bld-admin-body { padding: 16px 18px 18px; }
+.bld-admin-name {
+  font-family: 'Cormorant', serif;
+  font-size: 20px; font-weight: 300; color: var(--cream);
+  margin-bottom: 14px;
+}
+
+/* INLINE DATE INPUT (Orders) */
+.date-inline {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(184,134,58,0.25);
+  color: var(--muted);
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  padding: 2px 0;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  width: 120px;
+  color-scheme: dark;
+}
+.date-inline:hover { border-bottom-color: rgba(184,134,58,0.55); color: var(--cream); }
+.date-inline:focus { border-bottom-color: var(--gold); color: var(--cream); }
+
 /* RESPONSIVE */
 @media (max-width: 1100px) {
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
