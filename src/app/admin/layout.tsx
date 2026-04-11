@@ -18,6 +18,12 @@ const PAGE_TITLES: Record<string, string> = {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
+
+  // Login page gets a bare layout — no shell, no sidebar
+  if (pathname === '/admin/login') {
+    return <>{children}</>
+  }
+
   const rawTitle = PAGE_TITLES[pathname] ?? 'Admin'
   const [first, ...rest] = rawTitle.split(' ')
 

@@ -5,7 +5,7 @@ const ADMIN_PASS = process.env.ADMIN_PASS ?? ''
 
 const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_URL ?? ''
 
-// Constant-time string comparison to prevent timing attacks on admin credentials
+// Constant-time string comparison to prevent timing attacks
 function constantTimeEqual(a: string, b: string): boolean {
   const enc = new TextEncoder()
   const aBytes = enc.encode(a)
@@ -16,7 +16,6 @@ function constantTimeEqual(a: string, b: string): boolean {
   return diff === 0
 }
 
-// Routes that require admin Basic Auth
 function isAdminRoute(pathname: string) {
   return (
     pathname.startsWith('/admin') ||
@@ -26,7 +25,20 @@ function isAdminRoute(pathname: string) {
   )
 }
 
-// Add CORS headers — only allow requests from our own domain
+// Routes that don't require auth (login page + login API)
+function isPublicAdminRoute(pathname: string) {
+  return (
+    pathname === '/admin/login' ||
+    pathname.startsWith('/api/admin/')
+  )
+}
+
+function isValidToken(token: string): boolean {
+  if (!ADMIN_PASS) return false
+  const expected = btoa(`${ADMIN_USER}:${ADMIN_PASS}`)
+  return constantTimeEqual(token, expected)
+}
+
 function withCors(res: NextResponse, origin: string | null): NextResponse {
   const allowed = ALLOWED_ORIGIN || 'http://localhost:3000'
   if (origin && (origin === allowed || !ALLOWED_ORIGIN)) {
@@ -44,43 +56,39 @@ export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
   const origin = req.headers.get('origin')
 
-  // Handle CORS preflight for all API routes
+  // CORS preflight
   if (req.method === 'OPTIONS' && pathname.startsWith('/api/')) {
     const res = new NextResponse(null, { status: 204 })
     return withCors(res, origin)
   }
 
-  // Protect admin pages and admin API routes with HTTP Basic Auth
+  // Skip auth for public admin routes (login page + login/logout API)
+  if (isPublicAdminRoute(pathname)) {
+    return NextResponse.next()
+  }
+
+  // Protect admin pages and admin API routes
   if (isAdminRoute(pathname)) {
     if (!ADMIN_PASS) {
-      // No password set — block access entirely rather than allow anyone in
-      return new NextResponse('Admin access not configured.', { status: 503 })
+      // No password configured — redirect to login which will show the error
+      return NextResponse.redirect(new URL('/admin/login', req.url))
     }
 
-    const auth = req.headers.get('authorization') ?? ''
-    let authorised = false
+    const token = req.cookies.get('admin_token')?.value ?? ''
+    const authenticated = isValidToken(token)
 
-    if (auth.startsWith('Basic ')) {
-      try {
-        const decoded = atob(auth.slice(6))
-        const colon = decoded.indexOf(':')
-        const user = decoded.slice(0, colon)
-        const pass = decoded.slice(colon + 1)
-        authorised = constantTimeEqual(user, ADMIN_USER) && constantTimeEqual(pass, ADMIN_PASS)
-      } catch {
-        // malformed base64 — stay unauthorised
+    if (!authenticated) {
+      // API routes return 401; page routes redirect to login
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
       }
-    }
-
-    if (!authorised) {
-      return new NextResponse('Unauthorised', {
-        status: 401,
-        headers: { 'WWW-Authenticate': 'Basic realm="Automatic Cow Admin"' },
-      })
+      const loginUrl = new URL('/admin/login', req.url)
+      loginUrl.searchParams.set('next', pathname)
+      return NextResponse.redirect(loginUrl)
     }
   }
 
-  // Add CORS headers to all API responses
+  // Add CORS headers to API responses
   if (pathname.startsWith('/api/')) {
     const res = NextResponse.next()
     return withCors(res, origin)

@@ -53,6 +53,11 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
     onClose()
   }
 
+  const logout = async () => {
+    await fetch('/api/admin/logout', { method: 'POST' })
+    router.push('/admin/login')
+  }
+
   const isActive = (href: string) =>
     href === '/admin' ? pathname === '/admin' : pathname.startsWith(href)
 
@@ -112,10 +117,18 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
           <button
             className="admin-nav-link"
             onClick={() => go('/')}
-            style={{ padding: '8px 0', borderLeft: 'none', marginBottom: 8 }}
+            style={{ padding: '8px 0', borderLeft: 'none', marginBottom: 4 }}
           >
             <span className="admin-nav-icon">←</span>
             Back to Site
+          </button>
+          <button
+            className="admin-nav-link"
+            onClick={logout}
+            style={{ padding: '8px 0', borderLeft: 'none', marginBottom: 8, color: 'rgba(192,57,43,0.7)' }}
+          >
+            <span className="admin-nav-icon">⎋</span>
+            Sign Out
           </button>
           <div style={{
             fontSize: 9, color: 'var(--muted)', paddingTop: 10,
