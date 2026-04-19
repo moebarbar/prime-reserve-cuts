@@ -49,28 +49,54 @@
 
 /* STEAK STRIP */
 .steakStrip {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  height: 210px; background: var(--dark);
+  display: grid; grid-template-columns: 1fr 1.35fr 1fr;
+  height: 300px; background: #0a0806;
+  border-top: 1px solid rgba(184,134,58,0.08);
+  border-bottom: 1px solid rgba(184,134,58,0.08);
 }
-.sc { position: relative; overflow: hidden; background: #1c1208; }
-.sc + .sc { border-left: 3px solid var(--dark); }
+.sc { position: relative; overflow: hidden; background: #100b05; }
+.sc + .sc { border-left: 1px solid rgba(184,134,58,0.12); }
+.scFeatured { /* center card slightly taller via align-self handled by parent */ }
 .scImg {
   width: 100%; height: 100%; object-fit: cover; display: block;
-  filter: brightness(.68) saturate(.88);
-  transition: transform .45s ease, filter .35s;
+  filter: brightness(.52) saturate(1.1) contrast(1.05);
+  transition: transform .55s ease, filter .4s;
 }
-.sc:hover .scImg { transform: scale(1.05); filter: brightness(.84) saturate(1.1); }
+.sc:hover .scImg { transform: scale(1.07); filter: brightness(.72) saturate(1.25) contrast(1.0); }
+.scWarmOverlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(140,50,20,0.18) 0%, rgba(80,20,5,0.10) 50%, transparent 100%);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  transition: opacity .4s;
+}
+.sc:hover .scWarmOverlay { opacity: 0.5; }
+.scGrade {
+  position: absolute; top: 14px; right: 14px; z-index: 4;
+  font-size: 7px; font-weight: 700; letter-spacing: .32em; text-transform: uppercase;
+  color: var(--gold); border: 1px solid rgba(184,134,58,0.45);
+  padding: 4px 8px; background: rgba(10,8,4,0.65);
+  backdrop-filter: blur(4px);
+}
 .scInfo {
   position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 30px 15px 13px;
-  background: linear-gradient(to top, rgba(13,11,8,.82) 0%, transparent 100%);
+  padding: 48px 18px 16px;
+  background: linear-gradient(to top, rgba(8,6,3,.92) 0%, rgba(8,6,3,.5) 55%, transparent 100%);
 }
 .scName {
-  font-family: 'Cormorant', serif; font-size: 15px; font-weight: 300;
-  font-style: italic; color: var(--cream); display: block; margin-bottom: 1px;
+  font-family: 'Cormorant', serif; font-size: 22px; font-weight: 300;
+  font-style: italic; color: var(--cream); display: block; margin-bottom: 3px;
+  letter-spacing: .01em;
 }
-.sc:first-child .scName { font-size: 19px; }
-.scPrice { font-size: 11px; font-weight: 500; color: var(--gold2); }
+.scFeatured .scName { font-size: 30px; }
+.scSub {
+  display: block; font-size: 9px; font-weight: 400; letter-spacing: .18em;
+  text-transform: uppercase; color: rgba(244,239,230,0.42); margin-bottom: 7px;
+}
+.scPrice {
+  font-size: 11px; font-weight: 600; color: var(--gold);
+  letter-spacing: .06em;
+}
 
 /* VALUE BAR */
 .vbar { display: flex; border-top: 1px solid var(--border); background: var(--panel); flex-wrap: wrap; }
@@ -192,7 +218,9 @@
 @media (max-width: 900px) {
   .heroContent { padding: 0 24px 32px; }
   .steakStrip { grid-template-columns: 1fr 1fr 1fr; height: auto; }
-  .sc { height: 170px; }
+  .sc { height: 220px; }
+  .scFeatured { height: 220px; }
+  .scFeatured .scName { font-size: 22px; }
   .howSection { padding: 60px 24px; }
   .howSteps { grid-template-columns: 1fr; gap: 12px; }
   .bldSection { padding: 44px 24px 60px; }
@@ -202,7 +230,9 @@
 @media (max-width: 580px) {
   .bldGrid { grid-template-columns: 1fr; }
   .steakStrip { grid-template-columns: 1fr; }
-  .sc { height: 150px; }
+  .sc { height: 180px; }
+  .scFeatured { height: 200px; }
+  .scFeatured .scName { font-size: 22px; }
 }
 
 @media (max-width: 480px) {

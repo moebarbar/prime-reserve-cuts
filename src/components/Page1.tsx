@@ -69,21 +69,45 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
       {/* STEAK STRIP */}
       <div className={styles.steakStrip}>
         {[
-          { src: 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=800&q=80&fit=crop&crop=center', name: 'NY Strip', price: '$49/week' },
-          { src: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=800&q=80&fit=crop&crop=center', name: 'Tenderloin', price: '$59/week' },
-          { src: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&q=80&fit=crop&crop=center', name: 'Ribeye', price: '$55/week' },
+          {
+            src: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=900&q=90&fit=crop&crop=center',
+            name: 'Tenderloin',
+            sub: 'Center-cut filet · butter-tender',
+            grade: 'USDA Prime',
+            price: '$59/wk',
+            featured: false,
+          },
+          {
+            src: 'https://images.unsplash.com/photo-1615937657715-bc7b4b7962c1?w=1200&q=90&fit=crop&crop=center',
+            name: 'Ribeye',
+            sub: 'Bone-in · heavy marbling',
+            grade: 'USDA Prime',
+            price: '$55/wk',
+            featured: true,
+          },
+          {
+            src: 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=900&q=90&fit=crop&crop=center',
+            name: 'NY Strip',
+            sub: '21-day dry-aged · firm texture',
+            grade: 'USDA Choice+',
+            price: '$49/wk',
+            featured: false,
+          },
         ].map((cut, i) => (
-          <div key={i} className={styles.sc}>
+          <div key={i} className={`${styles.sc} ${cut.featured ? styles.scFeatured : ''}`}>
             <img
               src={cut.src}
-              alt={cut.name}
+              alt={`Raw ${cut.name}`}
               className={styles.scImg}
               loading={i === 0 ? 'eager' : 'lazy'}
               onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0' }}
             />
+            <div className={styles.scWarmOverlay} />
+            <div className={styles.scGrade}>{cut.grade}</div>
             <div className={styles.scInfo}>
               <span className={styles.scName}>{cut.name}</span>
-              <span className={styles.scPrice}>From {cut.price}</span>
+              <span className={styles.scSub}>{cut.sub}</span>
+              <span className={styles.scPrice}>{cut.price}</span>
             </div>
           </div>
         ))}
