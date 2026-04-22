@@ -61,6 +61,9 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
 
       {/* OUR STORY CTA */}
       <div className={styles.heroBelow}>
+        <span style={{ fontSize: 11, color: 'var(--muted)', fontWeight: 300, letterSpacing: '0.12em' }}>
+          Houston&apos;s first weekly prime beef subscription
+        </span>
         <Link href="/our-story" className={styles.btnStory}>
           Our Story <span>→</span>
         </Link>
