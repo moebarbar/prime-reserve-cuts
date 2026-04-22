@@ -129,6 +129,20 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
 
       </div>
 
+      {/* CUTS INTRO */}
+      <div className={styles.cutsIntro}>
+        <div className={styles.eyebrow}>
+          <span className={styles.eyeDash} />
+          The Selection
+        </div>
+        <h2 className={styles.cutsTitle}>
+          Three cuts.<br /><em>One standard.</em>
+        </h2>
+        <p className={styles.cutsLead}>
+          Every cut is USDA Prime or above — sourced, aged, and delivered to your door every Saturday.
+        </p>
+      </div>
+
       {/* STEAK STRIP */}
       <div className={styles.steakStrip}>
         {[

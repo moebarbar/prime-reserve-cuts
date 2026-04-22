@@ -47,6 +47,25 @@
 }
 .mission strong { color: var(--cream); font-weight: 400; }
 
+/* CUTS INTRO */
+.cutsIntro {
+  background: #0a0908;
+  padding: 72px 52px 48px;
+  border-top: 1px solid var(--border);
+}
+.cutsTitle {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(32px, 4.5vw, 58px);
+  font-weight: 300; line-height: 1.05;
+  color: var(--cream); margin: 14px 0 18px;
+}
+.cutsTitle em { font-style: italic; color: var(--gold); }
+.cutsLead {
+  font-size: 13px; font-weight: 300;
+  color: var(--muted); line-height: 1.9;
+  max-width: 420px;
+}
+
 /* STEAK STRIP */
 .steakStrip {
   display: grid; grid-template-columns: 1fr 1.35fr 1fr;
