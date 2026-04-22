@@ -70,7 +70,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
       <div className={styles.steakStrip}>
         {[
           {
-            src: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=900&q=90&fit=crop&crop=center',
+            src: '/tenderloin-raw.jpg',
             name: 'Tenderloin',
             sub: 'Center-cut filet · butter-tender',
             grade: 'USDA Prime',
@@ -78,7 +78,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
             featured: false,
           },
           {
-            src: 'https://images.unsplash.com/photo-1615937657715-bc7b4b7962c1?w=1200&q=90&fit=crop&crop=center',
+            src: '/ribeye-raw.jpg',
             name: 'Ribeye',
             sub: 'Bone-in · heavy marbling',
             grade: 'USDA Prime',
@@ -86,7 +86,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
             featured: true,
           },
           {
-            src: 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=900&q=90&fit=crop&crop=center',
+            src: '/ny-strip-raw.jpg',
             name: 'NY Strip',
             sub: '21-day dry-aged · firm texture',
             grade: 'USDA Choice+',
