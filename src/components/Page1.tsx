@@ -66,54 +66,6 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
         </Link>
       </div>
 
-      {/* STEAK STRIP */}
-      <div className={styles.steakStrip}>
-        {[
-          {
-            src: '/tenderloin-raw.jpg',
-            name: 'Tenderloin',
-            sub: 'Center-cut filet · butter-tender',
-            grade: 'USDA Prime',
-            price: '$59/wk',
-            featured: false,
-          },
-          {
-            src: '/ribeye-raw.jpg',
-            name: 'Ribeye',
-            sub: 'Bone-in · heavy marbling',
-            grade: 'USDA Prime',
-            price: '$55/wk',
-            featured: true,
-          },
-          {
-            src: '/ny-strip-raw.jpg',
-            name: 'NY Strip',
-            sub: '21-day dry-aged · firm texture',
-            grade: 'USDA Choice+',
-            price: '$49/wk',
-            featured: false,
-          },
-        ].map((cut, i) => (
-          <div key={i} className={`${styles.sc} ${cut.featured ? styles.scFeatured : ''}`}>
-            <img
-              src={cut.src}
-              alt={`Raw ${cut.name}`}
-              className={styles.scImg}
-              loading={i === 0 ? 'eager' : 'lazy'}
-              onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0' }}
-            />
-            <div className={styles.scWarmOverlay} />
-            <div className={styles.scGrade}>{cut.grade}</div>
-            <div className={styles.scInfo}>
-              <span className={styles.scName}>{cut.name}</span>
-              <span className={styles.scSub}>{cut.sub}</span>
-              <span className={styles.scPrice}>{cut.price}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-
       {/* HOW IT WORKS */}
       <div className={styles.howSection}>
         <h2 className={styles.howHeading}>
@@ -175,6 +127,53 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
           ))}
         </div>
 
+      </div>
+
+      {/* STEAK STRIP */}
+      <div className={styles.steakStrip}>
+        {[
+          {
+            src: '/tenderloin-raw.jpg',
+            name: 'Tenderloin',
+            sub: 'Center-cut filet · butter-tender',
+            grade: 'USDA Prime',
+            price: '$59/wk',
+            featured: false,
+          },
+          {
+            src: '/ribeye-raw.jpg',
+            name: 'Ribeye',
+            sub: 'Bone-in · heavy marbling',
+            grade: 'USDA Prime',
+            price: '$55/wk',
+            featured: true,
+          },
+          {
+            src: '/ny-strip-raw.jpg',
+            name: 'NY Strip',
+            sub: '21-day dry-aged · firm texture',
+            grade: 'USDA Choice+',
+            price: '$49/wk',
+            featured: false,
+          },
+        ].map((cut, i) => (
+          <div key={i} className={`${styles.sc} ${cut.featured ? styles.scFeatured : ''}`}>
+            <img
+              src={cut.src}
+              alt={`Raw ${cut.name}`}
+              className={styles.scImg}
+              loading="lazy"
+              onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0' }}
+            />
+            <div className={styles.scWarmOverlay} />
+            <div className={styles.scGrade}>{cut.grade}</div>
+            <div className={styles.scInfo}>
+              <span className={styles.scName}>{cut.name}</span>
+              <span className={styles.scSub}>{cut.sub}</span>
+              <span className={styles.scPrice}>{cut.price}</span>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* SOURCING SECTION */}
