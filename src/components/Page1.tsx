@@ -154,7 +154,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
             name: 'Tenderloin',
             sub: 'Center-cut filet · butter-tender',
             grade: 'USDA Prime',
-            price: '$25/wk',
+            price: '$25',
             featured: false,
           },
           {
@@ -162,7 +162,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
             name: 'Ribeye',
             sub: 'Bone-in · heavy marbling',
             grade: 'USDA Prime',
-            price: '$25/wk',
+            price: '$25',
             featured: true,
           },
           {
@@ -170,7 +170,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
             name: 'NY Strip',
             sub: '21-day dry-aged · firm texture',
             grade: 'USDA Choice+',
-            price: '$20/wk',
+            price: '$20',
             featured: false,
           },
         ].map((cut, i) => (
@@ -187,6 +187,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
             <div className={styles.scInfo}>
               <span className={styles.scName}>{cut.name}</span>
               <span className={styles.scSub}>{cut.sub}</span>
+              <span className={styles.scPrice}>{cut.price}</span>
             </div>
           </div>
         ))}
