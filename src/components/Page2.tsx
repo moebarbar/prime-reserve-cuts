@@ -43,9 +43,9 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
 
   useEffect(() => {
     const TYPES = {
-      tenderloin: { name: 'Tenderloin', img: '/tenderloin-raw.jpg', detail: 'Center-cut filet · butter-tender' },
-      ribeye:     { name: 'Ribeye',     img: '/ribeye-raw.jpg',     detail: 'Bone-in · heavy marbling' },
-      'ny-strip': { name: 'NY Strip',   img: '/ny-strip-raw.jpg',   detail: '21-day dry-aged · firm texture' },
+      tenderloin: { name: 'Tenderloin', img: '/tenderloin-raw.jpg', detail: 'Center-cut filet · butter-tender', price_per_week: 25, weight: '8 oz' },
+      ribeye:     { name: 'Ribeye',     img: '/ribeye-raw.jpg',     detail: 'Bone-in · heavy marbling',         price_per_week: 25, weight: '16 oz' },
+      'ny-strip': { name: 'NY Strip',   img: '/ny-strip-raw.jpg',   detail: '21-day dry-aged · firm texture',   price_per_week: 20, weight: '14 oz' },
     } as const
     const matchType = (name: string): keyof typeof TYPES | null => {
       const n = name.toLowerCase().trim()
@@ -62,7 +62,7 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
           .filter(c => c.available && matchType(c.name) !== null)
           .map(c => {
             const t = matchType(c.name)!
-            return { ...c, name: TYPES[t].name, img: TYPES[t].img, detail: TYPES[t].detail }
+            return { ...c, name: TYPES[t].name, img: TYPES[t].img, detail: TYPES[t].detail, price_per_week: TYPES[t].price_per_week, weight: TYPES[t].weight }
           })
           .sort((a, b) => ORDER.indexOf(matchType(a.name)!) - ORDER.indexOf(matchType(b.name)!))
         setCuts(overridden)
