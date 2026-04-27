@@ -42,14 +42,20 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
   const [form, setForm]             = useState<FormData>({ unit: '', firstName: '', lastName: '', email: '', phone: '' })
 
   useEffect(() => {
-    const ALLOWED = ['tenderloin', 'ribeye', 'ny strip']
-    const ORDER = ['tenderloin', 'ribeye', 'ny strip']
+    const matchType = (name: string): 'tenderloin' | 'ribeye' | 'ny-strip' | null => {
+      const n = name.toLowerCase().trim()
+      if (n.includes('tenderloin') || n.includes('filet')) return 'tenderloin'
+      if (n.includes('ribeye')) return 'ribeye'
+      if (n.includes('ny strip') || n.includes('new york strip') || n === 'strip') return 'ny-strip'
+      return null
+    }
+    const ORDER = ['tenderloin', 'ribeye', 'ny-strip']
     fetch('/api/products')
       .then(r => r.json())
       .then((data: Cut[]) => {
         const filtered = data
-          .filter(c => c.available && ALLOWED.includes(c.name.toLowerCase().trim()))
-          .sort((a, b) => ORDER.indexOf(a.name.toLowerCase().trim()) - ORDER.indexOf(b.name.toLowerCase().trim()))
+          .filter(c => c.available && matchType(c.name) !== null)
+          .sort((a, b) => ORDER.indexOf(matchType(a.name)!) - ORDER.indexOf(matchType(b.name)!))
         setCuts(filtered)
       })
       .catch(() => setCuts([]))
