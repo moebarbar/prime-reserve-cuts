@@ -187,7 +187,6 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
             <div className={styles.scInfo}>
               <span className={styles.scName}>{cut.name}</span>
               <span className={styles.scSub}>{cut.sub}</span>
-              <span className={styles.scPrice}>{cut.price}</span>
             </div>
           </div>
         ))}
