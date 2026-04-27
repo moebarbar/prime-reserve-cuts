@@ -42,21 +42,30 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
   const [form, setForm]             = useState<FormData>({ unit: '', firstName: '', lastName: '', email: '', phone: '' })
 
   useEffect(() => {
-    const matchType = (name: string): 'tenderloin' | 'ribeye' | 'ny-strip' | null => {
+    const TYPES = {
+      tenderloin: { name: 'Tenderloin', img: '/tenderloin-raw.jpg', detail: 'Center-cut filet · butter-tender' },
+      ribeye:     { name: 'Ribeye',     img: '/ribeye-raw.jpg',     detail: 'Bone-in · heavy marbling' },
+      'ny-strip': { name: 'NY Strip',   img: '/ny-strip-raw.jpg',   detail: '21-day dry-aged · firm texture' },
+    } as const
+    const matchType = (name: string): keyof typeof TYPES | null => {
       const n = name.toLowerCase().trim()
       if (n.includes('tenderloin') || n.includes('filet')) return 'tenderloin'
       if (n.includes('ribeye')) return 'ribeye'
       if (n.includes('ny strip') || n.includes('new york strip') || n === 'strip') return 'ny-strip'
       return null
     }
-    const ORDER = ['tenderloin', 'ribeye', 'ny-strip']
+    const ORDER = ['tenderloin', 'ribeye', 'ny-strip'] as const
     fetch('/api/products')
       .then(r => r.json())
       .then((data: Cut[]) => {
-        const filtered = data
+        const overridden = data
           .filter(c => c.available && matchType(c.name) !== null)
+          .map(c => {
+            const t = matchType(c.name)!
+            return { ...c, name: TYPES[t].name, img: TYPES[t].img, detail: TYPES[t].detail }
+          })
           .sort((a, b) => ORDER.indexOf(matchType(a.name)!) - ORDER.indexOf(matchType(b.name)!))
-        setCuts(filtered)
+        setCuts(overridden)
       })
       .catch(() => setCuts([]))
   }, [])
