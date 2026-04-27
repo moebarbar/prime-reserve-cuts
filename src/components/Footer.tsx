@@ -38,7 +38,7 @@ export default function Footer() {
             />
             <div className={styles.brandText}>
               <span className={styles.brandName}>Automatic Cow</span>
-              <span className={styles.brandSlogan}>Good Food From Now On</span>
+              <span className={styles.brandSlogan}>Good Food. From Now On.</span>
             </div>
           </div>
 

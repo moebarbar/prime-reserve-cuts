@@ -36,7 +36,7 @@ export default function Nav({ step, hideSteps, onLogoClick }: NavProps) {
             letterSpacing: '0.3em',
             textTransform: 'uppercase',
             lineHeight: 1,
-          }}>Good Food From Now On</span>
+          }}>Good Food. From Now On.</span>
         </div>
       </Link>
       {!hideSteps && (
