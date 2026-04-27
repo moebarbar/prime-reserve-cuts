@@ -42,9 +42,16 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
   const [form, setForm]             = useState<FormData>({ unit: '', firstName: '', lastName: '', email: '', phone: '' })
 
   useEffect(() => {
+    const ALLOWED = ['tenderloin', 'ribeye', 'ny strip']
+    const ORDER = ['tenderloin', 'ribeye', 'ny strip']
     fetch('/api/products')
       .then(r => r.json())
-      .then((data: Cut[]) => setCuts(data.filter(c => c.available)))
+      .then((data: Cut[]) => {
+        const filtered = data
+          .filter(c => c.available && ALLOWED.includes(c.name.toLowerCase().trim()))
+          .sort((a, b) => ORDER.indexOf(a.name.toLowerCase().trim()) - ORDER.indexOf(b.name.toLowerCase().trim()))
+        setCuts(filtered)
+      })
       .catch(() => setCuts([]))
   }, [])
 

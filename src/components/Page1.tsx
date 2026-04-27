@@ -154,7 +154,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
             name: 'Tenderloin',
             sub: 'Center-cut filet · butter-tender',
             grade: 'USDA Prime',
-            price: '$59/wk',
+            price: '$25/wk',
             featured: false,
           },
           {
@@ -162,7 +162,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
             name: 'Ribeye',
             sub: 'Bone-in · heavy marbling',
             grade: 'USDA Prime',
-            price: '$55/wk',
+            price: '$25/wk',
             featured: true,
           },
           {
@@ -170,7 +170,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
             name: 'NY Strip',
             sub: '21-day dry-aged · firm texture',
             grade: 'USDA Choice+',
-            price: '$49/wk',
+            price: '$20/wk',
             featured: false,
           },
         ].map((cut, i) => (
