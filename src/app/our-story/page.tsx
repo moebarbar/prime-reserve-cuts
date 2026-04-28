@@ -1,11 +1,14 @@
-// TODO: On successful payment, POST { username, password, buildingKey, cutName, unit, email }
-// to /api/create-member — this endpoint will create the Supabase user + subscription record.
-// Dashboard route will be /dashboard — build in next sprint.
-
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import styles from './page.module.css'
+
+export const metadata: Metadata = {
+  title: 'Our Story — How Automatic Cow Was Born',
+  description: 'The story behind Houston\'s private USDA Prime steak membership — built for residents who expect the best, delivered without effort.',
+  alternates: { canonical: 'https://automaticcow.com/our-story' },
+}
 
 export default function OurStoryPage() {
   return (

@@ -3,7 +3,11 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import styles from '../legal.module.css'
 
-export const metadata = { title: 'Terms of Service · Automatic Cow' }
+export const metadata = {
+  title: 'Terms of Service',
+  description: 'Terms of service for Automatic Cow membership and weekly steak delivery.',
+  alternates: { canonical: 'https://automaticcow.com/terms' },
+}
 
 export default function TermsPage() {
   return (

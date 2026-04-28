@@ -3,7 +3,11 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import styles from '../legal.module.css'
 
-export const metadata = { title: 'Privacy Policy · Automatic Cow' }
+export const metadata = {
+  title: 'Privacy Policy',
+  description: 'How Automatic Cow handles your data — what we collect, why, and your rights.',
+  alternates: { canonical: 'https://automaticcow.com/privacy' },
+}
 
 export default function PrivacyPage() {
   return (
