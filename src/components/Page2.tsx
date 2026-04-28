@@ -196,6 +196,7 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
                 >
                   <div className={styles.ccThumb}>
                     <img src={cut.img} alt={cut.name} loading="lazy"
+                      style={cut.name === 'Ribeye' ? { transform: 'scaleX(-1)' } : undefined}
                       onError={e => { (e.target as HTMLImageElement).style.opacity = '0' }} />
                   </div>
                   <div className={styles.ccBody}>
