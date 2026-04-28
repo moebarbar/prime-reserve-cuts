@@ -69,7 +69,7 @@
 /* STEAK STRIP */
 .steakStrip {
   display: grid; grid-template-columns: 1fr 1.35fr 1fr;
-  height: 300px; background: #0a0806;
+  height: 440px; background: #0a0806;
   border-top: 1px solid rgba(184,134,58,0.08);
   border-bottom: 1px solid rgba(184,134,58,0.08);
 }
@@ -77,10 +77,13 @@
 .sc + .sc { border-left: 1px solid rgba(184,134,58,0.12); }
 .scFeatured { /* center card slightly taller via align-self handled by parent */ }
 .scImg {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-  filter: brightness(.78) saturate(1.0) contrast(1.0);
+  width: 100%; height: 100%; object-fit: cover; object-position: center 35%;
+  display: block;
+  filter: brightness(.85) saturate(1.0) contrast(1.0);
   transition: transform .55s ease, filter .4s;
 }
+.scFeatured .scImg { transform: scaleX(-1); object-position: 35% center; }
+.scFeatured:hover .scImg { transform: scaleX(-1) scale(1.07); }
 .sc:hover .scImg { transform: scale(1.07); filter: brightness(.92) saturate(1.1) contrast(1.0); }
 .scWarmOverlay {
   position: absolute; inset: 0;
@@ -237,8 +240,8 @@
 @media (max-width: 900px) {
   .heroContent { padding: 0 24px 32px; }
   .steakStrip { grid-template-columns: 1fr 1fr 1fr; height: auto; }
-  .sc { height: 220px; }
-  .scFeatured { height: 220px; }
+  .sc { height: 320px; }
+  .scFeatured { height: 320px; }
   .scFeatured .scName { font-size: 22px; }
   .howSection { padding: 60px 24px; }
   .howSteps { grid-template-columns: 1fr; gap: 12px; }
@@ -249,8 +252,8 @@
 @media (max-width: 580px) {
   .bldGrid { grid-template-columns: 1fr; }
   .steakStrip { grid-template-columns: 1fr; }
-  .sc { height: 180px; }
-  .scFeatured { height: 200px; }
+  .sc { height: 280px; }
+  .scFeatured { height: 320px; }
   .scFeatured .scName { font-size: 22px; }
 }
 
