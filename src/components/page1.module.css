@@ -82,7 +82,8 @@
   filter: brightness(.85) saturate(1.0) contrast(1.0);
   transition: transform .55s ease, filter .4s;
 }
-.scFeatured .scImg { object-position: 70% center; }
+.scFeatured .scImg { transform: scaleX(-1); }
+.scFeatured:hover .scImg { transform: scaleX(-1) scale(1.07); }
 .sc:hover .scImg { transform: scale(1.07); filter: brightness(.92) saturate(1.1) contrast(1.0); }
 .scWarmOverlay {
   position: absolute; inset: 0;
