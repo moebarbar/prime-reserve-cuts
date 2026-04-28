@@ -175,13 +175,15 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
           },
         ].map((cut, i) => (
           <div key={i} className={`${styles.sc} ${cut.featured ? styles.scFeatured : ''}`}>
-            <img
-              src={cut.src}
-              alt={`Raw ${cut.name}`}
-              className={styles.scImg}
-              loading="lazy"
-              onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0' }}
-            />
+            <div className={styles.scImgWrap}>
+              <img
+                src={cut.src}
+                alt={`Raw ${cut.name}`}
+                className={styles.scImg}
+                loading="lazy"
+                onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0' }}
+              />
+            </div>
             <div className={styles.scWarmOverlay} />
             <div className={styles.scGrade}>{cut.grade}</div>
             <div className={styles.scInfo}>
