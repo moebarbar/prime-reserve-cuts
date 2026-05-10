@@ -165,14 +165,13 @@ async function run() {
   console.log('✓ buildings seeded')
 
   // ── SEED PRODUCTS ──────────────────────────────────────────────────────────
+  // Steak — fast + premium
   await pool.query(`
     INSERT INTO products (name, grade, detail, weight, price, price_per_week, img, available, category)
     SELECT * FROM (VALUES
-      ('NY Strip',     'USDA Prime', 'Center-cut New York Strip · Bold, beefy, perfect sear',              '14 oz (397g)',  99,  49, 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=400&q=80&fit=crop&crop=center', TRUE, 'steak'),
-      ('Tenderloin',   'USDA Prime', 'Center-cut Filet Mignon · The most tender cut, silky clean',         '8 oz (227g)',   119, 59, 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=400&q=80&fit=crop&crop=center', TRUE, 'steak'),
       ('Ribeye',       'USDA Prime', 'Bone-in Ribeye · Rich marbling, buttery char',                       '16 oz (454g)',  89,  55, 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&q=80&fit=crop&crop=center', TRUE, 'steak'),
-      ('A5 Wagyu',     'A5 Wagyu',   '12oz Japanese Miyazaki striploin · extraordinary marbling',          '12 oz (340g)',  189, 95, 'https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80&fit=crop&crop=center', TRUE, 'steak'),
-      ('Tomahawk',     'Heritage',   '40oz long-bone cowboy cut · dry-aged Heritage breed',                '40 oz (1134g)', 229, 115,'https://images.pexels.com/photos/12261087/pexels-photo-12261087.jpeg?auto=compress&cs=tinysrgb&w=400', TRUE, 'steak')
+      ('NY Strip',     'USDA Prime', 'Center-cut New York Strip · Bold, beefy, perfect sear',              '14 oz (397g)',  99,  49, 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=400&q=80&fit=crop&crop=center', TRUE, 'steak'),
+      ('Sirloin',      'USDA Prime', 'Top sirloin · Lean, beefy, quick weeknight sear',                    '12 oz (340g)',  79,  39, 'https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80&fit=crop&crop=center', TRUE, 'steak')
     ) AS v(name, grade, detail, weight, price, price_per_week, img, available, category)
     WHERE NOT EXISTS (SELECT 1 FROM products LIMIT 1)
   `)
@@ -181,25 +180,25 @@ async function run() {
   // Backfill: any pre-existing rows from before category column existed
   await pool.query(`UPDATE products SET category = 'steak' WHERE category IS NULL OR category = ''`)
 
-  // Slow-cook products — placeholder pricing, hidden until prices are set in admin
+  // Slow-cook — collagen + time. Placeholder pricing, hidden until prices set in admin.
   await pool.query(`
     INSERT INTO products (name, grade, detail, weight, price, price_per_week, img, available, category)
     SELECT * FROM (VALUES
-      ('Brisket',     'USDA Prime', 'Whole packer brisket · the heart of Texas BBQ',          '12-14 lb',  0, 0, 'https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80&fit=crop&crop=center', FALSE, 'slow_cook'),
-      ('Chuck Roast', 'USDA Prime', 'Boneless chuck · the perfect Sunday pot roast',          '4-5 lb',    0, 0, 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80&fit=crop&crop=center', FALSE, 'slow_cook'),
-      ('Short Ribs',  'USDA Prime', 'Bone-in beef short ribs · braising heaven',              '3-4 lb',    0, 0, 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop&crop=center', FALSE, 'slow_cook')
+      ('Brisket',           'USDA Prime', 'Whole packer brisket · the heart of Texas BBQ',                 '12-14 lb',  0, 0, 'https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80&fit=crop&crop=center', FALSE, 'slow_cook'),
+      ('Chuck Roast',       'USDA Prime', 'Boneless chuck · the perfect Sunday pot roast',                 '4-5 lb',    0, 0, 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80&fit=crop&crop=center', FALSE, 'slow_cook'),
+      ('Shank (Osso Buco)', 'USDA Prime', 'Cross-cut shank · marrow + collagen for the longest braise',    '3-4 lb',    0, 0, 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop&crop=center', FALSE, 'slow_cook')
     ) AS v(name, grade, detail, weight, price, price_per_week, img, available, category)
     WHERE NOT EXISTS (SELECT 1 FROM products WHERE category = 'slow_cook')
   `)
   console.log('✓ slow-cook products seeded')
 
-  // Daily products — placeholder pricing, hidden
+  // Daily essentials — repeat buys. Placeholder pricing, hidden.
   await pool.query(`
     INSERT INTO products (name, grade, detail, weight, price, price_per_week, img, available, category)
     SELECT * FROM (VALUES
-      ('Ground Chuck 80/20',  'USDA Prime', 'Fresh-ground chuck · 80% lean · the burger gold standard',  '1 lb pack', 0, 0, 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=400&q=80&fit=crop&crop=center', FALSE, 'daily'),
-      ('Ground Sirloin 90/10','USDA Prime', 'Lean-ground sirloin · 90% lean · clean, robust flavor',     '1 lb pack', 0, 0, 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80&fit=crop&crop=center', FALSE, 'daily'),
-      ('Burger Patties',      'USDA Prime', 'Hand-pressed 6oz patties · ready for the grill',            '4 × 6 oz',  0, 0, 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=400&q=80&fit=crop&crop=center', FALSE, 'daily')
+      ('Ground Beef',         'USDA Prime', 'Fresh-ground beef · the everyday staple',               '1 lb pack', 0, 0, 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=400&q=80&fit=crop&crop=center', FALSE, 'daily'),
+      ('Beef Tallow / Suet',  'USDA Prime', 'Pure rendered beef fat · for searing, frying, baking',  '16 oz jar', 0, 0, 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80&fit=crop&crop=center', FALSE, 'daily'),
+      ('Marrow Bones',        'USDA Prime', 'Cross-cut marrow & soup bones · stocks, broths, roasts','2-3 lb',    0, 0, 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=400&q=80&fit=crop&crop=center', FALSE, 'daily')
     ) AS v(name, grade, detail, weight, price, price_per_week, img, available, category)
     WHERE NOT EXISTS (SELECT 1 FROM products WHERE category = 'daily')
   `)

@@ -42,19 +42,19 @@ const CATEGORIES: { key: Category; title: string; tagline: string; img: string }
   {
     key: 'steak',
     title: 'Steak',
-    tagline: 'Center-cut · USDA Prime · the weekend ritual',
+    tagline: 'Fast + premium · Ribeye, NY Strip, Sirloin',
     img: '/ribeye-raw.jpg',
   },
   {
     key: 'slow_cook',
     title: 'Slow Cook',
-    tagline: 'Brisket, short ribs, roasts · low-and-slow soulful cuts',
+    tagline: 'Collagen + time · Brisket, roasts, shank',
     img: '/source-ranch.jpg',
   },
   {
     key: 'daily',
-    title: 'Daily',
-    tagline: 'Ground beef & patties · the everyday workhorse',
+    title: 'Daily Essentials',
+    tagline: 'Repeat buys · Ground beef, tallow, bones',
     img: '/tenderloin-raw.jpg',
   },
 ]
