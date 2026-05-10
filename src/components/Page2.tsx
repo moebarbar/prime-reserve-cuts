@@ -42,19 +42,19 @@ const CATEGORIES: { key: Category; title: string; tagline: string; img: string }
   {
     key: 'steak',
     title: 'Steak',
-    tagline: 'Fast + premium · Ribeye, NY Strip, Sirloin',
+    tagline: 'Ribeye, NY Strip, Sirloin',
     img: '/ribeye-raw.jpg',
   },
   {
     key: 'slow_cook',
     title: 'Slow Cook',
-    tagline: 'Collagen + time · Brisket, roasts, shank',
+    tagline: 'Brisket, Chuck Roast, Shank',
     img: '/source-ranch.jpg',
   },
   {
     key: 'daily',
     title: 'Daily Essentials',
-    tagline: 'Repeat buys · Ground beef, tallow, bones',
+    tagline: 'Ground beef, tallow, marrow bones',
     img: '/tenderloin-raw.jpg',
   },
 ]
