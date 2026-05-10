@@ -1,0 +1,201 @@
+/* RANCHERS PAGE */
+
+.eyebrow {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px; font-weight: 600; letter-spacing: .44em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 16px;
+}
+
+/* ── HERO ─────────────────────────────────────────────────────────────────── */
+.hero {
+  min-height: 92vh;
+  background: var(--dark);
+  display: flex; align-items: center; justify-content: center;
+  padding: 120px 44px 80px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.heroInner { max-width: 760px; }
+.heroTitle {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(36px, 6vw, 76px);
+  font-weight: 300;
+  line-height: 1.05;
+  color: var(--cream);
+  margin: 0 0 28px;
+  letter-spacing: -0.01em;
+}
+.heroTitle em { font-style: italic; color: var(--gold); }
+.heroBody {
+  font-size: 14px; font-weight: 300; color: var(--muted);
+  max-width: 580px; margin: 0 auto 40px; line-height: 1.95;
+}
+.heroCta {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--gold); color: var(--dark);
+  font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 16px 40px; text-decoration: none;
+  transition: background .2s, transform .18s;
+}
+.heroCta:hover { background: var(--gold2); transform: translateY(-1px); }
+
+/* ── SECTION HEADING ──────────────────────────────────────────────────────── */
+.sectionHeading {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(30px, 4.5vw, 52px);
+  font-weight: 300;
+  line-height: 1.1;
+  color: var(--cream);
+  border-left: 3px solid var(--gold);
+  padding-left: 24px;
+  margin: 0 0 48px;
+}
+.sectionHeading em { font-style: italic; color: var(--gold); }
+
+/* ── DIFFERENTIATORS (benefits) ───────────────────────────────────────────── */
+.benefits { background: #0a0908; padding: 100px 44px; border-bottom: 1px solid var(--border); }
+.benefitsInner { max-width: 1080px; margin: 0 auto; }
+.benefitsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.benefitCard {
+  background: var(--panel); border: 1px solid rgba(184,134,58,0.12);
+  padding: 36px 32px; transition: border-color .2s;
+}
+.benefitCard:hover { border-color: rgba(184,134,58,0.4); }
+.benefitIcon { font-family: 'Cormorant', serif; font-size: 32px; color: var(--gold); margin-bottom: 18px; line-height: 1; }
+.benefitTitle {
+  font-family: 'Cormorant', serif; font-size: 22px; font-weight: 300;
+  color: var(--cream); margin-bottom: 12px; line-height: 1.2;
+}
+.benefitBody { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.85; }
+
+/* ── QUOTE / DIVIDER ──────────────────────────────────────────────────────── */
+.quote {
+  background: var(--dark); padding: 88px 44px;
+  border-bottom: 1px solid var(--border); text-align: center;
+}
+.quoteInner { max-width: 800px; margin: 0 auto; }
+.quoteText {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(24px, 3.4vw, 42px);
+  font-weight: 300;
+  color: var(--cream);
+  line-height: 1.3;
+  margin: 0;
+}
+
+/* ── WHO WE'RE LOOKING FOR ────────────────────────────────────────────────── */
+.how { background: #0a0908; padding: 100px 44px; border-bottom: 1px solid var(--border); }
+.howInner { max-width: 920px; margin: 0 auto; }
+.criteriaList { list-style: none; padding: 0; margin: 0; }
+.criteriaList li {
+  display: flex; align-items: center; gap: 24px;
+  padding: 22px 0; border-bottom: 1px solid var(--border);
+}
+.criteriaList li:last-child { border-bottom: none; }
+.criteriaNum {
+  font-family: 'Cormorant', serif; font-size: 24px; font-weight: 300;
+  color: var(--gold); min-width: 44px; opacity: 0.7;
+}
+.criteriaText { font-size: 15px; font-weight: 300; color: var(--cream); line-height: 1.5; }
+.criteriaNote {
+  margin-top: 32px; padding: 18px 24px;
+  border-left: 2px solid rgba(184,134,58,0.4);
+  font-size: 13px; color: var(--muted); line-height: 1.85;
+  font-style: italic;
+}
+
+/* ── FORM SECTION ─────────────────────────────────────────────────────────── */
+.formSec { background: var(--dark); padding: 100px 44px; border-bottom: 1px solid var(--border); }
+.formInner {
+  max-width: 1080px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1.05fr; gap: 64px; align-items: start;
+}
+.formLeft {}
+.formHeading {
+  font-family: 'Cormorant', serif; font-size: clamp(32px, 5vw, 56px);
+  font-weight: 300; line-height: 1.05; color: var(--cream); margin: 0 0 24px;
+}
+.formHeading em { font-style: italic; color: var(--gold); }
+.formBody { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.95; margin-bottom: 32px; }
+.formList {
+  list-style: none; padding: 0; margin: 0;
+  border-top: 1px solid var(--border);
+}
+.formList li {
+  font-size: 13px; font-weight: 300; color: var(--cream);
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.formList li::before { content: '✓'; color: var(--gold); font-size: 12px; font-weight: 600; }
+
+/* ── FORM CARD ────────────────────────────────────────────────────────────── */
+.formCard {
+  background: var(--panel); border: 1px solid var(--border); padding: 36px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.formField { border-bottom: 1px solid var(--border); transition: border-color .22s; padding-bottom: 4px; }
+.formField:focus-within { border-color: rgba(184,134,58,.55); }
+.formField label {
+  display: block; font-size: 8px; font-weight: 600; letter-spacing: .4em;
+  text-transform: uppercase; color: var(--muted); padding-top: 16px; margin-bottom: 5px;
+  transition: color .22s;
+}
+.formField:focus-within label { color: var(--gold); }
+.formField input,
+.formField textarea,
+.formField select {
+  width: 100%; background: transparent; border: none; outline: none; color: var(--cream);
+  font-family: 'Jost', sans-serif; font-size: max(16px, 16px); font-weight: 300;
+  padding-bottom: 11px; caret-color: var(--gold); resize: vertical;
+}
+.formField select { cursor: pointer; appearance: none; -webkit-appearance: none; }
+.formField select option { background: var(--panel); color: var(--cream); }
+.formField input::placeholder,
+.formField textarea::placeholder { color: rgba(244,239,230,.2); font-style: italic; }
+.formRow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.formSubmit {
+  margin-top: 28px; padding: 16px; background: var(--gold); border: none; color: var(--dark);
+  font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  cursor: pointer; transition: background .2s; min-height: 48px;
+}
+.formSubmit:hover:not(:disabled) { background: var(--gold2); }
+.formSubmit:disabled { opacity: .65; cursor: not-allowed; }
+.formErr {
+  background: rgba(192,57,43,0.1); border: 1px solid rgba(192,57,43,0.3);
+  color: #e05c4d; font-size: 11px; padding: 10px 14px; margin-bottom: 8px;
+}
+
+/* ── SUCCESS STATE ────────────────────────────────────────────────────────── */
+.successIcon {
+  width: 56px; height: 56px; border-radius: 50%; background: rgba(184,134,58,0.15);
+  border: 1.5px solid var(--gold); color: var(--gold); font-size: 24px;
+  display: flex; align-items: center; justify-content: center; margin-bottom: 18px;
+}
+.successTitle {
+  font-family: 'Cormorant', serif; font-size: 32px; font-weight: 300;
+  color: var(--cream); margin: 0 0 12px;
+}
+.successBody { font-size: 13px; color: var(--muted); line-height: 1.85; }
+
+/* ── RESPONSIVE ───────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .hero { padding: 100px 24px 60px; }
+  .benefits, .how, .formSec { padding: 72px 24px; }
+  .quote { padding: 64px 24px; }
+  .benefitsGrid { grid-template-columns: 1fr; gap: 12px; }
+  .formInner { grid-template-columns: 1fr; gap: 44px; }
+}
+@media (max-width: 480px) {
+  .hero { padding: 80px 16px 48px; }
+  .benefits, .how, .formSec { padding: 56px 16px; }
+  .quote { padding: 48px 16px; }
+  .benefitCard, .formCard { padding: 28px 24px; }
+  .heroCta { width: 100%; justify-content: center; }
+  .formRow { grid-template-columns: 1fr; gap: 0; }
+  .criteriaList li { gap: 16px; padding: 18px 0; }
+  .criteriaNum { font-size: 20px; min-width: 36px; }
+  .criteriaText { font-size: 13px; }
+  .formSubmit { width: 100%; }
+}

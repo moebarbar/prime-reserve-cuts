@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 
+type Category = 'steak' | 'slow_cook' | 'daily'
+
 interface Product {
   id: string
   name: string
@@ -12,10 +14,21 @@ interface Product {
   price_per_week: number
   img: string
   available: boolean
+  category: Category
 }
 
 const GRADES = ['USDA Prime', 'A5 Wagyu', 'Heritage', 'USDA Choice', 'Grass-Fed']
-const empty: Omit<Product, 'id'> = { name: '', grade: 'USDA Prime', detail: '', weight: '', price: 0, price_per_week: 0, img: '', available: true }
+const CATEGORIES: { value: Category; label: string }[] = [
+  { value: 'steak',     label: 'Steak' },
+  { value: 'slow_cook', label: 'Slow Cook' },
+  { value: 'daily',     label: 'Daily' },
+]
+const CATEGORY_LABEL: Record<Category, string> = {
+  steak: 'Steak',
+  slow_cook: 'Slow Cook',
+  daily: 'Daily',
+}
+const empty: Omit<Product, 'id'> = { name: '', grade: 'USDA Prime', detail: '', weight: '', price: 0, price_per_week: 0, img: '', available: true, category: 'steak' }
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -38,7 +51,7 @@ export default function ProductsPage() {
 
   const openEdit = (p: Product) => {
     setEditing(p)
-    setForm({ name: p.name, grade: p.grade, detail: p.detail, weight: p.weight ?? '', price: p.price, price_per_week: p.price_per_week ?? 0, img: p.img, available: p.available })
+    setForm({ name: p.name, grade: p.grade, detail: p.detail, weight: p.weight ?? '', price: p.price, price_per_week: p.price_per_week ?? 0, img: p.img, available: p.available, category: p.category ?? 'steak' })
     setImgErr(false)
     setModal('edit')
   }
@@ -47,8 +60,9 @@ export default function ProductsPage() {
 
   const submit = async () => {
     if (!form.name.trim()) return alert('Product name is required.')
-    if (form.price <= 0)   return alert('Monthly price must be greater than 0.')
-    if (form.price_per_week <= 0) return alert('Weekly price must be greater than 0.')
+    // Allow placeholder pricing only when the product is hidden from the public site
+    if (form.available && form.price <= 0)          return alert('Monthly price must be greater than 0 to publish.')
+    if (form.available && form.price_per_week <= 0) return alert('Weekly price must be greater than 0 to publish.')
 
     try {
       if (modal === 'add') {
@@ -144,7 +158,12 @@ export default function ProductsPage() {
                 {!p.available && <span className="prod-unavail-badge">Hidden</span>}
               </div>
               <div className="prod-body">
-                <div className="prod-grade">{p.grade}</div>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4 }}>
+                  <div className="prod-grade" style={{ marginBottom: 0 }}>{p.grade}</div>
+                  <div style={{ fontSize: 7, fontWeight: 700, letterSpacing: '.22em', textTransform: 'uppercase', color: 'var(--muted)', background: 'rgba(244,239,230,0.06)', padding: '2px 6px' }}>
+                    {CATEGORY_LABEL[p.category ?? 'steak']}
+                  </div>
+                </div>
                 <div className="prod-name">{p.name}</div>
                 <div className="prod-detail">{p.detail}</div>
                 {p.weight && <div style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 6 }}>⚖ {p.weight}</div>}
@@ -198,12 +217,19 @@ export default function ProductsPage() {
                     onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
                 </div>
                 <div className="f-field">
-                  <label className="f-label">Grade</label>
-                  <select className="f-select" value={form.grade}
-                    onChange={e => setForm(f => ({ ...f, grade: e.target.value }))}>
-                    {GRADES.map(g => <option key={g}>{g}</option>)}
+                  <label className="f-label">Category *</label>
+                  <select className="f-select" value={form.category}
+                    onChange={e => setForm(f => ({ ...f, category: e.target.value as Category }))}>
+                    {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                   </select>
                 </div>
+              </div>
+              <div className="f-field">
+                <label className="f-label">Grade</label>
+                <select className="f-select" value={form.grade}
+                  onChange={e => setForm(f => ({ ...f, grade: e.target.value }))}>
+                  {GRADES.map(g => <option key={g}>{g}</option>)}
+                </select>
               </div>
               <div className="f-row">
                 <div className="f-field">

@@ -21,18 +21,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const { name, grade, detail, weight, price, price_per_week, img, available } = body
+  const { name, grade, detail, weight, price, price_per_week, img, available, category } = body
 
   if (!name || !grade || !detail) {
     return NextResponse.json({ error: 'name, grade, and detail are required' }, { status: 400 })
   }
 
+  const cat = typeof category === 'string' && ['steak', 'slow_cook', 'daily'].includes(category)
+    ? category
+    : 'steak'
+
   try {
     const [product] = await query(`
-      INSERT INTO products (name, grade, detail, weight, price, price_per_week, img, available)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO products (name, grade, detail, weight, price, price_per_week, img, available, category)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
-    `, [name, grade, detail, weight ?? '', Number(price) || 0, Number(price_per_week) || 0, img ?? '', available !== false])
+    `, [name, grade, detail, weight ?? '', Number(price) || 0, Number(price_per_week) || 0, img ?? '', available !== false, cat])
 
     return NextResponse.json(product, { status: 201 })
   } catch (err) {

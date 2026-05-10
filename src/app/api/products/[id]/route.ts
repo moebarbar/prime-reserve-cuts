@@ -11,7 +11,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const { name, grade, detail, weight, price, price_per_week, img, available } = body
+  const { name, grade, detail, weight, price, price_per_week, img, available, category } = body
+
+  const cat = typeof category === 'string' && ['steak', 'slow_cook', 'daily'].includes(category)
+    ? category
+    : 'steak'
 
   try {
     const [product] = await query(`
@@ -24,10 +28,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
           price_per_week = $6,
           img            = $7,
           available      = $8,
+          category       = $9,
           updated_at     = NOW()
-      WHERE id = $9
+      WHERE id = $10
       RETURNING *
-    `, [name, grade, detail, weight ?? '', Number(price) || 0, Number(price_per_week) || 0, img ?? '', available !== false, id])
+    `, [name, grade, detail, weight ?? '', Number(price) || 0, Number(price_per_week) || 0, img ?? '', available !== false, cat, id])
 
     if (!product) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     return NextResponse.json(product)

@@ -19,7 +19,8 @@ function constantTimeEqual(a: string, b: string): boolean {
 function isAdminRoute(pathname: string, method: string) {
   // Admin pages always protected
   if (pathname.startsWith('/admin')) return true
-  // All write operations on data APIs are admin-only
+  // All write operations on data APIs are admin-only,
+  // except the public *root* POST on inquiry endpoints (form submissions).
   if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
     if (
       pathname.startsWith('/api/leads') ||
@@ -27,13 +28,21 @@ function isAdminRoute(pathname: string, method: string) {
       pathname.startsWith('/api/products') ||
       pathname.startsWith('/api/buildings')
     ) return true
+    // Inquiries: only the [id] sub-routes are admin-only (status updates, delete).
+    // The public form POST goes to the root path, which we leave open.
+    if (
+      pathname.startsWith('/api/partner-inquiries/') ||
+      pathname.startsWith('/api/rancher-inquiries/')
+    ) return true
   }
   // Leads and orders reads are admin-only (sensitive customer data)
   // Products GET is intentionally public — main site checkout uses it
   if (method === 'GET') {
     if (
       pathname.startsWith('/api/leads') ||
-      pathname.startsWith('/api/orders')
+      pathname.startsWith('/api/orders') ||
+      pathname.startsWith('/api/partner-inquiries') ||
+      pathname.startsWith('/api/rancher-inquiries')
     ) return true
   }
   return false

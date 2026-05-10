@@ -44,6 +44,8 @@ export default function Footer() {
 
           <nav className={styles.links}>
             <Link href="/our-story">Our Story</Link>
+            <Link href="/partners">For Property Managers</Link>
+            <Link href="/ranchers">For Ranchers</Link>
             <Link href="/terms">Terms of Service</Link>
             <Link href="/privacy">Privacy Policy</Link>
             <a href="mailto:beef@automaticcow.com">Contact</a>

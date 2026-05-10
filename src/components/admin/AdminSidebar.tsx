@@ -38,6 +38,13 @@ const NAV_SECTIONS = [
       { href: '/admin/products', icon: '◧', label: 'Products' },
     ],
   },
+  {
+    label: 'Inquiries',
+    items: [
+      { href: '/admin/partners', icon: '🤝', label: 'Partner Inquiries' },
+      { href: '/admin/ranchers', icon: '🐄', label: 'Rancher Applications' },
+    ],
+  },
 ]
 
 export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {

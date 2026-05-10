@@ -47,6 +47,36 @@
 .cutsTitle { font-family: 'Cormorant', serif; font-size: clamp(28px, 2.8vw, 36px); font-weight: 300; line-height: 1.1; margin-bottom: 24px; }
 .cutsTitle em { font-style: italic; color: var(--gold); }
 
+/* category grid (two-tap entry) */
+.catGrid { display: flex; flex-direction: column; gap: 3px; }
+.catCard {
+  display: grid; grid-template-columns: 88px 1fr;
+  align-items: stretch; cursor: pointer;
+  border: 1.5px solid var(--border); background: var(--panel);
+  transition: border-color .2s, transform .15s;
+  overflow: hidden; padding: 0; text-align: left;
+  font-family: inherit; color: inherit;
+  touch-action: manipulation;
+}
+.catCard:hover:not(:disabled) { border-color: rgba(184,134,58,.55); }
+.catCard:hover:not(:disabled) .catThumb img { filter: brightness(.95) saturate(1.05); }
+.catCardEmpty { cursor: not-allowed; opacity: .55; }
+.catThumb { width: 88px; height: 88px; flex-shrink: 0; overflow: hidden; background: #1c1208; }
+.catThumb img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(.7) saturate(.85); transition: filter .3s; }
+.catBody { padding: 13px 16px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+.catTitle { font-family: 'Cormorant', serif; font-size: 22px; font-weight: 300; color: var(--cream); line-height: 1.1; }
+.catTagline { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.catMeta { font-size: 9px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; color: var(--gold); margin-top: 4px; }
+.catSoon { color: var(--muted); }
+.catBackBtn {
+  display: inline-flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer;
+  font-family: 'Jost', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--gold); padding: 4px 0; margin-bottom: 14px; transition: color .2s;
+  touch-action: manipulation;
+}
+.catBackBtn:hover { color: var(--gold2); }
+.catBackBtn:hover .b-arr { transform: translateX(-3px); }
+
 .cutList { display: flex; flex-direction: column; gap: 3px; }
 .cc {
   display: grid; grid-template-columns: 88px 1fr auto;
