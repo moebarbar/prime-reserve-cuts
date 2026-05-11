@@ -56,8 +56,8 @@ export default function OurStoryPage() {
               },
               {
                 num: '02',
-                title: 'Choose Your Cut',
-                desc: 'NY Strip. Tenderloin. Ribeye. Three cuts, sourced from the best ranches. Pick the one that\'s yours.',
+                title: 'Choose Your Category',
+                desc: 'Steak. Slow Cook. Daily essentials. Three categories of USDA Prime beef — pick what fits your week.',
               },
               {
                 num: '03',

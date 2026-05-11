@@ -77,7 +77,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
         <div className={styles.howSteps}>
           {[
             { num: '01', title: 'Pick Your Place', desc: 'Scan the QR code in your building lobby. Your property is already set up — no searching, no setup.' },
-            { num: '02', title: 'Choose Your Cut', desc: 'NY Strip. Tenderloin. Ribeye. Three cuts, sourced from the best ranches. Pick the one that\'s yours.' },
+            { num: '02', title: 'Choose Your Category', desc: 'Steak. Slow Cook. Daily essentials. Three categories of beef — pick what fits your week.' },
             { num: '03', title: 'Every Saturday, Done.', desc: 'Your order arrives vacuum-sealed, chilled, and ready. Every Saturday. No reminders. No reordering. It just happens.' },
           ].map(s => (
             <div key={s.num} className={styles.howCard}>
@@ -139,57 +139,58 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
           The Selection
         </div>
         <h2 className={styles.cutsTitle}>
-          Three cuts.<br /><em>One standard.</em>
+          Three categories.<br /><em>One standard.</em>
         </h2>
         <p className={styles.cutsLead}>
-          Every cut is USDA Prime or above — sourced, aged, and delivered to your door every Saturday.
+          From the weekend ribeye to the everyday ground beef — every cut is USDA Prime,
+          sourced, and delivered to your door every Saturday.
         </p>
       </div>
 
-      {/* STEAK STRIP */}
+      {/* CATEGORY STRIP */}
       <div className={styles.steakStrip}>
         {[
           {
-            src: '/tenderloin-raw.jpg',
-            name: 'Tenderloin',
-            sub: 'Center-cut filet · butter-tender',
+            src: '/source-ranch.jpg',
+            name: 'Slow Cook',
+            sub: 'Brisket · Chuck Roast · Shank',
             grade: 'USDA Prime',
-            price: '$25',
+            price: '3 cuts',
             featured: false,
           },
           {
             src: '/ribeye-raw.jpg',
-            name: 'Ribeye',
-            sub: 'Bone-in · heavy marbling',
+            name: 'Steak',
+            sub: 'Ribeye · NY Strip · Sirloin',
             grade: 'USDA Prime',
-            price: '$25',
+            price: '6 cuts',
             featured: true,
           },
           {
-            src: '/ny-strip-raw.jpg',
-            name: 'NY Strip',
-            sub: '21-day dry-aged · firm texture',
-            grade: 'USDA Choice+',
-            price: '$20',
+            src: '/tenderloin-raw.jpg',
+            name: 'Daily Essentials',
+            sub: 'Ground Beef · Tallow · Marrow Bones',
+            grade: 'USDA Prime',
+            price: '3 items',
             featured: false,
           },
-        ].map((cut, i) => (
-          <div key={i} className={`${styles.sc} ${cut.featured ? styles.scFeatured : ''}`}>
+        ].map((cat, i) => (
+          <div key={i} className={`${styles.sc} ${cat.featured ? styles.scFeatured : ''}`}>
             <div className={styles.scImgWrap}>
               <img
-                src={cut.src}
-                alt={`Raw ${cut.name}`}
+                src={cat.src}
+                alt={cat.name}
                 className={styles.scImg}
                 loading="lazy"
                 onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0' }}
               />
             </div>
             <div className={styles.scWarmOverlay} />
-            <div className={styles.scGrade}>{cut.grade}</div>
+            <div className={styles.scGrade}>{cat.grade}</div>
             <div className={styles.scInfo}>
-              <span className={styles.scName}>{cut.name}</span>
-              <span className={styles.scSub}>{cut.sub}</span>
-              <span className={styles.scPrice}>{cut.price}</span>
+              <span className={styles.scName}>{cat.name}</span>
+              <span className={styles.scSub}>{cat.sub}</span>
+              <span className={styles.scPrice}>{cat.price}</span>
             </div>
           </div>
         ))}
