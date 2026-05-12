@@ -59,7 +59,7 @@ export default function Footer() {
         <div className={styles.credit}>
           Website designed, developed &amp; managed by{' '}
           <a
-            href="https://www.instagram.com/immoebarbar"
+            href="https://moebarbar.com"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.creditLink}
