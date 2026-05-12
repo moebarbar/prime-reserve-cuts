@@ -75,7 +75,7 @@ export default function PitchDeck() {
         <div className={styles.coverInner}>
           <div className={styles.brand}>Automatic <em>Cow</em></div>
           <h1 className={styles.coverTitle}>
-            The luxury weekly<br /><em>steak ritual.</em>
+            Whole-cow luxury.<br /><em>Every Saturday.</em>
           </h1>
           <div className={styles.coverMeta}>
             <span>Investor Brief</span>
@@ -112,10 +112,10 @@ export default function PitchDeck() {
             </div>
           </div>
           <ul className={styles.problemList}>
-            <li>Costco &amp; HEB don&apos;t carry true USDA Prime above 2% marbling</li>
-            <li>Specialty butchers require a drive, parking, conversation, planning</li>
-            <li>National DTC players (Crowd Cow, Snake River) ship 2-day frozen — quality erosion + carbon footprint</li>
-            <li>Restaurants charge 4x markup for the same cut you could grill at home</li>
+            <li>Costco &amp; HEB don&apos;t carry true USDA Prime — nor proper brisket, marrow bones, or rendered tallow</li>
+            <li>Specialty butchers require a drive, parking, conversation, planning — for one cut at a time</li>
+            <li>National DTC players (Crowd Cow, Snake River) ship 2-day frozen and only sell prime steaks — never the full animal</li>
+            <li>Different cuts. Different cravings. Different stores. Nobody serves the whole-week, whole-cow customer.</li>
           </ul>
         </div>
       </section>
@@ -125,16 +125,21 @@ export default function PitchDeck() {
         <div className={styles.slideInner}>
           <div className={styles.eyebrow}>The Solution</div>
           <h2 className={styles.h2}>
-            Set it once.<br /><em>Best beef of your week. Forever.</em>
+            One subscription.<br /><em>The whole animal.</em>
           </h2>
           <p className={styles.lead}>
-            A weekly membership for USDA Prime beef, delivered every Saturday through your building&apos;s
-            concierge. Three categories — Steak, Slow Cook, Daily Essentials. Direct from ranch to your unit.
+            A weekly USDA Prime membership covering every cut your household actually eats —
+            three categories from one animal:
+            <br /><br />
+            <strong>Steak</strong> (Ribeye, NY Strip, Sirloin, Filet, Wagyu, Tomahawk) ·
+            <strong> Slow Cook</strong> (Brisket, Chuck Roast, Shank) ·
+            <strong> Daily Essentials</strong> (Ground Beef, Tallow, Marrow Bones).
+            Delivered every Saturday to your building&apos;s concierge.
           </p>
           <div className={styles.solutionFlow}>
             {[
               { n: '01', t: 'Pick Your Building', d: 'Scan the QR in your lobby. We already know your address.' },
-              { n: '02', t: 'Choose Your Category', d: 'Steak. Slow Cook. Daily Essentials. Mix freely.' },
+              { n: '02', t: 'Choose Your Category', d: 'Premium steaks, soulful slow-cook cuts, or daily essentials. Mix freely.' },
               { n: '03', t: 'Every Saturday, Done', d: 'Vacuum-sealed, chilled, dropped at your concierge.' },
             ].map(s => (
               <div key={s.n} className={styles.solutionStep}>
@@ -303,9 +308,11 @@ export default function PitchDeck() {
               <div className={styles.modelPercent}>72%</div>
               <div className={styles.modelTitle}>Member Subscription</div>
               <div className={styles.modelBody}>
-                Weekly recurring · 3 categories · $15–$115/week per cut.
+                Weekly recurring · whole-animal utilization across three tiers:
                 <br /><br />
-                <strong>Average:</strong> $45/wk × 4 = $180/mo per member.
+                <strong>Steak</strong> $25–115/wk · <strong>Slow Cook</strong> $35–85/wk · <strong>Daily Essentials</strong> $15–40/wk.
+                <br /><br />
+                Blended ARPU: <strong>$180/mo</strong> per member.
               </div>
             </div>
             <div className={styles.modelCard}>
@@ -353,9 +360,10 @@ export default function PitchDeck() {
             </div>
           </div>
           <div className={styles.compMoats}>
-            <span><strong>Moat 1:</strong> Building partnerships — exclusive concierge access</span>
-            <span><strong>Moat 2:</strong> Saturday cold-chain network optimised for one city</span>
-            <span><strong>Moat 3:</strong> Direct rancher relationships at small scale</span>
+            <span><strong>Moat 1:</strong> Whole-animal economics — premium steaks subsidise daily essentials</span>
+            <span><strong>Moat 2:</strong> Building partnerships — exclusive concierge access</span>
+            <span><strong>Moat 3:</strong> Saturday cold-chain network optimised for one city</span>
+            <span><strong>Moat 4:</strong> Direct rancher relationships at small scale</span>
           </div>
         </div>
       </section>
