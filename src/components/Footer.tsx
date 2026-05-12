@@ -56,6 +56,18 @@ export default function Footer() {
           </div>
         </div>
 
+        <div className={styles.credit}>
+          Website designed, developed &amp; managed by{' '}
+          <a
+            href="https://www.instagram.com/immoebarbar"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.creditLink}
+          >
+            Moe Barbar
+          </a>
+        </div>
+
       </div>
     </footer>
   )

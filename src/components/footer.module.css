@@ -114,6 +114,28 @@
   letter-spacing: 0.08em;
 }
 
+.credit {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: rgba(244,239,230,0.45);
+  text-align: center;
+}
+.creditLink {
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(184,134,58,0.35);
+  padding-bottom: 1px;
+  transition: color .2s, border-color .2s;
+}
+.creditLink:hover {
+  color: var(--gold2);
+  border-bottom-color: var(--gold2);
+}
+
 @media (max-width: 700px) {
   .inner { padding: 0 20px; }
   .bottom { flex-direction: column; align-items: flex-start; gap: 16px; }
