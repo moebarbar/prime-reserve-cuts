@@ -1,0 +1,560 @@
+/* ── PITCH DECK ─────────────────────────────────────────────────────────── */
+
+.deck {
+  background: var(--dark);
+  color: var(--cream);
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  position: relative;
+}
+
+/* ── Counter (top-right) ───────────────────────────────────────────────── */
+.counter {
+  position: fixed; top: 24px; right: 32px; z-index: 100;
+  display: flex; align-items: center; gap: 12px;
+  font-family: 'Cormorant', serif;
+  color: var(--cream); padding: 8px 16px;
+  background: rgba(13,11,8,0.55); backdrop-filter: blur(8px);
+  border: 1px solid rgba(184,134,58,0.2);
+}
+.counterNum    { font-size: 24px; font-weight: 300; color: var(--gold); }
+.counterSep    { width: 18px; height: 1px; background: rgba(184,134,58,0.6); }
+.counterTotal  { font-size: 14px; font-weight: 300; color: var(--muted); }
+
+/* ── Side rail (left) ──────────────────────────────────────────────────── */
+.rail {
+  position: fixed; left: 28px; top: 50%;
+  transform: translateY(-50%); z-index: 100;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.railDot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(244,239,230,0.18);
+  transition: background .2s, transform .2s;
+  cursor: pointer; display: block;
+}
+.railDot:hover { background: rgba(184,134,58,0.6); }
+.railDotActive { background: var(--gold); transform: scale(1.4); }
+
+/* ── Slide ─────────────────────────────────────────────────────────────── */
+.slide {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 80px 80px;
+  scroll-snap-align: start;
+  border-bottom: 1px solid rgba(184,134,58,0.08);
+  position: relative;
+}
+.slideInner {
+  max-width: 1080px; width: 100%;
+}
+.eyebrow {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px; font-weight: 600; letter-spacing: .44em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 20px;
+}
+.h2 {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(38px, 5.5vw, 68px);
+  font-weight: 300; line-height: 1.05;
+  color: var(--cream); margin: 0 0 44px;
+  letter-spacing: -0.01em;
+}
+.h2 em { font-style: italic; color: var(--gold); }
+.lead {
+  font-size: 15px; font-weight: 300; color: var(--cream);
+  line-height: 1.9; max-width: 720px; margin: 0 0 24px;
+  opacity: 0.85;
+}
+.lead strong { color: var(--gold); font-weight: 500; }
+
+/* ── 01 — COVER ────────────────────────────────────────────────────────── */
+.cover {
+  background:
+    radial-gradient(ellipse at 70% 30%, rgba(184,134,58,0.12) 0%, transparent 60%),
+    var(--dark);
+  flex-direction: column;
+}
+.coverInner { text-align: center; }
+.brand {
+  font-family: 'Cormorant', serif;
+  font-size: 24px; font-weight: 300; letter-spacing: 0.18em;
+  color: var(--cream); margin-bottom: 64px;
+}
+.brand em { color: var(--gold); font-style: italic; }
+.coverTitle {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(54px, 9vw, 120px);
+  font-weight: 300; line-height: 1.0;
+  margin: 0 0 56px; letter-spacing: -0.02em;
+}
+.coverTitle em { color: var(--gold); font-style: italic; }
+.coverMeta {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  font-family: 'Jost', sans-serif;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--muted);
+}
+.metaDot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); }
+.coverFooter {
+  position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+  font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--muted); opacity: 0.7;
+  animation: bob 2.4s ease-in-out infinite;
+}
+@keyframes bob {
+  0%,100% { transform: translate(-50%, 0); }
+  50%     { transform: translate(-50%, 6px); }
+}
+
+/* ── 02 — PROBLEM ──────────────────────────────────────────────────────── */
+.problemGrid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+  margin-bottom: 40px;
+}
+.problemCard {
+  background: var(--panel);
+  border: 1px solid rgba(184,134,58,0.16);
+  padding: 36px 28px;
+}
+.problemStat {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(48px, 6vw, 72px);
+  font-weight: 300; color: var(--gold);
+  line-height: 1; margin-bottom: 16px;
+}
+.problemLabel {
+  font-size: 13px; line-height: 1.6; color: var(--cream); opacity: 0.85;
+}
+.problemList {
+  list-style: none; padding: 0; margin: 0;
+  border-top: 1px solid var(--border);
+}
+.problemList li {
+  padding: 16px 0; border-bottom: 1px solid var(--border);
+  font-size: 14px; color: var(--cream); opacity: 0.82;
+  display: flex; align-items: flex-start;
+}
+.problemList li::before {
+  content: '×'; color: #c93a3a; margin-right: 14px;
+  font-family: 'Cormorant', serif; font-size: 20px;
+  line-height: 1; font-weight: 400;
+}
+
+/* ── 03 — SOLUTION ─────────────────────────────────────────────────────── */
+.solutionFlow {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+  margin-top: 32px;
+}
+.solutionStep {
+  background: var(--panel);
+  border-top: 2px solid var(--gold);
+  padding: 36px 28px;
+}
+.solutionNum {
+  font-family: 'Cormorant', serif;
+  font-size: 36px; font-weight: 300; color: var(--gold);
+  margin-bottom: 12px; line-height: 1;
+}
+.solutionTitle {
+  font-family: 'Cormorant', serif;
+  font-size: 22px; font-weight: 400; color: var(--cream);
+  margin-bottom: 10px;
+}
+.solutionDesc { font-size: 13px; color: var(--cream); opacity: 0.78; line-height: 1.7; }
+
+/* ── 04 — WHY NOW ──────────────────────────────────────────────────────── */
+.whyGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.whyCard {
+  background: var(--panel);
+  border: 1px solid rgba(184,134,58,0.14);
+  padding: 40px 28px;
+}
+.whyTitle {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 24px;
+}
+.whyBig {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(36px, 4vw, 52px);
+  font-weight: 300; color: var(--cream);
+  line-height: 1.05; margin-bottom: 20px;
+}
+.whyDesc { font-size: 12px; color: var(--cream); opacity: 0.7; line-height: 1.7; }
+
+/* ── 05 — MARKET ───────────────────────────────────────────────────────── */
+.marketStack {
+  display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px;
+}
+.marketTier {
+  display: flex; align-items: center; gap: 32px;
+  padding: 28px 36px;
+  background: var(--panel);
+  border-left: 3px solid var(--gold);
+}
+.tierTam { width: 100%; }
+.tierSam { width: 70%; }
+.tierSom { width: 40%; background: linear-gradient(90deg, rgba(184,134,58,0.18) 0%, var(--panel) 100%); }
+.tierLabel {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--gold);
+  min-width: 50px;
+}
+.tierValue {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(28px, 3.6vw, 44px); font-weight: 300;
+  color: var(--cream); min-width: 120px;
+}
+.tierDesc { font-size: 12px; color: var(--cream); opacity: 0.7; line-height: 1.5; }
+.marketFootnote {
+  font-size: 13px; color: var(--cream); opacity: 0.78;
+  padding: 18px 24px; border-left: 2px solid rgba(184,134,58,0.4);
+  line-height: 1.7;
+}
+.marketFootnote strong { color: var(--gold); font-weight: 500; }
+
+/* ── 06 — HOW IT WORKS ─────────────────────────────────────────────────── */
+.howChain {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  margin-top: 8px;
+}
+.howStep {
+  background: var(--panel);
+  border: 1px solid rgba(184,134,58,0.14);
+  padding: 32px 22px;
+  position: relative;
+}
+.howStep + .howStep::before {
+  content: '→'; position: absolute; left: -16px; top: 50%;
+  transform: translateY(-50%); color: var(--gold); font-size: 16px;
+}
+.howIcon {
+  font-family: 'Cormorant', serif; font-size: 28px;
+  color: var(--gold); margin-bottom: 18px; line-height: 1;
+}
+.howTitle {
+  font-family: 'Cormorant', serif;
+  font-size: 19px; font-weight: 400; color: var(--cream);
+  margin-bottom: 12px; line-height: 1.2;
+}
+.howDesc { font-size: 12px; color: var(--cream); opacity: 0.74; line-height: 1.7; }
+
+/* ── 07 — TRACTION ─────────────────────────────────────────────────────── */
+.tractionGrid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+  margin-bottom: 24px;
+}
+.tractionStat {
+  background: var(--panel);
+  border: 1px solid rgba(184,134,58,0.14);
+  padding: 32px 28px;
+}
+.tractionNum {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(44px, 5vw, 64px);
+  font-weight: 300; color: var(--gold);
+  line-height: 1; margin-bottom: 16px;
+}
+.tractionLbl {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.26em;
+  text-transform: uppercase; color: var(--cream); margin-bottom: 14px;
+}
+.tractionSub { font-size: 12px; color: var(--cream); opacity: 0.7; line-height: 1.7; }
+.tractionFootnote {
+  font-size: 12px; color: var(--cream); opacity: 0.65;
+  padding-top: 16px; font-style: italic;
+}
+
+/* ── 08 — UNIT ECONOMICS ───────────────────────────────────────────────── */
+.ueGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.ueCard {
+  background: var(--panel);
+  border-top: 2px solid var(--gold);
+  padding: 28px 22px;
+}
+.ueVal {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 300; color: var(--cream);
+  line-height: 1.05; margin-bottom: 12px;
+}
+.ueLbl {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 10px;
+}
+.ueSub { font-size: 11px; color: var(--cream); opacity: 0.72; line-height: 1.6; }
+
+/* ── 09 — BUSINESS MODEL ───────────────────────────────────────────────── */
+.modelGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.modelCard {
+  background: var(--panel);
+  border: 1px solid rgba(184,134,58,0.14);
+  padding: 36px 28px;
+  position: relative;
+}
+.modelPercent {
+  font-family: 'Cormorant', serif;
+  font-size: 18px; font-weight: 500; color: var(--gold);
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+.modelTitle {
+  font-family: 'Cormorant', serif;
+  font-size: 22px; font-weight: 400; color: var(--cream);
+  margin-bottom: 16px; line-height: 1.2;
+}
+.modelBody { font-size: 13px; color: var(--cream); opacity: 0.8; line-height: 1.85; }
+.modelBody strong { color: var(--gold); font-weight: 500; }
+
+/* ── 10 — COMPETITION ──────────────────────────────────────────────────── */
+.compMatrix {
+  position: relative; width: 100%; aspect-ratio: 2/1;
+  background: var(--panel);
+  border: 1px solid rgba(184,134,58,0.16);
+  margin-bottom: 28px;
+  background-image:
+    linear-gradient(to right, rgba(184,134,58,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(184,134,58,0.05) 1px, transparent 1px);
+  background-size: 25% 25%;
+}
+.compYAxis, .compXAxis {
+  position: absolute;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--gold); opacity: 0.7;
+}
+.compYAxis { left: 14px; top: 50%; transform: translateY(-50%) rotate(-90deg); transform-origin: left center; }
+.compXAxis { bottom: 14px; left: 50%; transform: translateX(-50%); }
+.compDot {
+  position: absolute;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: rgba(244,239,230,0.5);
+  transform: translate(-50%, 50%);
+}
+.compDot span {
+  position: absolute; left: 16px; top: -6px; white-space: nowrap;
+  font-size: 11px; color: var(--cream); opacity: 0.75;
+}
+.compUs {
+  width: 18px; height: 18px;
+  background: var(--gold); box-shadow: 0 0 22px rgba(184,134,58,0.6);
+}
+.compUs span { font-weight: 600; color: var(--gold); opacity: 1; font-size: 13px; left: 22px; }
+.compMoats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+.compMoats span {
+  font-size: 12px; color: var(--cream); opacity: 0.85;
+  padding: 14px 16px;
+  border-left: 2px solid var(--gold);
+  line-height: 1.7;
+}
+.compMoats strong { color: var(--gold); font-weight: 500; }
+
+/* ── 11 — GO TO MARKET ─────────────────────────────────────────────────── */
+.gtmFlow {
+  display: grid; grid-template-columns: 1fr auto 1fr auto 1fr;
+  gap: 12px; align-items: center;
+}
+.gtmPhase {
+  background: var(--panel);
+  border: 1px solid rgba(184,134,58,0.18);
+  padding: 28px 24px;
+  text-align: center;
+}
+.gtmTag {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
+}
+.gtmCity {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-weight: 300; color: var(--cream); margin-bottom: 12px;
+}
+.gtmTarget { font-size: 11px; color: var(--cream); opacity: 0.72; line-height: 1.6; }
+.gtmArrow {
+  font-family: 'Cormorant', serif; font-size: 32px;
+  color: var(--gold); opacity: 0.6;
+}
+
+/* ── 12 — ROADMAP ──────────────────────────────────────────────────────── */
+.roadmap { display: flex; flex-direction: column; }
+.roadmapRow {
+  display: grid; grid-template-columns: 120px 1fr;
+  gap: 32px; align-items: start;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border);
+}
+.roadmapQ {
+  font-family: 'Cormorant', serif;
+  font-size: 22px; font-weight: 300;
+  color: var(--gold); padding-top: 2px;
+}
+.roadmapItems {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-wrap: wrap; gap: 16px;
+}
+.roadmapItems li {
+  font-size: 13px; color: var(--cream); opacity: 0.85;
+  background: rgba(184,134,58,0.06);
+  border: 1px solid rgba(184,134,58,0.2);
+  padding: 8px 14px;
+}
+
+/* ── 13 — TEAM ─────────────────────────────────────────────────────────── */
+.teamGrid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+  margin-bottom: 24px;
+}
+.teamCard {
+  background: var(--panel);
+  border: 1px solid rgba(184,134,58,0.14);
+  padding: 32px 28px;
+  text-align: center;
+}
+.teamAvatar {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: rgba(184,134,58,0.14);
+  border: 1.5px solid var(--gold); color: var(--gold);
+  font-family: 'Cormorant', serif; font-size: 28px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 18px;
+}
+.teamName {
+  font-family: 'Cormorant', serif;
+  font-size: 22px; font-weight: 400; color: var(--cream);
+  margin-bottom: 6px;
+}
+.teamRole {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 14px;
+}
+.teamBio { font-size: 12px; color: var(--cream); opacity: 0.78; line-height: 1.7; }
+.teamFootnote {
+  font-size: 11px; color: var(--cream); opacity: 0.6; font-style: italic;
+  text-align: center; padding-top: 12px;
+}
+
+/* ── 14 — THE ASK ──────────────────────────────────────────────────────── */
+.askGrid {
+  display: grid; grid-template-columns: 1fr 1.4fr; gap: 32px;
+  margin-bottom: 24px;
+}
+.askBig {
+  background: var(--panel);
+  border: 1px solid var(--gold);
+  padding: 44px 32px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.askLbl {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 18px;
+}
+.askVal {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(64px, 8vw, 96px);
+  font-weight: 300; color: var(--cream);
+  line-height: 1; margin-bottom: 18px;
+}
+.askSub { font-size: 12px; color: var(--cream); opacity: 0.78; }
+.askUse {
+  background: var(--panel);
+  border: 1px solid rgba(184,134,58,0.14);
+  padding: 32px;
+}
+.askUseTitle {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 24px;
+}
+.askRow {
+  display: grid; grid-template-columns: 44px 1fr 1.8fr;
+  align-items: center; gap: 14px; margin-bottom: 14px;
+}
+.askPct {
+  font-family: 'Cormorant', serif;
+  font-size: 18px; color: var(--gold); font-weight: 400;
+}
+.askBar {
+  height: 4px; background: rgba(244,239,230,0.06); overflow: hidden;
+}
+.askBarFill {
+  height: 100%; background: var(--gold);
+}
+.askLblSm { font-size: 12px; color: var(--cream); opacity: 0.85; }
+.askMilestones {
+  font-size: 14px; color: var(--cream); opacity: 0.9;
+  padding: 20px 24px;
+  border-left: 2px solid var(--gold);
+  line-height: 1.8;
+}
+.askMilestones strong { color: var(--gold); font-weight: 500; }
+
+/* ── 15 — CLOSING ──────────────────────────────────────────────────────── */
+.closing {
+  background:
+    radial-gradient(ellipse at 30% 70%, rgba(184,134,58,0.10) 0%, transparent 60%),
+    var(--dark);
+  flex-direction: column;
+  text-align: center;
+}
+.closingInner { max-width: 820px; }
+.closingHeadline {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(44px, 6.5vw, 84px);
+  font-weight: 300; line-height: 1.05;
+  margin: 24px 0 36px; letter-spacing: -0.01em;
+}
+.closingHeadline em { font-style: italic; color: var(--gold); }
+.closingLead {
+  font-size: 16px; font-weight: 300; line-height: 1.9;
+  color: var(--cream); opacity: 0.86;
+  max-width: 660px; margin: 0 auto 56px;
+}
+.closingContact {
+  display: flex; justify-content: center; gap: 80px;
+  margin-bottom: 52px;
+}
+.contactLbl {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.36em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 10px;
+}
+.contactVal {
+  font-family: 'Cormorant', serif;
+  font-size: 22px; font-weight: 300; color: var(--cream);
+  text-decoration: none; border-bottom: 1px solid rgba(184,134,58,0.3);
+  transition: border-color .2s;
+}
+.contactVal:hover { border-color: var(--gold); }
+.closingFoot {
+  font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); opacity: 0.6;
+}
+
+/* ── RESPONSIVE ────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .slide { padding: 60px 44px; }
+  .problemGrid, .whyGrid, .modelGrid, .teamGrid { grid-template-columns: 1fr 1fr; }
+  .howChain, .ueGrid { grid-template-columns: 1fr 1fr; }
+  .gtmFlow { grid-template-columns: 1fr; }
+  .gtmArrow { transform: rotate(90deg); justify-self: center; }
+  .askGrid { grid-template-columns: 1fr; }
+  .closingContact { gap: 40px; }
+}
+@media (max-width: 700px) {
+  .slide { padding: 56px 24px; min-height: auto; }
+  .deck { scroll-snap-type: none; }
+  .counter { top: 14px; right: 14px; padding: 6px 12px; }
+  .counterNum { font-size: 18px; }
+  .rail { display: none; }
+  .problemGrid, .whyGrid, .solutionFlow, .howChain, .ueGrid, .modelGrid, .teamGrid,
+  .tractionGrid, .compMoats { grid-template-columns: 1fr; }
+  .roadmapRow { grid-template-columns: 1fr; gap: 12px; }
+  .marketTier { width: 100% !important; flex-wrap: wrap; gap: 12px; }
+  .compMatrix { aspect-ratio: 1/1; }
+  .compDot span { font-size: 10px; left: 14px; }
+  .compUs span { font-size: 11px; }
+  .closingContact { flex-direction: column; gap: 24px; }
+  .askRow { grid-template-columns: 36px 1fr; }
+  .askRow .askLblSm { grid-column: 1 / -1; padding-left: 50px; }
+}
