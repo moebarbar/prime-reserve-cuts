@@ -81,6 +81,13 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
     }
     const STEAK_ORDER = ['tenderloin', 'ribeye', 'ny-strip'] as const
 
+    // Custom photography for slow-cook + daily products. Matched by name (case-insensitive).
+    const IMG_OVERRIDES: Record<string, string> = {
+      brisket:      'https://i.imgur.com/2SI0S49.jpg',
+      'chuck roast':'https://i.imgur.com/16gBTVR.jpg',
+      'ground beef':'https://i.imgur.com/n2wjXBV.jpg',
+    }
+
     fetch('/api/products')
       .then(r => r.json())
       .then((data: Cut[]) => {
@@ -90,7 +97,12 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
             const t = matchSteakType(p.name)!
             return { ...p, category: 'steak' as Category, name: STEAK_TYPES[t].name, img: STEAK_TYPES[t].img, detail: STEAK_TYPES[t].detail, price_per_week: STEAK_TYPES[t].price_per_week, weight: STEAK_TYPES[t].weight }
           }
-          return { ...p, category: (p.category ?? 'steak') as Category }
+          const override = IMG_OVERRIDES[p.name.toLowerCase().trim()]
+          return {
+            ...p,
+            category: (p.category ?? 'steak') as Category,
+            ...(override ? { img: override } : {}),
+          }
         })
         // Sort the steak section the same way the homepage does
         list.sort((a, b) => {
