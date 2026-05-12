@@ -38,24 +38,27 @@ interface Page2Props {
   onContinue: (form: FormData, selections: CutSelection[]) => void
 }
 
-const CATEGORIES: { key: Category; title: string; tagline: string; img: string }[] = [
+const CATEGORIES: { key: Category; title: string; tagline: string; img: string; intro: string }[] = [
   {
     key: 'steak',
     title: 'Steak',
     tagline: 'Ribeye, NY Strip, Sirloin',
     img: '/ribeye-raw.jpg',
+    intro: 'Sear hot. Rest patient. Serve proud.',
   },
   {
     key: 'slow_cook',
     title: 'Slow Cook',
     tagline: 'Brisket, Chuck Roast, Shank',
     img: '/source-ranch.jpg',
+    intro: 'Low. Slow. Worth the wait.',
   },
   {
     key: 'daily',
     title: 'Daily Essentials',
     tagline: 'Ground beef, tallow, marrow bones',
     img: '/tenderloin-raw.jpg',
+    intro: 'Always in the fridge. Always reaching for it.',
   },
 ]
 

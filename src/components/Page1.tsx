@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import styles from './page1.module.css'
 import { BUILDINGS } from '@/data/buildings'
 import Footer from './Footer'
@@ -11,7 +12,44 @@ interface Page1Props {
   onContinue: () => void
 }
 
+const CATEGORIES = [
+  {
+    key: 'slow_cook',
+    src: 'https://i.imgur.com/2SI0S49.jpg',
+    name: 'Slow Cook',
+    sub: 'Brisket · Chuck Roast · Shank',
+    grade: 'USDA Prime',
+    price: '3 cuts',
+    featured: false,
+    intro: 'Low. Slow. Worth the wait.',
+    items: ['Brisket', 'Chuck Roast', 'Shank (Osso Buco)'],
+  },
+  {
+    key: 'steak',
+    src: '/ribeye-raw.jpg',
+    name: 'Steak',
+    sub: 'Ribeye · NY Strip · Sirloin',
+    grade: 'USDA Prime',
+    price: '6 cuts',
+    featured: true,
+    intro: 'Sear hot. Rest patient. Serve proud.',
+    items: ['Ribeye', 'NY Strip', 'Sirloin', 'Filet Mignon', 'A5 Wagyu', 'Tomahawk'],
+  },
+  {
+    key: 'daily',
+    src: 'https://i.imgur.com/n2wjXBV.jpg',
+    name: 'Daily Essentials',
+    sub: 'Ground Beef · Tallow · Marrow Bones',
+    grade: 'USDA Prime',
+    price: '3 items',
+    featured: false,
+    intro: 'Always in the fridge. Always reaching for it.',
+    items: ['Ground Beef', 'Beef Tallow / Suet', 'Marrow Bones'],
+  },
+] as const
+
 export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props) {
+  const [openCat, setOpenCat] = useState<string | null>(null)
   const handleContinue = () => {
     if (!selectedKey) {
       const grid = document.getElementById('bld-grid')
@@ -147,54 +185,58 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
         </p>
       </div>
 
-      {/* CATEGORY STRIP */}
+      {/* CATEGORY STRIP — click a card to reveal its detail panel */}
       <div className={styles.steakStrip}>
-        {[
-          {
-            src: 'https://i.imgur.com/2SI0S49.jpg',
-            name: 'Slow Cook',
-            sub: 'Brisket · Chuck Roast · Shank',
-            grade: 'USDA Prime',
-            price: '3 cuts',
-            featured: false,
-          },
-          {
-            src: '/ribeye-raw.jpg',
-            name: 'Steak',
-            sub: 'Ribeye · NY Strip · Sirloin',
-            grade: 'USDA Prime',
-            price: '6 cuts',
-            featured: true,
-          },
-          {
-            src: 'https://i.imgur.com/n2wjXBV.jpg',
-            name: 'Daily Essentials',
-            sub: 'Ground Beef · Tallow · Marrow Bones',
-            grade: 'USDA Prime',
-            price: '3 items',
-            featured: false,
-          },
-        ].map((cat, i) => (
-          <div key={i} className={`${styles.sc} ${cat.featured ? styles.scFeatured : ''}`}>
-            <div className={styles.scImgWrap}>
-              <img
-                src={cat.src}
-                alt={cat.name}
-                className={styles.scImg}
-                loading="lazy"
-                onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0' }}
-              />
-            </div>
-            <div className={styles.scWarmOverlay} />
-            <div className={styles.scGrade}>{cat.grade}</div>
-            <div className={styles.scInfo}>
-              <span className={styles.scName}>{cat.name}</span>
-              <span className={styles.scSub}>{cat.sub}</span>
-              <span className={styles.scPrice}>{cat.price}</span>
+        {CATEGORIES.map(cat => {
+          const isOpen = openCat === cat.key
+          return (
+            <button
+              key={cat.key}
+              type="button"
+              className={`${styles.sc} ${cat.featured ? styles.scFeatured : ''} ${isOpen ? styles.scOpen : ''}`}
+              onClick={() => setOpenCat(isOpen ? null : cat.key)}
+              aria-expanded={isOpen}
+            >
+              <div className={styles.scImgWrap}>
+                <img
+                  src={cat.src}
+                  alt={cat.name}
+                  className={styles.scImg}
+                  loading="lazy"
+                  onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0' }}
+                />
+              </div>
+              <div className={styles.scWarmOverlay} />
+              <div className={styles.scGrade}>{cat.grade}</div>
+              <div className={styles.scInfo}>
+                <span className={styles.scName}>{cat.name}</span>
+                <span className={styles.scSub}>{cat.sub}</span>
+                <span className={styles.scPrice}>{cat.price}</span>
+              </div>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* DETAIL PANEL — appears below the strip when a category is clicked */}
+      {openCat && (() => {
+        const cat = CATEGORIES.find(c => c.key === openCat)!
+        return (
+          <div className={styles.catDetail}>
+            <div className={styles.catDetailInner}>
+              <button className={styles.catClose} onClick={() => setOpenCat(null)} aria-label="Close">×</button>
+              <div className={styles.catEyebrow}>{cat.name}</div>
+              <p className={styles.catIntro}>{cat.intro}</p>
+              <div className={styles.catItems}>
+                {cat.items.map(item => (
+                  <span key={item} className={styles.catItem}>{item}</span>
+                ))}
+              </div>
+              <div className={styles.catHint}>↓ Pick your building below to start ordering</div>
             </div>
           </div>
-        ))}
-      </div>
+        )
+      })()}
 
       {/* SOURCING SECTION */}
       <div className={styles.sourceSection}>
