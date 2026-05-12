@@ -429,8 +429,8 @@ export default function PitchDeck() {
           </h2>
           <div className={styles.teamGrid}>
             <div className={styles.teamCard}>
-              <div className={styles.teamAvatar}>M</div>
-              <div className={styles.teamName}>[Founder Name]</div>
+              <div className={styles.teamAvatar}>D</div>
+              <div className={styles.teamName}>Dipendra Sharesta</div>
               <div className={styles.teamRole}>Founder &amp; CEO</div>
               <div className={styles.teamBio}>[Background — prior ventures, exits, relevant industry experience.]</div>
             </div>
