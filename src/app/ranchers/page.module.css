@@ -152,7 +152,7 @@
 .formField select { cursor: pointer; appearance: none; -webkit-appearance: none; }
 .formField select option { background: var(--panel); color: var(--cream); }
 .formField input::placeholder,
-.formField textarea::placeholder { color: rgba(244,239,230,.2); font-style: italic; }
+.formField textarea::placeholder { color: rgba(244,239,230,.5); font-style: italic; }
 .formRow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .formSubmit {
   margin-top: 28px; padding: 16px; background: var(--gold); border: none; color: var(--dark);

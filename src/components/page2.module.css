@@ -38,7 +38,7 @@
   /* prevent iOS zoom on focus (font-size must be >= 16px) */
   font-size: max(16px, 17px);
 }
-.field input::placeholder { color: rgba(244,239,230,.2); font-style: italic; }
+.field input::placeholder { color: rgba(244,239,230,.5); font-style: italic; }
 .fieldRow { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .note { margin-top: 22px; padding: 13px 16px; border-left: 2px solid rgba(184,134,58,.28); font-size: 11px; color: var(--muted); line-height: 1.7; }
 

@@ -8,8 +8,8 @@
   --panel:  #111009;
   --gold:   #b8863a;
   --gold2:  #e2b86a;
-  --muted:  rgba(244,239,230,0.46);
-  --border: rgba(244,239,230,0.1);
+  --muted:  rgba(244,239,230,0.66);
+  --border: rgba(244,239,230,0.16);
 }
 
 html { scroll-behavior: smooth; }

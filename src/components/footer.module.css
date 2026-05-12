@@ -81,7 +81,7 @@
   font-family: 'Cormorant', serif;
   font-size: 15px;
   font-weight: 300;
-  color: rgba(244,239,230,0.4);
+  color: rgba(244,239,230,0.7);
   letter-spacing: 0.08em;
   line-height: 1.2;
 }
@@ -89,7 +89,7 @@
   font-family: 'Jost', sans-serif;
   font-size: 7px;
   font-weight: 500;
-  color: rgba(184,134,58,0.5);
+  color: rgba(184,134,58,0.75);
   letter-spacing: 0.3em;
   text-transform: uppercase;
   line-height: 1;
@@ -110,7 +110,7 @@
 .links a:hover { color: var(--gold); }
 .copy {
   font-size: 10px;
-  color: rgba(244,239,230,0.2);
+  color: rgba(244,239,230,0.55);
   letter-spacing: 0.08em;
 }
 

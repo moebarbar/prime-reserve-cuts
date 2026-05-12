@@ -449,7 +449,7 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
 .f-input:focus, .f-select:focus, .f-textarea:focus {
   border-bottom-color: var(--gold);
 }
-.f-input::placeholder, .f-textarea::placeholder { color: rgba(244,239,230,0.2); font-style: italic; }
+.f-input::placeholder, .f-textarea::placeholder { color: rgba(244,239,230,0.5); font-style: italic; }
 .f-select { cursor: pointer; background: transparent; }
 .f-select option { background: #111009; }
 .f-textarea { resize: vertical; min-height: 70px; font-size: 13px; }

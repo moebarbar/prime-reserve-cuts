@@ -151,7 +151,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
       <div className={styles.steakStrip}>
         {[
           {
-            src: '/source-ranch.jpg',
+            src: 'https://i.imgur.com/2SI0S49.jpg',
             name: 'Slow Cook',
             sub: 'Brisket · Chuck Roast · Shank',
             grade: 'USDA Prime',
@@ -167,7 +167,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
             featured: true,
           },
           {
-            src: '/tenderloin-raw.jpg',
+            src: 'https://i.imgur.com/n2wjXBV.jpg',
             name: 'Daily Essentials',
             sub: 'Ground Beef · Tallow · Marrow Bones',
             grade: 'USDA Prime',
