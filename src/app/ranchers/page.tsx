@@ -5,9 +5,23 @@ import RancherInquiryForm from './RancherInquiryForm'
 import styles from './page.module.css'
 
 export const metadata: Metadata = {
-  title: 'Ranchers — More Than a Buyer. A Long-Term Partner.',
-  description: 'Houston\'s most demanding tables source from us. We partner with small-batch USDA Prime ranches and pay what your beef is worth.',
+  title: 'For Ranchers — More Than a Buyer. A Long-Term Partner.',
+  description: 'Sell your USDA Prime beef directly to Houston\'s most demanding tables. We partner with small-batch ranches across Texas, Oklahoma, and the Midwest and pay what your cattle are worth.',
+  keywords: [
+    'sell beef direct to consumer',
+    'cattle rancher partnership Texas',
+    'USDA Prime ranch sourcing',
+    'small-batch beef wholesale',
+    'beef DTC distribution Houston',
+    'ranch to table Houston',
+  ],
   alternates: { canonical: 'https://automaticcow.com/ranchers' },
+  openGraph: {
+    title: 'For Ranchers — More Than a Buyer. A Long-Term Partner.',
+    description: 'Direct distribution from your ranch to Houston\'s luxury tables. Apply to partner with Automatic Cow.',
+    url: 'https://automaticcow.com/ranchers',
+    type: 'website',
+  },
 }
 
 const DIFFERENTIATORS = [

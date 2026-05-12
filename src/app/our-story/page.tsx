@@ -6,8 +6,14 @@ import styles from './page.module.css'
 
 export const metadata: Metadata = {
   title: 'Our Story — How Automatic Cow Was Born',
-  description: 'The story behind Houston\'s private USDA Prime steak membership — built for residents who expect the best, delivered without effort.',
+  description: 'The story behind Houston\'s private USDA Prime beef membership — whole-animal access for residents who expect the best, delivered without effort.',
   alternates: { canonical: 'https://automaticcow.com/our-story' },
+  openGraph: {
+    title: 'Our Story — How Automatic Cow Was Born',
+    description: 'Houston\'s private USDA Prime beef membership for luxury residents. Built for the whole week, delivered every Saturday.',
+    url: 'https://automaticcow.com/our-story',
+    type: 'article',
+  },
 }
 
 export default function OurStoryPage() {

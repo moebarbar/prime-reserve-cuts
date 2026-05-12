@@ -90,9 +90,9 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
             </h1>
           </div>
           <p className={styles.mission}>
-            <strong>The best steak in Houston shouldn&apos;t require a reservation.</strong>{' '}
-            Automatic Cow delivers USDA Prime cuts directly to luxury residents —
-            every week, to your unit, zero effort.
+            <strong>The best beef in Houston shouldn&apos;t require a reservation.</strong>{' '}
+            Automatic Cow delivers USDA Prime cuts — steaks, brisket, ground beef and more —
+            directly to luxury residents, every week, to your unit, zero effort.
           </p>
         </div>
       </div>
@@ -200,7 +200,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
               <div className={styles.scImgWrap}>
                 <img
                   src={cat.src}
-                  alt={cat.name}
+                  alt={`${cat.name} — ${cat.sub} · USDA Prime beef delivered weekly in Houston`}
                   className={styles.scImg}
                   loading="lazy"
                   onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0' }}
@@ -273,7 +273,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
                 ),
                 region: 'High Plains, Texas',
                 title: 'Grain-Finished Cattle',
-                body: 'Our NY Strip and Ribeye come from grain-finished Black Angus herds raised on the Texas High Plains — known for producing the most consistent marbling in the country.',
+                body: 'Our premium steaks — Ribeye, NY Strip, Sirloin — come from grain-finished Black Angus herds raised on the Texas High Plains, known for producing the most consistent marbling in the country.',
               },
               {
                 icon: (
@@ -288,8 +288,8 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
                   </svg>
                 ),
                 region: 'Midwest Cornbelt',
-                title: 'Corn-Fed Tenderloin',
-                body: 'Our Tenderloin is sourced from Midwest corn-fed programs with an average of 150+ days on feed — resulting in the buttery, clean finish that defines a true filet.',
+                title: 'Whole-Animal Sourcing',
+                body: 'Brisket, chuck roast, shank, ground beef, marrow bones — every cut comes from the same USDA Prime Midwestern herds, 150+ days on feed. One animal. One standard. Three categories on your table.',
               },
               {
                 icon: (

@@ -5,9 +5,22 @@ import PartnerInquiryForm from './PartnerInquiryForm'
 import styles from './page.module.css'
 
 export const metadata: Metadata = {
-  title: 'Partner Buildings — A Premium Amenity for Your Residents',
-  description: 'Bring USDA Prime steak, weekly, to your residents. A turnkey luxury amenity for Houston property managers — at zero cost to the building.',
+  title: 'For Property Managers — A Premium Amenity for Your Residents',
+  description: 'Bring weekly USDA Prime beef delivery to your residents — steaks, brisket, ground beef, and more. A turnkey luxury amenity for Houston property managers, at zero cost to the building.',
+  keywords: [
+    'property manager amenity Houston',
+    'luxury high-rise amenity',
+    'resident retention amenity',
+    'concierge beef delivery Houston',
+    'building partnership food delivery',
+  ],
   alternates: { canonical: 'https://automaticcow.com/partners' },
+  openGraph: {
+    title: 'For Property Managers — A Premium Amenity for Your Residents',
+    description: 'Weekly USDA Prime beef delivery as a zero-cost luxury amenity for Houston high-rise buildings.',
+    url: 'https://automaticcow.com/partners',
+    type: 'website',
+  },
 }
 
 const BENEFITS = [

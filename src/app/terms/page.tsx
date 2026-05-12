@@ -5,7 +5,7 @@ import styles from '../legal.module.css'
 
 export const metadata = {
   title: 'Terms of Service',
-  description: 'Terms of service for Automatic Cow membership and weekly steak delivery.',
+  description: 'Terms of service for Automatic Cow weekly USDA Prime beef membership in Houston.',
   alternates: { canonical: 'https://automaticcow.com/terms' },
 }
 
