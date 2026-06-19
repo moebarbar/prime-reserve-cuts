@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import stripe from '@/lib/stripe'
+import { query } from '@/lib/db'
 import { rateLimit, rateLimitResponse } from '@/lib/rateLimit'
-import { PRICE_BY_NAME } from '@/data/products'
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL ?? 'http://localhost:3000'
 
@@ -58,9 +58,15 @@ export async function POST(req: NextRequest) {
     quantity: number
   }[] = []
   for (const sel of selections as Selection[]) {
-    const pricePerLb = PRICE_BY_NAME[sel.name]
-    if (pricePerLb == null) {
-      return NextResponse.json({ error: `Unknown product "${sel.name}"` }, { status: 400 })
+    // Price comes from the products table (server-side trust boundary) — never
+    // from the browser — so admin price edits flow straight into billing.
+    const [product] = await query<{ price: number | string }>(
+      `SELECT price FROM products WHERE name = $1 AND available = true LIMIT 1`,
+      [sel.name],
+    ).catch(() => [] as { price: number | string }[])
+    const pricePerLb = product ? Number(product.price) : NaN
+    if (!Number.isFinite(pricePerLb) || pricePerLb <= 0) {
+      return NextResponse.json({ error: `Unavailable product "${sel.name}"` }, { status: 400 })
     }
     line_items.push({
       price_data: {

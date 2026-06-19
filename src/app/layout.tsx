@@ -105,7 +105,7 @@ const prices = PRODUCTS.map(p => p.pricePerLb)
 const LOW_PRICE = Math.min(...prices).toFixed(2)
 const HIGH_PRICE = Math.max(...prices).toFixed(2)
 
-const catProductOffers = (catKey: 'steak' | 'slow_cook' | 'ground') =>
+const catProductOffers = (catKey: 'steak' | 'slow_cook' | 'daily') =>
   productsByCategory(catKey).map(p => ({
     '@type': 'Offer',
     itemOffered: {

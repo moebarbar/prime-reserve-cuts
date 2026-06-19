@@ -1,11 +1,17 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// CANONICAL PRODUCT CATALOG — single source of truth for the ordering funnel,
-// the homepage category strip, the Stripe checkout, and the JSON-LD structured
-// data. Pricing is per-pound; the customer picks pounds-per-week and the site
+// CANONICAL PRODUCT CATALOG. Products are DB-driven at runtime (the funnel,
+// checkout, and admin all read/write the `products` table). This file is the
+// seed + SEO source + funnel fallback, kept in sync with the DB seed/sync script
+// (scripts/migrate.ts seed + scripts/update-products.ts).
+//
+// Pricing is per-pound; the customer picks pounds-per-week and the site
 // multiplies. Local beef · weekly delivery · cancel anytime.
+//
+// Category note: the DB uses three category keys — 'steak', 'slow_cook' and
+// 'daily'. We surface 'daily' as the "Ground Beef" section in the UI.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type Category = 'steak' | 'slow_cook' | 'ground'
+export type Category = 'steak' | 'slow_cook' | 'daily'
 
 export interface Product {
   id: string
@@ -41,7 +47,7 @@ export const CATEGORY_META: CategoryMeta[] = [
     intro: 'Low. Slow. Worth the wait.',
   },
   {
-    key: 'ground',
+    key: 'daily',
     title: 'Ground Beef',
     tagline: 'Fresh-ground, by the pound',
     img: 'https://i.imgur.com/n2wjXBV.jpg',
@@ -62,15 +68,9 @@ export const PRODUCTS: Product[] = [
   { id: 'roasts',  name: 'Roasts',                category: 'slow_cook', pricePerLb: 14.99, detail: 'Sunday pot roast · low and slow', img: 'https://i.imgur.com/16gBTVR.jpg', available: true },
   { id: 'brisket', name: 'Brisket',               category: 'slow_cook', pricePerLb: 14.99, detail: 'The heart of Texas BBQ',           img: 'https://i.imgur.com/2SI0S49.jpg', available: true },
 
-  // ── Ground Beef ─────────────────────────────────────────────────────────
-  { id: 'ground',  name: 'Ground Beef',           category: 'ground', pricePerLb: 12.99, detail: 'Fresh-ground · the everyday staple', img: 'https://i.imgur.com/n2wjXBV.jpg', available: true },
+  // ── Ground Beef (DB category 'daily') ───────────────────────────────────
+  { id: 'ground',  name: 'Ground Beef',           category: 'daily', pricePerLb: 12.99, detail: 'Fresh-ground · the everyday staple', img: 'https://i.imgur.com/n2wjXBV.jpg', available: true },
 ]
 
 export const productsByCategory = (cat: Category): Product[] =>
   PRODUCTS.filter(p => p.category === cat && p.available)
-
-// Server-side trust boundary: checkout looks prices up here by name rather than
-// trusting anything the browser sends.
-export const PRICE_BY_NAME: Record<string, number> = Object.fromEntries(
-  PRODUCTS.map(p => [p.name, p.pricePerLb]),
-)

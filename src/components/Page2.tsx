@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './page2.module.css'
 import { BUILDINGS } from '@/data/buildings'
 import { PRODUCTS, CATEGORY_META, type Category, type Product } from '@/data/products'
@@ -31,10 +31,31 @@ const CATEGORIES = CATEGORY_META
 
 export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
   const building = BUILDINGS.find(b => b.key === buildingKey)
-  const allProducts: Cut[] = PRODUCTS
+  // DB-driven: the admin manages the `products` table and the funnel renders it.
+  // We seed state with the canonical catalog so the first paint is correct, then
+  // replace it with live DB rows (falling back to the seed if the API is empty).
+  const [allProducts, setAllProducts] = useState<Cut[]>(PRODUCTS)
   const [activeCat, setActiveCat]     = useState<Category | null>(null)
   const [selections, setSelections]   = useState<CutSelection[]>([])
   const [form, setForm]               = useState<FormData>({ unit: '', firstName: '', lastName: '', email: '', phone: '' })
+
+  useEffect(() => {
+    fetch('/api/products')
+      .then(r => r.json())
+      .then((rows: Array<{ id: string; name: string; detail: string; img: string; price: number | string; available: boolean; category: Category }>) => {
+        if (!Array.isArray(rows) || rows.length === 0) return // keep the static fallback
+        setAllProducts(rows.map(r => ({
+          id: r.id,
+          name: r.name,
+          category: r.category,
+          pricePerLb: Number(r.price) || 0,
+          detail: r.detail,
+          img: r.img,
+          available: r.available,
+        })))
+      })
+      .catch(() => { /* keep the static fallback */ })
+  }, [])
 
   const productsForActive = activeCat
     ? allProducts.filter(p => p.category === activeCat && p.available)

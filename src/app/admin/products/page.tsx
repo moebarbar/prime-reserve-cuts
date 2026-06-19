@@ -17,18 +17,18 @@ interface Product {
   category: Category
 }
 
-const GRADES = ['USDA Prime', 'A5 Wagyu', 'Heritage', 'USDA Choice', 'Grass-Fed']
+const GRADES = ['Local Beef', 'Grass-Fed', 'USDA Choice', 'USDA Prime']
 const CATEGORIES: { value: Category; label: string }[] = [
-  { value: 'steak',     label: 'Steak' },
-  { value: 'slow_cook', label: 'Slow Cook' },
-  { value: 'daily',     label: 'Daily' },
+  { value: 'steak',     label: 'Steaks' },
+  { value: 'slow_cook', label: 'Roasts / Slow Cuts' },
+  { value: 'daily',     label: 'Ground Beef' },
 ]
 const CATEGORY_LABEL: Record<Category, string> = {
-  steak: 'Steak',
-  slow_cook: 'Slow Cook',
-  daily: 'Daily',
+  steak: 'Steaks',
+  slow_cook: 'Roasts / Slow Cuts',
+  daily: 'Ground Beef',
 }
-const empty: Omit<Product, 'id'> = { name: '', grade: 'USDA Prime', detail: '', weight: '', price: 0, price_per_week: 0, img: '', available: true, category: 'steak' }
+const empty: Omit<Product, 'id'> = { name: '', grade: 'Local Beef', detail: '', weight: '', price: 0, price_per_week: 0, img: '', available: true, category: 'steak' }
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -61,15 +61,18 @@ export default function ProductsPage() {
   const submit = async () => {
     if (!form.name.trim()) return alert('Product name is required.')
     // Allow placeholder pricing only when the product is hidden from the public site
-    if (form.available && form.price <= 0)          return alert('Monthly price must be greater than 0 to publish.')
-    if (form.available && form.price_per_week <= 0) return alert('Weekly price must be greater than 0 to publish.')
+    if (form.available && form.price <= 0) return alert('Price per lb must be greater than 0 to publish.')
+
+    // `price` is the per-lb price (the field the site uses). Keep the legacy
+    // price_per_week column in sync so older queries never see a stale value.
+    const payload = { ...form, price_per_week: form.price }
 
     try {
       if (modal === 'add') {
         const res = await fetch('/api/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form),
+          body: JSON.stringify(payload),
         })
         if (!res.ok) throw new Error('Failed to create product')
         const created = await res.json()
@@ -78,7 +81,7 @@ export default function ProductsPage() {
         const res = await fetch(`/api/products/${editing.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form),
+          body: JSON.stringify(payload),
         })
         if (!res.ok) throw new Error('Failed to update product')
         const updated = await res.json()
@@ -168,8 +171,7 @@ export default function ProductsPage() {
                 <div className="prod-detail">{p.detail}</div>
                 {p.weight && <div style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 6 }}>⚖ {p.weight}</div>}
                 <div style={{ display: 'flex', gap: 12, alignItems: 'baseline' }}>
-                  <div className="prod-price"><sup>$</sup>{p.price_per_week}<sub>/wk</sub></div>
-                  <div style={{ fontSize: 10, color: 'var(--muted)' }}>${p.price}/mo</div>
+                  <div className="prod-price"><sup>$</sup>{Number(p.price).toFixed(2)}<sub>/lb</sub></div>
                 </div>
               </div>
               <div className="prod-foot">
@@ -243,17 +245,10 @@ export default function ProductsPage() {
                     onChange={e => setForm(f => ({ ...f, weight: e.target.value }))} />
                 </div>
               </div>
-              <div className="f-row">
-                <div className="f-field">
-                  <label className="f-label">Weekly Price ($) * <span style={{ opacity: 0.5, fontSize: 9 }}>shown at checkout</span></label>
-                  <input className="f-input" type="number" min={1} placeholder="49" value={form.price_per_week || ''}
-                    onChange={e => setForm(f => ({ ...f, price_per_week: parseInt(e.target.value) || 0 }))} />
-                </div>
-                <div className="f-field">
-                  <label className="f-label">Monthly Price ($) * <span style={{ opacity: 0.5, fontSize: 9 }}>shown on homepage</span></label>
-                  <input className="f-input" type="number" min={1} placeholder="189" value={form.price || ''}
-                    onChange={e => setForm(f => ({ ...f, price: parseInt(e.target.value) || 0 }))} />
-                </div>
+              <div className="f-field">
+                <label className="f-label">Price per lb ($) * <span style={{ opacity: 0.5, fontSize: 9 }}>shown on the site · billed weekly × pounds</span></label>
+                <input className="f-input" type="number" min={0} step="0.01" placeholder="14.99" value={form.price || ''}
+                  onChange={e => setForm(f => ({ ...f, price: parseFloat(e.target.value) || 0 }))} />
               </div>
               <div className="f-field">
                 <label className="f-label">Visibility</label>

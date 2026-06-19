@@ -42,8 +42,8 @@ async function run() {
       grade          TEXT NOT NULL,
       detail         TEXT NOT NULL,
       weight         TEXT NOT NULL DEFAULT '',
-      price          INTEGER NOT NULL,
-      price_per_week INTEGER NOT NULL DEFAULT 0,
+      price          NUMERIC(8,2) NOT NULL,
+      price_per_week NUMERIC(8,2) NOT NULL DEFAULT 0,
       img            TEXT NOT NULL DEFAULT '',
       category       TEXT NOT NULL DEFAULT 'steak'
                        CHECK (category IN ('steak','slow_cook','daily')),
@@ -53,8 +53,11 @@ async function run() {
     )
   `)
   await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS weight TEXT NOT NULL DEFAULT ''`)
-  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS price_per_week INTEGER NOT NULL DEFAULT 0`)
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS price_per_week NUMERIC(8,2) NOT NULL DEFAULT 0`)
   await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT 'steak'`)
+  // Per-pound pricing needs decimals — widen the legacy INTEGER price columns (idempotent)
+  await pool.query(`ALTER TABLE products ALTER COLUMN price TYPE NUMERIC(8,2)`)
+  await pool.query(`ALTER TABLE products ALTER COLUMN price_per_week TYPE NUMERIC(8,2)`)
   // Add the CHECK constraint only if it doesn't already exist (idempotent)
   await pool.query(`
     DO $$ BEGIN
@@ -165,44 +168,28 @@ async function run() {
   console.log('✓ buildings seeded')
 
   // ── SEED PRODUCTS ──────────────────────────────────────────────────────────
-  // Steak — fast + premium
+  // Per-pound catalog. `price` is the price per pound (also mirrored into
+  // price_per_week). Only seeds a fresh products table; to refresh an existing
+  // database to this exact lineup run scripts/update-products.ts.
   await pool.query(`
     INSERT INTO products (name, grade, detail, weight, price, price_per_week, img, available, category)
     SELECT * FROM (VALUES
-      ('Ribeye',       'USDA Prime', 'Bone-in Ribeye · Rich marbling, buttery char',                       '16 oz (454g)',  89,  55, 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&q=80&fit=crop&crop=center', TRUE, 'steak'),
-      ('NY Strip',     'USDA Prime', 'Center-cut New York Strip · Bold, beefy, perfect sear',              '14 oz (397g)',  99,  49, 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=400&q=80&fit=crop&crop=center', TRUE, 'steak'),
-      ('Sirloin',      'USDA Prime', 'Top sirloin · Lean, beefy, quick weeknight sear',                    '12 oz (340g)',  79,  39, 'https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80&fit=crop&crop=center', TRUE, 'steak')
+      ('Bone-in Ribeye',        'Local Beef', 'Bone-in · richly marbled',             '', 31.99, 31.99, '/ribeye-raw.jpg',                                                                                  TRUE, 'steak'),
+      ('New York Strip',        'Local Beef', 'Firm, classic steakhouse cut',         '', 27.99, 27.99, '/ny-strip-raw.jpg',                                                                                TRUE, 'steak'),
+      ('Filet',                 'Local Beef', 'Center-cut tenderloin · butter-tender','', 39.99, 39.99, '/tenderloin-raw.jpg',                                                                              TRUE, 'steak'),
+      ('Sirloin',               'Local Beef', 'Lean & beefy · quick weeknight sear',  '', 19.99, 19.99, 'https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80&fit=crop&crop=center',        TRUE, 'steak'),
+      ('Round Steak / Cutlets', 'Local Beef', 'Thin-sliced · cutlets & milanesa',     '', 14.99, 14.99, 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80&fit=crop&crop=center',     TRUE, 'steak'),
+      ('Flank / Skirt',         'Local Beef', 'Bold grain · fajitas & stir-fry',      '', 24.99, 24.99, 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop&crop=center',        TRUE, 'steak'),
+      ('Roasts',                'Local Beef', 'Sunday pot roast · low and slow',      '', 14.99, 14.99, 'https://i.imgur.com/16gBTVR.jpg',                                                                  TRUE, 'slow_cook'),
+      ('Brisket',               'Local Beef', 'The heart of Texas BBQ',               '', 14.99, 14.99, 'https://i.imgur.com/2SI0S49.jpg',                                                                  TRUE, 'slow_cook'),
+      ('Ground Beef',           'Local Beef', 'Fresh-ground · the everyday staple',   '', 12.99, 12.99, 'https://i.imgur.com/n2wjXBV.jpg',                                                                  TRUE, 'daily')
     ) AS v(name, grade, detail, weight, price, price_per_week, img, available, category)
     WHERE NOT EXISTS (SELECT 1 FROM products LIMIT 1)
   `)
-  console.log('✓ steak products seeded')
+  console.log('✓ products seeded')
 
   // Backfill: any pre-existing rows from before category column existed
   await pool.query(`UPDATE products SET category = 'steak' WHERE category IS NULL OR category = ''`)
-
-  // Slow-cook — collagen + time. Placeholder pricing, hidden until prices set in admin.
-  await pool.query(`
-    INSERT INTO products (name, grade, detail, weight, price, price_per_week, img, available, category)
-    SELECT * FROM (VALUES
-      ('Brisket',           'USDA Prime', 'Whole packer brisket · the heart of Texas BBQ',                 '12-14 lb',  0, 0, 'https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80&fit=crop&crop=center', FALSE, 'slow_cook'),
-      ('Chuck Roast',       'USDA Prime', 'Boneless chuck · the perfect Sunday pot roast',                 '4-5 lb',    0, 0, 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80&fit=crop&crop=center', FALSE, 'slow_cook'),
-      ('Shank (Osso Buco)', 'USDA Prime', 'Cross-cut shank · marrow + collagen for the longest braise',    '3-4 lb',    0, 0, 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop&crop=center', FALSE, 'slow_cook')
-    ) AS v(name, grade, detail, weight, price, price_per_week, img, available, category)
-    WHERE NOT EXISTS (SELECT 1 FROM products WHERE category = 'slow_cook')
-  `)
-  console.log('✓ slow-cook products seeded')
-
-  // Daily essentials — repeat buys. Placeholder pricing, hidden.
-  await pool.query(`
-    INSERT INTO products (name, grade, detail, weight, price, price_per_week, img, available, category)
-    SELECT * FROM (VALUES
-      ('Ground Beef',         'USDA Prime', 'Fresh-ground beef · the everyday staple',               '1 lb pack', 0, 0, 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=400&q=80&fit=crop&crop=center', FALSE, 'daily'),
-      ('Beef Tallow / Suet',  'USDA Prime', 'Pure rendered beef fat · for searing, frying, baking',  '16 oz jar', 0, 0, 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80&fit=crop&crop=center', FALSE, 'daily'),
-      ('Marrow Bones',        'USDA Prime', 'Cross-cut marrow & soup bones · stocks, broths, roasts','2-3 lb',    0, 0, 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=400&q=80&fit=crop&crop=center', FALSE, 'daily')
-    ) AS v(name, grade, detail, weight, price, price_per_week, img, available, category)
-    WHERE NOT EXISTS (SELECT 1 FROM products WHERE category = 'daily')
-  `)
-  console.log('✓ daily products seeded')
 
   console.log('\n✅ All migrations complete.')
   await pool.end()
