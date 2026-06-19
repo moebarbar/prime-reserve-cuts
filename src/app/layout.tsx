@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 import './globals.css'
+import { PRODUCTS, CATEGORY_META, productsByCategory } from '@/data/products'
 
 const SITE_URL = 'https://automaticcow.com'
 const SITE_NAME = 'Automatic Cow'
-const TITLE = 'Automatic Cow — Weekly USDA Prime Beef Delivery in Houston'
-const DESC = 'Houston\'s private USDA Prime beef membership for luxury residents. Steak (Ribeye, NY Strip, Sirloin), Slow Cook (Brisket, Chuck Roast, Shank), and Daily Essentials (Ground Beef, Tallow, Marrow Bones) — delivered to your concierge every Saturday.'
+const TITLE = 'Automatic Cow — Weekly Local Beef Delivery in Houston'
+const DESC = 'Houston\'s weekly local beef membership. Steaks (Bone-in Ribeye, NY Strip, Filet, Sirloin, Round, Flank), Roasts & Brisket, and fresh Ground Beef — priced by the pound and delivered to your door every Saturday. Cancel anytime.'
 
 export const viewport: Viewport = {
   themeColor: '#0d0b08',
@@ -97,17 +98,29 @@ export const metadata: Metadata = {
   category: 'food delivery',
 }
 
-// Shared offer for the individual catalog cuts. A range (not a single price)
-// so the structured data can never mismatch the exact per-cut price the page
-// renders from the database — while still satisfying Google's requirement that
-// every Product expose one of offers / review / aggregateRating.
-const CUT_OFFER = {
-  '@type': 'AggregateOffer',
-  priceCurrency: 'USD',
-  lowPrice: '15',
-  highPrice: '115',
-  availability: 'https://schema.org/InStock',
-}
+// Structured data is generated from the same canonical catalog the funnel uses
+// (src/data/products.ts) so prices in Google's rich results always match the
+// per-pound prices on the page. Each Product carries an exact-price Offer.
+const prices = PRODUCTS.map(p => p.pricePerLb)
+const LOW_PRICE = Math.min(...prices).toFixed(2)
+const HIGH_PRICE = Math.max(...prices).toFixed(2)
+
+const catProductOffers = (catKey: 'steak' | 'slow_cook' | 'ground') =>
+  productsByCategory(catKey).map(p => ({
+    '@type': 'Offer',
+    itemOffered: {
+      '@type': 'Product',
+      name: p.name,
+      category: CATEGORY_META.find(c => c.key === catKey)?.title,
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: 'USD',
+        price: p.pricePerLb.toFixed(2),
+        eligibleQuantity: { '@type': 'QuantitativeValue', unitText: 'LB', value: '1' },
+        availability: 'https://schema.org/InStock',
+      },
+    },
+  }))
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -137,7 +150,7 @@ const jsonLd = {
         '@type': 'City',
         name: 'Houston',
       },
-      priceRange: '$$$',
+      priceRange: '$$',
     },
     {
       '@type': 'WebSite',
@@ -149,60 +162,33 @@ const jsonLd = {
     },
     {
       '@type': 'Product',
-      name: 'Weekly USDA Prime Beef Subscription',
-      description: 'A weekly USDA Prime beef membership for Houston luxury residents. Whole-animal access across three categories: Steak, Slow Cook, and Daily Essentials.',
+      name: 'Weekly Local Beef Subscription',
+      description: 'A weekly local beef membership for Houston residents. Steaks, roasts, brisket, and ground beef — priced by the pound, delivered every Saturday. Cancel anytime.',
       brand: { '@type': 'Brand', name: SITE_NAME },
       category: 'Beef Subscription',
       offers: {
         '@type': 'AggregateOffer',
         priceCurrency: 'USD',
-        lowPrice: '15',
-        highPrice: '115',
-        offerCount: '12',
+        lowPrice: LOW_PRICE,
+        highPrice: HIGH_PRICE,
+        offerCount: String(PRODUCTS.length),
         availability: 'https://schema.org/InStock',
       },
     },
     {
       '@type': 'Service',
       '@id': `${SITE_URL}/#service`,
-      serviceType: 'Weekly USDA Prime beef subscription with concierge delivery',
+      serviceType: 'Weekly local beef subscription with home delivery',
       provider: { '@id': `${SITE_URL}/#organization` },
       areaServed: { '@type': 'City', name: 'Houston' },
       hasOfferCatalog: {
         '@type': 'OfferCatalog',
         name: 'Automatic Cow Categories',
-        itemListElement: [
-          {
-            '@type': 'OfferCatalog',
-            name: 'Steak',
-            itemListElement: [
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Ribeye',       category: 'Steak · USDA Prime', offers: CUT_OFFER } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'NY Strip',     category: 'Steak · USDA Prime', offers: CUT_OFFER } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Sirloin',      category: 'Steak · USDA Prime', offers: CUT_OFFER } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Filet Mignon', category: 'Steak · USDA Prime', offers: CUT_OFFER } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'A5 Wagyu',     category: 'Steak · Wagyu',      offers: CUT_OFFER } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Tomahawk',     category: 'Steak · Heritage',   offers: CUT_OFFER } },
-            ],
-          },
-          {
-            '@type': 'OfferCatalog',
-            name: 'Slow Cook',
-            itemListElement: [
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Brisket',           category: 'Slow Cook · USDA Prime', offers: CUT_OFFER } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Chuck Roast',       category: 'Slow Cook · USDA Prime', offers: CUT_OFFER } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Shank (Osso Buco)', category: 'Slow Cook · USDA Prime', offers: CUT_OFFER } },
-            ],
-          },
-          {
-            '@type': 'OfferCatalog',
-            name: 'Daily Essentials',
-            itemListElement: [
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Ground Beef',        category: 'Daily Essentials · USDA Prime',  offers: CUT_OFFER } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Beef Tallow / Suet', category: 'Daily Essentials · Rendered fat', offers: CUT_OFFER } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Marrow Bones',       category: 'Daily Essentials · Bones',       offers: CUT_OFFER } },
-            ],
-          },
-        ],
+        itemListElement: CATEGORY_META.map(cat => ({
+          '@type': 'OfferCatalog',
+          name: cat.title,
+          itemListElement: catProductOffers(cat.key),
+        })),
       },
     },
     {
@@ -213,7 +199,7 @@ const jsonLd = {
           name: 'How does Automatic Cow delivery work?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Pick your building, choose your cuts across three categories (Steak, Slow Cook, Daily Essentials), and we deliver vacuum-sealed USDA Prime beef to your building\'s concierge every Saturday.',
+            text: 'Pick your building, choose your cuts (Steaks, Roasts & Brisket, or Ground Beef), set how many pounds you want each week, and we deliver vacuum-sealed local beef to your door every Saturday. Cancel anytime.',
           },
         },
         {
@@ -221,7 +207,7 @@ const jsonLd = {
           name: 'What cuts of beef do you offer?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'We sell across the whole animal: Steak (Ribeye, NY Strip, Sirloin, Filet Mignon, A5 Wagyu, Tomahawk), Slow Cook (Brisket, Chuck Roast, Shank), and Daily Essentials (Ground Beef, Beef Tallow, Marrow Bones).',
+            text: 'Steaks (Bone-in Ribeye $31.99/lb, New York Strip $27.99/lb, Filet $39.99/lb, Sirloin $19.99/lb, Round Steak / Cutlets $14.99/lb, Flank / Skirt $24.99/lb), Roasts $14.99/lb and Brisket $14.99/lb, and fresh Ground Beef $12.99/lb. Everything is priced by the pound.',
           },
         },
         {
@@ -237,7 +223,7 @@ const jsonLd = {
           name: 'How is the meat sourced?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'USDA Prime beef sourced directly from partner ranches in Texas, Oklahoma, and the American Midwest. No middlemen. Full cold-chain traceability through USDA-certified processing.',
+            text: 'Local beef sourced directly from partner ranches, processed whole-animal under USDA-inspected facilities. No middlemen — which is how we keep prices in a local, farmers-market range.',
           },
         },
         {

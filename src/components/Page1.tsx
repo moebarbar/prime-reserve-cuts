@@ -16,35 +16,35 @@ const CATEGORIES = [
   {
     key: 'slow_cook',
     src: 'https://i.imgur.com/2SI0S49.jpg',
-    name: 'Slow Cook',
-    sub: 'Brisket · Chuck Roast · Shank',
-    grade: 'USDA Prime',
-    price: '3 cuts',
+    name: 'Roasts / Slow Cuts',
+    sub: 'Roasts · Brisket',
+    grade: 'Local Beef',
+    price: 'from $14.99/lb',
     featured: false,
     intro: 'Low. Slow. Worth the wait.',
-    items: ['Brisket', 'Chuck Roast', 'Shank (Osso Buco)'],
+    items: ['Roasts', 'Brisket'],
   },
   {
     key: 'steak',
     src: '/ribeye-raw.jpg',
-    name: 'Steak',
-    sub: 'Ribeye · NY Strip · Sirloin',
-    grade: 'USDA Prime',
-    price: '6 cuts',
+    name: 'Steaks',
+    sub: 'Ribeye · NY Strip · Filet · Sirloin',
+    grade: 'Local Beef',
+    price: 'from $14.99/lb',
     featured: true,
     intro: 'Sear hot. Rest patient. Serve proud.',
-    items: ['Ribeye', 'NY Strip', 'Sirloin', 'Filet Mignon', 'A5 Wagyu', 'Tomahawk'],
+    items: ['Bone-in Ribeye', 'New York Strip', 'Filet', 'Sirloin', 'Round Steak / Cutlets', 'Flank / Skirt'],
   },
   {
-    key: 'daily',
+    key: 'ground',
     src: 'https://i.imgur.com/n2wjXBV.jpg',
-    name: 'Daily Essentials',
-    sub: 'Ground Beef · Tallow · Marrow Bones',
-    grade: 'USDA Prime',
-    price: '3 items',
+    name: 'Ground Beef',
+    sub: 'Fresh-ground, by the pound',
+    grade: 'Local Beef',
+    price: '$12.99/lb',
     featured: false,
     intro: 'Always in the fridge. Always reaching for it.',
-    items: ['Ground Beef', 'Beef Tallow / Suet', 'Marrow Bones'],
+    items: ['Ground Beef'],
   },
 ] as const
 
@@ -91,7 +91,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
           </div>
           <p className={styles.mission}>
             <strong>The best beef in Houston shouldn&apos;t require a reservation.</strong>{' '}
-            Automatic Cow delivers USDA Prime cuts — steaks, brisket, ground beef and more —
+            Automatic Cow delivers local beef — steaks, roasts, brisket and ground beef —
             directly to luxury residents, every week, to your unit, zero effort.
           </p>
         </div>
@@ -115,7 +115,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
         <div className={styles.howSteps}>
           {[
             { num: '01', title: 'Pick Your Place', desc: 'Scan the QR code in your building lobby. Your property is already set up — no searching, no setup.' },
-            { num: '02', title: 'Choose Your Category', desc: 'Steak. Slow Cook. Daily essentials. Three categories of beef — pick what fits your week.' },
+            { num: '02', title: 'Choose Your Cuts', desc: 'Steaks, roasts, or ground beef — priced by the pound. Pick your cuts and how many pounds you want each week.' },
             { num: '03', title: 'Every Saturday, Done.', desc: 'Your order arrives vacuum-sealed, chilled, and ready. Every Saturday. No reminders. No reordering. It just happens.' },
           ].map(s => (
             <div key={s.num} className={styles.howCard}>
@@ -180,8 +180,8 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
           Three categories.<br /><em>One standard.</em>
         </h2>
         <p className={styles.cutsLead}>
-          From the weekend ribeye to the everyday ground beef — every cut is USDA Prime,
-          sourced, and delivered to your door every Saturday.
+          From the weekend ribeye to the everyday ground beef — local beef, priced by the
+          pound, delivered to your door every Saturday. Cancel anytime.
         </p>
       </div>
 
@@ -289,7 +289,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
                 ),
                 region: 'Midwest Cornbelt',
                 title: 'Whole-Animal Sourcing',
-                body: 'Brisket, chuck roast, shank, ground beef, marrow bones — every cut comes from the same USDA Prime Midwestern herds, 150+ days on feed. One animal. One standard. Three categories on your table.',
+                body: 'Roasts, brisket, ground beef — every cut comes from the same local herds, raised right and processed whole-animal. One animal. One standard. Steaks, slow cuts, and ground beef on your table.',
               },
               {
                 icon: (

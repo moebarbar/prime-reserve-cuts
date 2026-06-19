@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import styles from './page2.module.css'
 import { BUILDINGS } from '@/data/buildings'
+import { PRODUCTS, CATEGORY_META, type Category, type Product } from '@/data/products'
 
 interface FormData {
   unit: string
@@ -12,20 +13,8 @@ interface FormData {
   phone: string
 }
 
-export type Category = 'steak' | 'slow_cook' | 'daily'
-
-export interface Cut {
-  id: string
-  name: string
-  grade: string
-  detail: string
-  weight: string
-  price: number
-  price_per_week: number
-  img: string
-  available: boolean
-  category: Category
-}
+export type Cut = Product
+export type { Category }
 
 export interface CutSelection {
   cut: Cut
@@ -38,88 +27,14 @@ interface Page2Props {
   onContinue: (form: FormData, selections: CutSelection[]) => void
 }
 
-const CATEGORIES: { key: Category; title: string; tagline: string; img: string; intro: string }[] = [
-  {
-    key: 'steak',
-    title: 'Steak',
-    tagline: 'Ribeye, NY Strip, Sirloin',
-    img: '/ribeye-raw.jpg',
-    intro: 'Sear hot. Rest patient. Serve proud.',
-  },
-  {
-    key: 'slow_cook',
-    title: 'Slow Cook',
-    tagline: 'Brisket, Chuck Roast, Shank',
-    img: '/source-ranch.jpg',
-    intro: 'Low. Slow. Worth the wait.',
-  },
-  {
-    key: 'daily',
-    title: 'Daily Essentials',
-    tagline: 'Ground beef, tallow, marrow bones',
-    img: '/tenderloin-raw.jpg',
-    intro: 'Always in the fridge. Always reaching for it.',
-  },
-]
+const CATEGORIES = CATEGORY_META
 
 export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
   const building = BUILDINGS.find(b => b.key === buildingKey)
-  const [allProducts, setAllProducts] = useState<Cut[]>([])
+  const allProducts: Cut[] = PRODUCTS
   const [activeCat, setActiveCat]     = useState<Category | null>(null)
   const [selections, setSelections]   = useState<CutSelection[]>([])
   const [form, setForm]               = useState<FormData>({ unit: '', firstName: '', lastName: '', email: '', phone: '' })
-
-  useEffect(() => {
-    const STEAK_TYPES = {
-      tenderloin: { name: 'Tenderloin', img: '/tenderloin-raw.jpg', detail: 'Center-cut filet · butter-tender', price_per_week: 25, weight: '8 oz' },
-      ribeye:     { name: 'Ribeye',     img: '/ribeye-raw.jpg',     detail: 'Bone-in · heavy marbling',         price_per_week: 25, weight: '16 oz' },
-      'ny-strip': { name: 'NY Strip',   img: '/ny-strip-raw.jpg',   detail: '21-day dry-aged · firm texture',   price_per_week: 20, weight: '14 oz' },
-    } as const
-    const matchSteakType = (name: string): keyof typeof STEAK_TYPES | null => {
-      const n = name.toLowerCase().trim()
-      if (n.includes('tenderloin') || n.includes('filet')) return 'tenderloin'
-      if (n.includes('ribeye')) return 'ribeye'
-      if (n.includes('ny strip') || n.includes('new york strip') || n === 'strip') return 'ny-strip'
-      return null
-    }
-    const STEAK_ORDER = ['tenderloin', 'ribeye', 'ny-strip'] as const
-
-    // Custom photography for slow-cook + daily products. Matched by name (case-insensitive).
-    const IMG_OVERRIDES: Record<string, string> = {
-      brisket:      'https://i.imgur.com/2SI0S49.jpg',
-      'chuck roast':'https://i.imgur.com/16gBTVR.jpg',
-      'ground beef':'https://i.imgur.com/n2wjXBV.jpg',
-    }
-
-    fetch('/api/products')
-      .then(r => r.json())
-      .then((data: Cut[]) => {
-        const list = data.map(p => {
-          // Override the three legacy steaks with the local raw photos / pricing
-          if ((p.category === 'steak' || !p.category) && matchSteakType(p.name)) {
-            const t = matchSteakType(p.name)!
-            return { ...p, category: 'steak' as Category, name: STEAK_TYPES[t].name, img: STEAK_TYPES[t].img, detail: STEAK_TYPES[t].detail, price_per_week: STEAK_TYPES[t].price_per_week, weight: STEAK_TYPES[t].weight }
-          }
-          const override = IMG_OVERRIDES[p.name.toLowerCase().trim()]
-          return {
-            ...p,
-            category: (p.category ?? 'steak') as Category,
-            ...(override ? { img: override } : {}),
-          }
-        })
-        // Sort the steak section the same way the homepage does
-        list.sort((a, b) => {
-          if (a.category === 'steak' && b.category === 'steak') {
-            const aT = matchSteakType(a.name)
-            const bT = matchSteakType(b.name)
-            if (aT && bT) return STEAK_ORDER.indexOf(aT) - STEAK_ORDER.indexOf(bT)
-          }
-          return 0
-        })
-        setAllProducts(list)
-      })
-      .catch(() => setAllProducts([]))
-  }, [])
 
   const productsForActive = activeCat
     ? allProducts.filter(p => p.category === activeCat && p.available)
@@ -145,7 +60,8 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
     setSelections(prev => prev.map(s => s.cut.id === cut.id ? { ...s, qty } : s))
   }
 
-  const weeklyTotal = selections.reduce((sum, s) => sum + s.cut.price_per_week * s.qty, 0)
+  const weeklyTotal = selections.reduce((sum, s) => sum + s.cut.pricePerLb * s.qty, 0)
+  const money = (n: number) => `$${n.toFixed(2)}`
 
   const handleContinue = () => {
     if (selections.length === 0) {
@@ -188,8 +104,8 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
           <div className={styles.label}>Step 2 of 3</div>
           <h2 className={styles.title}>Your details<br />&amp; <em>cut.</em></h2>
           <p className={styles.sub}>
-            Confirm your address and choose your weekly cut. We coordinate delivery
-            through your concierge — <strong>no hassle</strong>.
+            Confirm your address, pick your cuts and set how many pounds you want each
+            week. Local beef, weekly delivery, <strong>cancel anytime</strong>.
           </p>
 
           {/* Building pill */}
@@ -301,20 +217,19 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
                           onError={e => { (e.target as HTMLImageElement).style.opacity = '0' }} />
                       </div>
                       <div className={styles.ccBody}>
-                        <div className={styles.ccGrade}>{cut.grade}</div>
+                        <div className={styles.ccGrade}>Local Beef</div>
                         <div className={styles.ccName}>{cut.name}</div>
                         <div className={styles.ccDetail}>{cut.detail}</div>
-                        {cut.weight && <div className={styles.ccWeight}>⚖ {cut.weight}</div>}
                       </div>
                       <div className={styles.ccRight}>
                         <div>
-                          <span className={styles.ccPrice}>${cut.price_per_week}</span>
-                          <div className={styles.ccMo}>/week each</div>
+                          <span className={styles.ccPrice}>{money(cut.pricePerLb)}</span>
+                          <div className={styles.ccMo}>/lb</div>
                         </div>
                         {isSelected ? (
                           <div className={styles.qtyCtrl} onClick={e => e.stopPropagation()}>
                             <button className={styles.qtyBtn} onClick={() => setQty(cut, sel.qty - 1)}>−</button>
-                            <span className={styles.qtyVal}>{sel.qty}</span>
+                            <span className={styles.qtyVal}>{sel.qty} lb</span>
                             <button className={styles.qtyBtn} onClick={() => setQty(cut, sel.qty + 1)}>+</button>
                           </div>
                         ) : (
@@ -335,8 +250,8 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
             ) : (
               selections.map(s => (
                 <div key={s.cut.id} className={styles.omRow}>
-                  <span>{s.cut.name} × {s.qty}</span>
-                  <span>${s.cut.price_per_week * s.qty}</span>
+                  <span>{s.cut.name} × {s.qty} lb</span>
+                  <span>{money(s.cut.pricePerLb * s.qty)}</span>
                 </div>
               ))
             )}
@@ -350,7 +265,7 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
             </div>
             <div className={styles.omTotal}>
               <span className={styles.omTotalLbl}>Weekly Total</span>
-              <span className={styles.omTotalVal}>${weeklyTotal}</span>
+              <span className={styles.omTotalVal}>{money(weeklyTotal)}</span>
             </div>
           </div>
 

@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import stripe from '@/lib/stripe'
 import { rateLimit, rateLimitResponse } from '@/lib/rateLimit'
-
-const PRICE_IDS: Record<string, string> = {
-  'Ribeye':       process.env.STRIPE_PRICE_RIBEYE   ?? '',
-  'Filet Mignon': process.env.STRIPE_PRICE_FILET    ?? '',
-  'NY Strip':     process.env.STRIPE_PRICE_NYSTRIP  ?? '',
-  'Tenderloin':   process.env.STRIPE_PRICE_FILET    ?? '',  // maps to filet price
-  'A5 Wagyu':     process.env.STRIPE_PRICE_WAGYU    ?? '',
-  'Tomahawk':     process.env.STRIPE_PRICE_TOMAHAWK ?? '',
-}
+import { PRICE_BY_NAME } from '@/data/products'
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL ?? 'http://localhost:3000'
 
@@ -54,18 +46,35 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Build Stripe line_items from selections array
-  const line_items: { price: string; quantity: number }[] = []
-  for (const sel of selections as Selection[]) {
-    const priceId = PRICE_IDS[sel.name]
-    if (!priceId) {
-      return NextResponse.json({ error: `No Stripe price configured for "${sel.name}"` }, { status: 400 })
+  // Build Stripe line_items from selections. Prices come from the canonical
+  // catalog (per-pound) and the customer's qty is the number of pounds/week.
+  const line_items: {
+    price_data: {
+      currency: string
+      product_data: { name: string }
+      unit_amount: number
+      recurring: { interval: 'week' }
     }
-    line_items.push({ price: priceId, quantity: sel.qty })
+    quantity: number
+  }[] = []
+  for (const sel of selections as Selection[]) {
+    const pricePerLb = PRICE_BY_NAME[sel.name]
+    if (pricePerLb == null) {
+      return NextResponse.json({ error: `Unknown product "${sel.name}"` }, { status: 400 })
+    }
+    line_items.push({
+      price_data: {
+        currency: 'usd',
+        product_data: { name: `${sel.name} (per lb)` },
+        unit_amount: Math.round(pricePerLb * 100),
+        recurring: { interval: 'week' },
+      },
+      quantity: sel.qty,
+    })
   }
 
   // Compact cut label for metadata / DB
-  const cutLabel = (selections as Selection[]).map(s => s.qty > 1 ? `${s.name} ×${s.qty}` : s.name).join(', ')
+  const cutLabel = (selections as Selection[]).map(s => `${s.name} ×${s.qty}lb`).join(', ')
 
   try {
     const session = await stripe.checkout.sessions.create({

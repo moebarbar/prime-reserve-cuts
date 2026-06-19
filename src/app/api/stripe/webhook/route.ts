@@ -44,12 +44,12 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ received: true })
       }
 
-      // Fetch real price from products table
-      const [product] = await query<{ price: number }>(
-        `SELECT price FROM products WHERE name = $1 LIMIT 1`,
-        [cut.split(',')[0].replace(/\s*×\d+\s*$/, '').trim()]
-      ).catch(() => [] as { price: number }[])
-      const price = product?.price ?? 0
+      // The actual weekly amount Stripe charged (first invoice total), in dollars.
+      // This is the source of truth for the order's recurring price — it already
+      // reflects per-pound pricing × pounds across every selected cut.
+      const price = typeof session.amount_total === 'number'
+        ? session.amount_total / 100
+        : 0
 
       // Save order
       await query(`
