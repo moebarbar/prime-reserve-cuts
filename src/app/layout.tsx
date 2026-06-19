@@ -97,6 +97,18 @@ export const metadata: Metadata = {
   category: 'food delivery',
 }
 
+// Shared offer for the individual catalog cuts. A range (not a single price)
+// so the structured data can never mismatch the exact per-cut price the page
+// renders from the database — while still satisfying Google's requirement that
+// every Product expose one of offers / review / aggregateRating.
+const CUT_OFFER = {
+  '@type': 'AggregateOffer',
+  priceCurrency: 'USD',
+  lowPrice: '15',
+  highPrice: '115',
+  availability: 'https://schema.org/InStock',
+}
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -164,30 +176,30 @@ const jsonLd = {
             '@type': 'OfferCatalog',
             name: 'Steak',
             itemListElement: [
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Ribeye',     category: 'Steak · USDA Prime' } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'NY Strip',   category: 'Steak · USDA Prime' } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Sirloin',    category: 'Steak · USDA Prime' } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Filet Mignon', category: 'Steak · USDA Prime' } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'A5 Wagyu',   category: 'Steak · Wagyu' } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Tomahawk',   category: 'Steak · Heritage' } },
+              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Ribeye',       category: 'Steak · USDA Prime', offers: CUT_OFFER } },
+              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'NY Strip',     category: 'Steak · USDA Prime', offers: CUT_OFFER } },
+              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Sirloin',      category: 'Steak · USDA Prime', offers: CUT_OFFER } },
+              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Filet Mignon', category: 'Steak · USDA Prime', offers: CUT_OFFER } },
+              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'A5 Wagyu',     category: 'Steak · Wagyu',      offers: CUT_OFFER } },
+              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Tomahawk',     category: 'Steak · Heritage',   offers: CUT_OFFER } },
             ],
           },
           {
             '@type': 'OfferCatalog',
             name: 'Slow Cook',
             itemListElement: [
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Brisket',           category: 'Slow Cook · USDA Prime' } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Chuck Roast',       category: 'Slow Cook · USDA Prime' } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Shank (Osso Buco)', category: 'Slow Cook · USDA Prime' } },
+              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Brisket',           category: 'Slow Cook · USDA Prime', offers: CUT_OFFER } },
+              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Chuck Roast',       category: 'Slow Cook · USDA Prime', offers: CUT_OFFER } },
+              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Shank (Osso Buco)', category: 'Slow Cook · USDA Prime', offers: CUT_OFFER } },
             ],
           },
           {
             '@type': 'OfferCatalog',
             name: 'Daily Essentials',
             itemListElement: [
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Ground Beef',        category: 'Daily Essentials · USDA Prime' } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Beef Tallow / Suet', category: 'Daily Essentials · Rendered fat' } },
-              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Marrow Bones',       category: 'Daily Essentials · Bones' } },
+              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Ground Beef',        category: 'Daily Essentials · USDA Prime',  offers: CUT_OFFER } },
+              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Beef Tallow / Suet', category: 'Daily Essentials · Rendered fat', offers: CUT_OFFER } },
+              { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Marrow Bones',       category: 'Daily Essentials · Bones',       offers: CUT_OFFER } },
             ],
           },
         ],
@@ -217,7 +229,7 @@ const jsonLd = {
           name: 'Which Houston buildings do you deliver to?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'We currently serve Aspire Post Oak, The Driscoll, Market Square Tower, Parkside at Discovery Green, Elev8 Downtown, and Hanover Autry Park, with more luxury high-rises joining each quarter.',
+            text: 'We currently serve Pearl 21Eleven on Westheimer in the Upper Kirby corridor, with more luxury high-rises joining each quarter.',
           },
         },
         {

@@ -16,7 +16,7 @@ interface SubscriptionConfirmedProps {
 
 export default function SubscriptionConfirmed({
   customerName  = 'James',
-  buildingName  = 'Aspire Post Oak',
+  buildingName  = 'Pearl 21Eleven',
   unit          = '1204',
   cutName       = 'Ribeye',
   cutDetail     = '16oz bone-in · 21-day dry-aged',

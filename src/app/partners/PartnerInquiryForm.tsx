@@ -58,7 +58,7 @@ export default function PartnerInquiryForm() {
       <div className={styles.formField}>
         <label>Property Name *</label>
         <input
-          type="text" placeholder="e.g. Aspire Post Oak"
+          type="text" placeholder="e.g. Pearl 21Eleven"
           value={form.property_name}
           onChange={e => setForm({ ...form, property_name: e.target.value })}
         />
