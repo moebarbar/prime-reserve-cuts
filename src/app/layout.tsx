@@ -229,7 +229,7 @@ const jsonLd = {
           name: 'Which Houston buildings do you deliver to?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'We currently serve Pearl 21Eleven on Westheimer in the Upper Kirby corridor, with more luxury high-rises joining each quarter.',
+            text: 'We currently serve Pearl 21Eleven, Aspire Post Oak, The Driscoll, Market Square Tower, Parkside at Discovery Green, and Elev8 Downtown, with more luxury high-rises joining each quarter.',
           },
         },
         {

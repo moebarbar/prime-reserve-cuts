@@ -109,7 +109,7 @@ export default function PartnersPage() {
         <div className={styles.proofInner}>
           <div className={styles.proofLabel}>Already partnered with</div>
           <div className={styles.proofList}>
-            Pearl 21Eleven
+            Pearl 21Eleven · Aspire Post Oak · The Driscoll · Market Square Tower · Parkside at Discovery Green · Elev8 Downtown
           </div>
         </div>
       </section>
