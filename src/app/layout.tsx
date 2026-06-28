@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 import './globals.css'
 import { PRODUCTS, CATEGORY_META, productsByCategory } from '@/data/products'
+import { SITE } from '@/data/site'
 
 const SITE_URL = 'https://automaticcow.com'
 const SITE_NAME = 'Automatic Cow'
@@ -23,36 +24,35 @@ export const metadata: Metadata = {
   },
   description: DESC,
   keywords: [
-    // Core service
+    // Core service (local intent)
     'beef delivery Houston',
+    'local beef Houston',
+    'meat delivery Houston',
     'steak delivery Houston',
-    'USDA Prime beef Houston',
     'weekly meat subscription Houston',
     'butcher delivery Houston',
-    'concierge beef delivery',
-    // Steak category
+    'grass-fed beef Houston',
+    'farmers market beef Houston',
+    // Steak cuts we actually sell
     'ribeye delivery Houston',
-    'NY Strip delivery Houston',
+    'New York strip Houston',
     'sirloin delivery Houston',
-    'wagyu Houston delivery',
-    'tomahawk steak Houston',
-    'filet mignon delivery Houston',
-    // Slow cook category
+    'filet Houston delivery',
+    'flank steak Houston',
+    'skirt steak Houston',
+    // Roasts / slow cuts
     'brisket delivery Houston',
-    'chuck roast Houston',
-    'osso buco Houston',
-    'beef shank Houston',
-    'whole brisket Texas',
-    // Daily essentials
+    'beef roast delivery Houston',
+    'pot roast Houston',
+    // Ground beef
     'ground beef delivery Houston',
-    'beef tallow Houston',
-    'marrow bones Houston',
-    'bone broth bones delivery',
+    'fresh ground beef Houston',
+    'bulk ground beef Houston',
     // Audience / context
-    'Houston luxury residents',
-    'high-rise food delivery Houston',
-    'luxury meat subscription Texas',
-    'private beef membership',
+    'beef delivery near me',
+    'Houston meat subscription',
+    'local meat delivery Texas',
+    'beef by the pound Houston',
   ],
   authors: [{ name: SITE_NAME }],
   creator: SITE_NAME,
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
         url: `${SITE_URL}/ribeye-raw.jpg`,
         width: 1200,
         height: 630,
-        alt: 'USDA Prime ribeye — Automatic Cow weekly delivery',
+        alt: 'Local beef ribeye — Automatic Cow weekly Houston delivery',
       },
     ],
   },
@@ -131,25 +131,42 @@ const jsonLd = {
       name: SITE_NAME,
       url: SITE_URL,
       logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo.png` },
-      sameAs: [],
+      email: SITE.email,
+      ...(SITE.phone ? { telephone: SITE.phone } : {}),
+      sameAs: SITE.sameAs,
     },
     {
-      '@type': 'LocalBusiness',
+      '@type': ['LocalBusiness', 'FoodEstablishment'],
       '@id': `${SITE_URL}/#business`,
       name: SITE_NAME,
       url: SITE_URL,
       image: `${SITE_URL}/ribeye-raw.jpg`,
+      logo: `${SITE_URL}/logo.png`,
       description: DESC,
+      email: SITE.email,
+      ...(SITE.phone ? { telephone: SITE.phone } : {}),
       address: {
         '@type': 'PostalAddress',
-        addressLocality: 'Houston',
-        addressRegion: 'TX',
-        addressCountry: 'US',
+        addressLocality: SITE.city,
+        addressRegion: SITE.region,
+        addressCountry: SITE.country,
       },
-      areaServed: {
-        '@type': 'City',
-        name: 'Houston',
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: SITE.geo.lat,
+        longitude: SITE.geo.lng,
       },
+      areaServed: SITE.areasServed.map(name => ({ '@type': 'City', name })),
+      // Order online any day; we deliver every Saturday.
+      openingHoursSpecification: [
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+          opens: '00:00',
+          closes: '23:59',
+        },
+      ],
+      ...(SITE.sameAs.length ? { sameAs: SITE.sameAs } : {}),
       priceRange: '$$',
     },
     {

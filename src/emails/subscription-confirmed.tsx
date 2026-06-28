@@ -113,7 +113,7 @@ export default function SubscriptionConfirmed({
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <tbody>
                 {[
-                  ['01', 'We source your cut', 'From our network of USDA Prime and A5 suppliers.'],
+                  ['01', 'We source your cut', 'From our network of local partner ranches.'],
                   ['02', 'Packaged for perfection', 'Vacuum-sealed, dry-ice packed, restaurant quality.'],
                   ['03', 'Delivered to your unit', `Coordinated with your concierge at ${buildingName}.`],
                 ].map(([num, title, sub]) => (

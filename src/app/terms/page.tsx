@@ -5,7 +5,7 @@ import styles from '../legal.module.css'
 
 export const metadata = {
   title: 'Terms of Service',
-  description: 'Terms of service for Automatic Cow weekly USDA Prime beef membership in Houston.',
+  description: 'Terms of service for Automatic Cow weekly local beef delivery in Houston.',
   alternates: { canonical: 'https://automaticcow.com/terms' },
 }
 
@@ -41,7 +41,7 @@ export default function TermsPage() {
 
           <section className={styles.section}>
             <h2>5. Product Quality</h2>
-            <p>All cuts are USDA Prime grade, sourced from licensed, inspected U.S. suppliers. If you receive a product that does not meet quality standards, contact us within 24 hours of delivery for a full replacement or credit.</p>
+            <p>All cuts are local beef, sourced from licensed, USDA-inspected U.S. suppliers. If you receive a product that does not meet quality standards, contact us within 24 hours of delivery for a full replacement or credit.</p>
           </section>
 
           <section className={styles.section}>

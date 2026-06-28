@@ -6,11 +6,11 @@ import styles from './page.module.css'
 
 export const metadata: Metadata = {
   title: 'For Ranchers — More Than a Buyer. A Long-Term Partner.',
-  description: 'Sell your USDA Prime beef directly to Houston\'s most demanding tables. We partner with small-batch ranches across Texas, Oklahoma, and the Midwest and pay what your cattle are worth.',
+  description: 'Sell your beef directly to Houston tables. We partner with small-batch local ranches across Texas, Oklahoma, and the Midwest and pay what your cattle are worth.',
   keywords: [
     'sell beef direct to consumer',
     'cattle rancher partnership Texas',
-    'USDA Prime ranch sourcing',
+    'local ranch sourcing',
     'small-batch beef wholesale',
     'beef DTC distribution Houston',
     'ranch to table Houston',

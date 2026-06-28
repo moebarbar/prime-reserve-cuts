@@ -1,0 +1,47 @@
+# Automatic Cow
+
+> Automatic Cow is a weekly **local beef delivery** service in **Houston, Texas**.
+> Customers choose their cuts, set how many pounds they want each week, and we
+> deliver fresh, locally-sourced beef to their door every Saturday. Priced by the
+> pound. Cancel anytime.
+
+## What we sell (priced per pound)
+
+Steaks:
+- Bone-in Ribeye — $31.99/lb
+- New York Strip — $27.99/lb
+- Filet — $39.99/lb
+- Sirloin — $19.99/lb
+- Round Steak / Cutlets — $14.99/lb
+- Flank / Skirt — $24.99/lb
+
+Roasts / Slow Cuts:
+- Roasts — $14.99/lb
+- Brisket — $14.99/lb
+
+Ground Beef:
+- Ground Beef — $12.99/lb
+
+## How it works
+
+1. Pick your building / delivery location in Houston.
+2. Choose your cuts and how many pounds of each you want per week.
+3. The site calculates your weekly price instantly (price per pound × pounds).
+4. We deliver every Saturday. Local beef, weekly delivery, cancel anytime.
+
+## Service area
+
+Houston, Texas — including Upper Kirby, River Oaks, Montrose, Downtown,
+Uptown / Galleria, The Heights, and Midtown.
+
+## Key pages
+
+- Home / order: https://automaticcow.com
+- Our story: https://automaticcow.com/our-story
+- Blog (beef guides, Houston): https://automaticcow.com/blog
+- For property managers: https://automaticcow.com/partners
+- For ranchers: https://automaticcow.com/ranchers
+
+## Contact
+
+Email: beef@automaticcow.com

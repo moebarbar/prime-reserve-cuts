@@ -6,11 +6,11 @@ import styles from './page.module.css'
 
 export const metadata: Metadata = {
   title: 'Our Story — How Automatic Cow Was Born',
-  description: 'The story behind Houston\'s private USDA Prime beef membership — whole-animal access for residents who expect the best, delivered without effort.',
+  description: 'The story behind Automatic Cow — Houston\'s weekly local beef delivery. Steaks, roasts, brisket and ground beef priced by the pound, delivered every Saturday.',
   alternates: { canonical: 'https://automaticcow.com/our-story' },
   openGraph: {
     title: 'Our Story — How Automatic Cow Was Born',
-    description: 'Houston\'s private USDA Prime beef membership for luxury residents. Built for the whole week, delivered every Saturday.',
+    description: 'Houston\'s weekly local beef delivery. Priced by the pound, delivered every Saturday. Cancel anytime.',
     url: 'https://automaticcow.com/our-story',
     type: 'article',
   },
@@ -63,7 +63,7 @@ export default function OurStoryPage() {
               {
                 num: '02',
                 title: 'Choose Your Category',
-                desc: 'Steak. Slow Cook. Daily essentials. Three categories of USDA Prime beef — pick what fits your week.',
+                desc: 'Steaks. Roasts. Ground beef. Pick your cuts and how many pounds you want each week.',
               },
               {
                 num: '03',

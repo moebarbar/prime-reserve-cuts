@@ -200,7 +200,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
               <div className={styles.scImgWrap}>
                 <img
                   src={cat.src}
-                  alt={`${cat.name} — ${cat.sub} · USDA Prime beef delivered weekly in Houston`}
+                  alt={`${cat.name} — ${cat.sub} · local beef delivered weekly in Houston`}
                   className={styles.scImg}
                   loading="lazy"
                   onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0' }}
@@ -314,7 +314,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
 
           <div className={styles.sourceSeal}>
             <div className={styles.sealLine} />
-            <span className={styles.sealText}>USDA Prime · Cold Chain Verified · Direct to Your Unit</span>
+            <span className={styles.sealText}>Local Beef · Priced by the Pound · Direct to Your Door</span>
             <div className={styles.sealLine} />
           </div>
         </div>

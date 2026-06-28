@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import styles from './footer.module.css'
+import { SITE, hasPhone } from '@/data/site'
 
 export default function Footer() {
   return (
@@ -9,11 +10,11 @@ export default function Footer() {
         {/* TRUST BADGES */}
         <div className={styles.badges}>
           {[
-            { icon: '🏛️', label: 'USDA Prime', sub: 'Certified Grade' },
+            { icon: '🐄', label: 'Local Beef', sub: 'Partner Ranches' },
             { icon: '✅', label: 'USDA Inspected', sub: 'Est. Approved' },
             { icon: '🌡️', label: 'Cold Chain', sub: 'Maintained' },
-            { icon: '🧪', label: 'Food Safety', sub: 'HACCP Compliant' },
-            { icon: '🚫', label: 'No Hormones', sub: 'Added' },
+            { icon: '⚖️', label: 'Priced by the lb', sub: 'No Markup Games' },
+            { icon: '🗓️', label: 'Weekly Delivery', sub: 'Cancel Anytime' },
           ].map(b => (
             <div key={b.label} className={styles.badge}>
               <div className={styles.badgeIcon}>{b.icon}</div>
@@ -43,16 +44,18 @@ export default function Footer() {
           </div>
 
           <nav className={styles.links}>
+            <Link href="/blog">Blog</Link>
             <Link href="/our-story">Our Story</Link>
             <Link href="/partners">For Property Managers</Link>
             <Link href="/ranchers">For Ranchers</Link>
             <Link href="/terms">Terms of Service</Link>
             <Link href="/privacy">Privacy Policy</Link>
-            <a href="mailto:beef@automaticcow.com">Contact</a>
+            <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+            {hasPhone && <a href={`tel:${SITE.phone.replace(/[^+\d]/g, '')}`}>{SITE.phone}</a>}
           </nav>
 
           <div className={styles.copy}>
-            © {new Date().getFullYear()} Automatic Cow · Houston, TX
+            © {new Date().getFullYear()} {SITE.name} · Local beef delivery across {SITE.city}, {SITE.region}
           </div>
         </div>
 
