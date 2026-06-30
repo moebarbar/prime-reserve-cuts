@@ -31,6 +31,8 @@ export async function POST(req: NextRequest) {
       const building = meta.building ?? ''
       const unit     = meta.unit     ?? ''
       const cut      = meta.cut      ?? ''
+      const kind     = meta.kind === 'one_time' ? 'one_time' : 'subscription'
+      const oneTime  = kind === 'one_time'
       const sessionId = session.id
 
       // Idempotency guard — skip if this session was already processed
@@ -44,9 +46,9 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ received: true })
       }
 
-      // The actual weekly amount Stripe charged (first invoice total), in dollars.
-      // This is the source of truth for the order's recurring price — it already
-      // reflects per-pound pricing × pounds across every selected cut.
+      // The actual amount Stripe charged, in dollars. For a subscription this is
+      // the first weekly invoice (= the weekly total); for a one-time order it's
+      // the single charge. Either way it already reflects per-pound × pounds.
       const price = typeof session.amount_total === 'number'
         ? session.amount_total / 100
         : 0
@@ -54,13 +56,13 @@ export async function POST(req: NextRequest) {
       // Save order
       await query(`
         INSERT INTO orders
-          (customer, email, building, unit, cut, price, status, start_date, next_delivery, stripe_session_id)
-        VALUES ($1, $2, $3, $4, $5, $6, 'active',
+          (customer, email, building, unit, cut, price, kind, status, start_date, next_delivery, stripe_session_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, 'active',
           date_trunc('week', NOW() + interval '7 days'),
           date_trunc('week', NOW() + interval '7 days') + interval '5 days',
-          $7
+          $8
         )
-      `, [name, email, building, unit, cut, price, sessionId])
+      `, [name, email, building, unit, cut, price, kind, sessionId])
 
       // Mark lead converted
       await query(`
@@ -85,13 +87,16 @@ export async function POST(req: NextRequest) {
           cutDetail: '',
           price,
           nextDelivery: nextDeliveryStr,
+          oneTime,
         })
       )
 
       await resend.emails.send({
         from:    'Automatic Cow <hello@automaticcow.com>',
         to:      email,
-        subject: `You're in, ${name.split(' ')[0]}. First delivery ${nextDeliveryStr}.`,
+        subject: oneTime
+          ? `Order confirmed, ${name.split(' ')[0]}. Delivery ${nextDeliveryStr}.`
+          : `You're in, ${name.split(' ')[0]}. First delivery ${nextDeliveryStr}.`,
         html,
       })
 

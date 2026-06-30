@@ -13,6 +13,7 @@ interface Order {
   cut: string
   price: number
   status: OrderStatus
+  kind?: 'subscription' | 'one_time'
   start_date: string | null
   next_delivery: string | null
   created_at: string
@@ -131,7 +132,8 @@ export default function OrdersPage() {
   }
 
   const activeOrders = orders.filter(o => o.status === 'active')
-  const mrr = activeOrders.reduce((s, o) => s + o.price, 0)
+  // MRR is recurring revenue → subscriptions only (exclude one-time orders).
+  const mrr = activeOrders.filter(o => (o.kind ?? 'subscription') === 'subscription').reduce((s, o) => s + o.price, 0)
 
   return (
     <>
@@ -208,6 +210,7 @@ export default function OrdersPage() {
                 <th>Customer</th>
                 <th>Building</th>
                 <th>Cut</th>
+                <th>Type</th>
                 <th>Price</th>
                 <th>Start Date</th>
                 <th>Next Delivery</th>
@@ -232,6 +235,17 @@ export default function OrdersPage() {
                       <div className="td-dim">Unit {o.unit}</div>
                     </td>
                     <td>{o.cut}</td>
+                    <td>
+                      <span style={{
+                        fontSize: 10, fontWeight: 600, letterSpacing: '.04em',
+                        padding: '3px 8px', borderRadius: 999, whiteSpace: 'nowrap',
+                        border: '1px solid var(--border)',
+                        color: o.kind === 'one_time' ? 'var(--gold2)' : 'var(--muted)',
+                        background: o.kind === 'one_time' ? 'rgba(184,134,58,0.12)' : 'transparent',
+                      }}>
+                        {o.kind === 'one_time' ? 'One-time' : 'Subscription'}
+                      </span>
+                    </td>
                     <td style={{ fontFamily: 'Cormorant, serif', fontSize: 17, color: 'var(--gold2)' }}>${o.price}</td>
                     <td className="td-dim">{fmtDate(o.start_date)}</td>
                     <td onClick={e => e.stopPropagation()}>
@@ -264,7 +278,7 @@ export default function OrdersPage() {
                   </tr>
                   {expanded === o.id && (
                     <tr className="detail-row">
-                      <td colSpan={9}>
+                      <td colSpan={10}>
                         <div className="detail-box">
                           <div className="detail-item"><label>Customer</label><span>{o.customer}</span></div>
                           <div className="detail-item"><label>Email</label><span>{o.email}</span></div>

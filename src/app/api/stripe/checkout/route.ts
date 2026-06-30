@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     return rateLimitResponse()
   }
 
-  let body: { name?: unknown; email?: unknown; selections?: unknown; building?: unknown; unit?: unknown }
+  let body: { name?: unknown; email?: unknown; selections?: unknown; building?: unknown; unit?: unknown; purchaseType?: unknown }
   try {
     body = await req.json()
   } catch {
@@ -21,6 +21,9 @@ export async function POST(req: NextRequest) {
   }
 
   const { name, email, selections, building, unit } = body
+  // 'one_time' = pay once; anything else defaults to the weekly subscription.
+  const kind: 'subscription' | 'one_time' = body.purchaseType === 'one_time' ? 'one_time' : 'subscription'
+  const isSubscription = kind === 'subscription'
 
   if (!name || !email || !building || !unit || !Array.isArray(selections) || selections.length === 0) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -47,13 +50,14 @@ export async function POST(req: NextRequest) {
   }
 
   // Build Stripe line_items from selections. Prices come from the canonical
-  // catalog (per-pound) and the customer's qty is the number of pounds/week.
+  // catalog (per-pound) and the customer's qty is the number of pounds. For a
+  // subscription each line recurs weekly; for a one-time order it doesn't.
   const line_items: {
     price_data: {
       currency: string
       product_data: { name: string }
       unit_amount: number
-      recurring: { interval: 'week' }
+      recurring?: { interval: 'week' }
     }
     quantity: number
   }[] = []
@@ -73,7 +77,7 @@ export async function POST(req: NextRequest) {
         currency: 'usd',
         product_data: { name: `${sel.name} (per lb)` },
         unit_amount: Math.round(pricePerLb * 100),
-        recurring: { interval: 'week' },
+        ...(isSubscription ? { recurring: { interval: 'week' as const } } : {}),
       },
       quantity: sel.qty,
     })
@@ -81,16 +85,15 @@ export async function POST(req: NextRequest) {
 
   // Compact cut label for metadata / DB
   const cutLabel = (selections as Selection[]).map(s => `${s.name} ×${s.qty}lb`).join(', ')
+  const metadata = { name: name as string, building: building as string, unit: unit as string, cut: cutLabel, kind }
 
   try {
     const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
+      mode: isSubscription ? 'subscription' : 'payment',
       customer_email: email as string,
       line_items,
-      metadata: { name: name as string, building: building as string, unit: unit as string, cut: cutLabel },
-      subscription_data: {
-        metadata: { name: name as string, building: building as string, unit: unit as string, cut: cutLabel },
-      },
+      metadata,
+      ...(isSubscription ? { subscription_data: { metadata } } : {}),
       success_url: `${BASE_URL}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:  `${BASE_URL}/?checkout=cancelled`,
     })

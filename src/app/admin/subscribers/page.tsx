@@ -13,6 +13,7 @@ interface Order {
   cut: string
   price: number
   status: OrderStatus
+  kind?: 'subscription' | 'one_time'
   start_date: string | null
   next_delivery: string | null
   created_at: string
@@ -35,7 +36,11 @@ export default function SubscribersPage() {
   useEffect(() => {
     fetch('/api/orders')
       .then(r => r.json())
-      .then(data => { setOrders(data); setLoading(false) })
+      // Subscribers = recurring orders only. One-time orders live on the Orders page.
+      .then((data: Order[]) => {
+        setOrders(data.filter(o => (o.kind ?? 'subscription') === 'subscription'))
+        setLoading(false)
+      })
       .catch(() => setLoading(false))
   }, [])
 
