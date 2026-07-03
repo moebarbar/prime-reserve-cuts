@@ -21,6 +21,9 @@ const nextConfig = {
           { key: 'Strict-Transport-Security',      value: 'max-age=31536000; includeSubDomains; preload' },
           { key: 'Cross-Origin-Opener-Policy',     value: 'same-origin' },
           { key: 'X-DNS-Prefetch-Control',         value: 'off' },
+          // Baseline CSP — a strict script-src needs nonce work with Next's
+          // inline scripts, but these directives are drop-in safe
+          { key: 'Content-Security-Policy',        value: "frame-ancestors 'none'; base-uri 'self'; object-src 'none'" },
         ],
       },
     ]

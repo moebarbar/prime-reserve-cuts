@@ -12,6 +12,7 @@ interface SubscriptionConfirmedProps {
   cutDetail: string
   price: number
   nextDelivery: string
+  oneTime?: boolean
 }
 
 export default function SubscriptionConfirmed({
@@ -22,7 +23,9 @@ export default function SubscriptionConfirmed({
   cutDetail     = '16oz bone-in · 21-day dry-aged',
   price         = 89,
   nextDelivery  = 'May 1, 2026',
+  oneTime       = false,
 }: SubscriptionConfirmedProps) {
+  const priceStr = `$${Number(price).toFixed(2)}`
   return (
     <Html>
       <Head>
@@ -37,7 +40,7 @@ export default function SubscriptionConfirmed({
           fontStyle="normal"
         />
       </Head>
-      <Preview>You&apos;re in. First delivery {nextDelivery} to Unit {unit} at {buildingName}.</Preview>
+      <Preview>{oneTime ? 'Order confirmed' : 'You’re in'}. Delivery {nextDelivery} to Unit {unit} at {buildingName}.</Preview>
       <Body style={body}>
         <Container style={container}>
 
@@ -49,13 +52,15 @@ export default function SubscriptionConfirmed({
 
           {/* HERO BAND */}
           <Section style={heroBand}>
-            <Heading style={heroHeading}>You&apos;re in.</Heading>
-            <Text style={heroSub}>Membership confirmed. Welcome to the herd.</Text>
+            <Heading style={heroHeading}>{oneTime ? 'Order confirmed.' : 'You’re in.'}</Heading>
+            <Text style={heroSub}>
+              {oneTime ? 'Thanks for your order. It’s on the way.' : 'Membership confirmed. Welcome to the herd.'}
+            </Text>
           </Section>
 
           {/* ORDER CARD */}
           <Section style={card}>
-            <Text style={cardLabel}>YOUR SUBSCRIPTION</Text>
+            <Text style={cardLabel}>{oneTime ? 'YOUR ORDER' : 'YOUR SUBSCRIPTION'}</Text>
 
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <tbody>
@@ -76,12 +81,12 @@ export default function SubscriptionConfirmed({
                   <td style={rowValue}>{unit}</td>
                 </tr>
                 <tr>
-                  <td style={rowLabel}>First Delivery</td>
+                  <td style={rowLabel}>{oneTime ? 'Delivery' : 'First Delivery'}</td>
                   <td style={rowValue}>{nextDelivery}</td>
                 </tr>
                 <tr>
                   <td style={rowLabel}>Billing</td>
-                  <td style={rowValue}>Weekly · Every Saturday</td>
+                  <td style={rowValue}>{oneTime ? 'One-time · This Saturday' : 'Weekly · Every Saturday'}</td>
                 </tr>
               </tbody>
             </table>
@@ -91,8 +96,8 @@ export default function SubscriptionConfirmed({
             <table style={{ width: '100%' }}>
               <tbody>
                 <tr>
-                  <td style={{ ...rowLabel, fontSize: 13 }}>Weekly Total</td>
-                  <td style={priceCell}>${price}/week</td>
+                  <td style={{ ...rowLabel, fontSize: 13 }}>{oneTime ? 'Order Total' : 'Weekly Total'}</td>
+                  <td style={priceCell}>{oneTime ? priceStr : `${priceStr}/week`}</td>
                 </tr>
               </tbody>
             </table>
@@ -102,7 +107,9 @@ export default function SubscriptionConfirmed({
           <Section style={deliveryNote}>
             <Text style={deliveryIcon}>🚪</Text>
             <Text style={deliveryText}>
-              <strong style={{ color: '#e8d8b0' }}>Delivered to your door, Every Saturday.</strong>
+              <strong style={{ color: '#e8d8b0' }}>
+                {oneTime ? 'Delivered to your door this Saturday.' : 'Delivered to your door, Every Saturday.'}
+              </strong>
               {' '}Vacuum-sealed with dry ice, coordinated with your concierge at {buildingName}. No signature required.
             </Text>
           </Section>
@@ -136,7 +143,7 @@ export default function SubscriptionConfirmed({
               Questions? Reply to this email or contact us anytime.
             </Text>
             <Text style={footerText}>
-              You can cancel anytime from your member dashboard.
+              {oneTime ? 'Want it every week? Start a subscription anytime.' : 'You can cancel anytime from your member dashboard.'}
             </Text>
             <Text style={{ ...footerText, marginTop: 20, color: '#4a3e2a' }}>
               © {new Date().getFullYear()} Automatic Cow · Houston, TX

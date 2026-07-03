@@ -9,6 +9,15 @@ const store = new Map<string, Entry>()
  */
 export function rateLimit(key: string, limit: number, windowMs: number): boolean {
   const now = Date.now()
+
+  // Evict expired entries occasionally so the map can't grow unboundedly
+  // under a spray of unique keys
+  if (store.size > 1000) {
+    store.forEach((e, k) => {
+      if (now > e.resetAt) store.delete(k)
+    })
+  }
+
   const entry = store.get(key)
 
   if (!entry || now > entry.resetAt) {

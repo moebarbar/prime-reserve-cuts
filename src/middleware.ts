@@ -1,20 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { verifySessionToken } from '@/lib/adminSession'
 
 const ADMIN_USER = process.env.ADMIN_USER ?? 'admin'
 const ADMIN_PASS = process.env.ADMIN_PASS ?? ''
 
 const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_URL ?? ''
-
-// Constant-time string comparison to prevent timing attacks
-function constantTimeEqual(a: string, b: string): boolean {
-  const enc = new TextEncoder()
-  const aBytes = enc.encode(a)
-  const bBytes = enc.encode(b)
-  if (aBytes.length !== bBytes.length) return false
-  let diff = 0
-  for (let i = 0; i < aBytes.length; i++) diff |= aBytes[i] ^ bBytes[i]
-  return diff === 0
-}
 
 function isAdminRoute(pathname: string, method: string) {
   // Admin pages always protected
@@ -35,9 +25,10 @@ function isAdminRoute(pathname: string, method: string) {
       pathname.startsWith('/api/rancher-inquiries/')
     ) return true
   }
-  // Leads and orders reads are admin-only (sensitive customer data)
+  // Leads and orders reads are admin-only (sensitive customer data).
+  // HEAD is a read too — treat it exactly like GET.
   // Products GET is intentionally public — main site checkout uses it
-  if (method === 'GET') {
+  if (['GET', 'HEAD'].includes(method)) {
     if (
       pathname.startsWith('/api/leads') ||
       pathname.startsWith('/api/orders') ||
@@ -48,34 +39,27 @@ function isAdminRoute(pathname: string, method: string) {
   return false
 }
 
-// Routes that don't require auth (login page + login API)
+// Routes that don't require auth (login page + login/logout API only —
+// anything else added under /api/admin/ later must NOT be silently public)
 function isPublicAdminRoute(pathname: string) {
   return (
     pathname === '/admin/login' ||
-    pathname.startsWith('/api/admin/')
+    pathname === '/api/admin/login' ||
+    pathname === '/api/admin/logout'
   )
-}
-
-function isValidToken(token: string): boolean {
-  if (!ADMIN_PASS) return false
-  const expected = btoa(`${ADMIN_USER}:${ADMIN_PASS}`)
-  return constantTimeEqual(token, expected)
 }
 
 function withCors(res: NextResponse, origin: string | null): NextResponse {
   const allowed = ALLOWED_ORIGIN || 'http://localhost:3000'
-  if (origin && (origin === allowed || !ALLOWED_ORIGIN)) {
-    res.headers.set('Access-Control-Allow-Origin', origin)
-  } else {
-    res.headers.set('Access-Control-Allow-Origin', allowed)
-  }
+  // Only ever emit the configured origin — never reflect the caller's.
+  res.headers.set('Access-Control-Allow-Origin', allowed)
   res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
   res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   res.headers.set('Access-Control-Max-Age', '86400')
   return res
 }
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
   const origin = req.headers.get('origin')
 
@@ -98,7 +82,7 @@ export function middleware(req: NextRequest) {
     }
 
     const token = req.cookies.get('admin_token')?.value ?? ''
-    const authenticated = isValidToken(token)
+    const authenticated = token ? await verifySessionToken(token, ADMIN_USER) : false
 
     if (!authenticated) {
       // API routes return 401; page routes redirect to login

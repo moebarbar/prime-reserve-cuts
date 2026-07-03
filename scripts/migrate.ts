@@ -138,9 +138,11 @@ async function run() {
       building           TEXT NOT NULL,
       unit               TEXT NOT NULL,
       cut                TEXT NOT NULL,
-      price              INTEGER NOT NULL,
+      price              NUMERIC(10,2) NOT NULL,
+      kind               TEXT NOT NULL DEFAULT 'subscription'
+                           CHECK (kind IN ('subscription','one_time')),
       status             TEXT NOT NULL DEFAULT 'pending'
-                           CHECK (status IN ('active','paused','cancelled','pending')),
+                           CHECK (status IN ('active','paused','cancelled','pending','completed')),
       start_date         DATE,
       next_delivery      DATE,
       stripe_session_id  TEXT UNIQUE,
@@ -151,6 +153,27 @@ async function run() {
   // Add stripe_session_id to existing tables that predate this migration
   await pool.query(`
     ALTER TABLE orders ADD COLUMN IF NOT EXISTS stripe_session_id TEXT UNIQUE
+  `)
+  // Per-pound totals are decimals — widen the legacy INTEGER price column (idempotent)
+  await pool.query(`ALTER TABLE orders ALTER COLUMN price TYPE NUMERIC(10,2)`)
+  // One-time purchases vs weekly subscriptions
+  await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'subscription'`)
+  await pool.query(`
+    DO $$ BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'orders_kind_check'
+      ) THEN
+        ALTER TABLE orders ADD CONSTRAINT orders_kind_check
+          CHECK (kind IN ('subscription','one_time'));
+      END IF;
+    END $$;
+  `)
+  // One-time orders finish as 'completed' after delivery — widen the status
+  // CHECK on tables that predate it (drop + re-add is idempotent)
+  await pool.query(`ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_status_check`)
+  await pool.query(`
+    ALTER TABLE orders ADD CONSTRAINT orders_status_check
+      CHECK (status IN ('active','paused','cancelled','pending','completed'))
   `)
   console.log('✓ orders table')
 

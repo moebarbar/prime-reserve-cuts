@@ -44,6 +44,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid field values' }, { status: 400 })
   }
 
+  // Basic email shape check (same as the inquiry routes) — keeps garbage out
+  // of the table that webhook UPDATEs later match on
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
+  }
+
   try {
     const [lead] = await query(`
       INSERT INTO leads (name, email, phone, building, unit, cut)

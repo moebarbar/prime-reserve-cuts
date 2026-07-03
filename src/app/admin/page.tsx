@@ -10,7 +10,7 @@ interface Lead {
 
 interface Order {
   id: string; customer: string; email: string; building: string
-  unit: string; cut: string; price: number; status: string
+  unit: string; cut: string; price: number; status: string; kind?: string
   next_delivery: string | null; created_at: string
 }
 
@@ -56,7 +56,11 @@ export default function AdminDashboard() {
 
   const activeOrders   = orders.filter(o => o.status === 'active')
   const pausedOrders   = orders.filter(o => o.status === 'paused')
-  const mrr            = activeOrders.reduce((s, o) => s + o.price, 0)
+  // Recurring revenue + member counts come from subscriptions only; one-time
+  // orders are operational (they still get delivered) but aren't recurring.
+  const activeSubs     = activeOrders.filter(o => (o.kind ?? 'subscription') === 'subscription')
+  const oneTimeActive  = activeOrders.filter(o => o.kind === 'one_time')
+  const mrr            = activeSubs.reduce((s, o) => s + o.price, 0)
   const arr            = mrr * 12  // monthly × 12
   const newLeads       = leads.filter(l => l.status === 'new').length
   const contactedLeads = leads.filter(l => l.status === 'contacted').length
@@ -65,7 +69,7 @@ export default function AdminDashboard() {
 
   // Revenue by cut
   const cutRevenue: Record<string, { count: number; rev: number }> = {}
-  activeOrders.forEach(o => {
+  activeSubs.forEach(o => {
     if (!cutRevenue[o.cut]) cutRevenue[o.cut] = { count: 0, rev: 0 }
     cutRevenue[o.cut].count++
     cutRevenue[o.cut].rev += o.price
@@ -74,7 +78,7 @@ export default function AdminDashboard() {
 
   // Revenue by building (top 3)
   const bldRevenue: Record<string, number> = {}
-  activeOrders.forEach(o => { bldRevenue[o.building] = (bldRevenue[o.building] || 0) + o.price })
+  activeSubs.forEach(o => { bldRevenue[o.building] = (bldRevenue[o.building] || 0) + o.price })
   const topBuildings = Object.entries(bldRevenue).sort((a, b) => b[1] - a[1]).slice(0, 4)
 
   // Recent activity — combine leads + orders, sort by date
@@ -96,8 +100,10 @@ export default function AdminDashboard() {
         </div>
         <div className="stat-card">
           <div className="stat-eyebrow">Active Members</div>
-          <div className="stat-value">{activeOrders.length}</div>
-          <div className="stat-sub">{pausedOrders.length} paused · {orders.filter(o => o.status === 'cancelled').length} churned</div>
+          <div className="stat-value">{activeSubs.length}</div>
+          <div className="stat-sub">
+            {pausedOrders.length} paused · {oneTimeActive.length} one-time
+          </div>
         </div>
         <div className="stat-card">
           <div className="stat-eyebrow">Open Leads</div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import styles from './page2.module.css'
 import { BUILDINGS } from '@/data/buildings'
 import { PRODUCTS, CATEGORY_META, type Category, type Product } from '@/data/products'
+import PurchaseTypeToggle, { type PurchaseType } from '@/components/PurchaseTypeToggle'
 
 interface FormData {
   unit: string
@@ -23,28 +24,34 @@ export interface CutSelection {
 
 interface Page2Props {
   buildingKey: string
+  purchaseType: PurchaseType
+  onPurchaseTypeChange: (v: PurchaseType) => void
+  initialSelections?: CutSelection[]
+  initialForm?: FormData
   onBack: () => void
   onContinue: (form: FormData, selections: CutSelection[]) => void
 }
 
 const CATEGORIES = CATEGORY_META
 
-export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
+export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange, initialSelections, initialForm, onBack, onContinue }: Page2Props) {
   const building = BUILDINGS.find(b => b.key === buildingKey)
+  const isSub = purchaseType === 'subscription'
   // DB-driven: the admin manages the `products` table and the funnel renders it.
   // We seed state with the canonical catalog so the first paint is correct, then
   // replace it with live DB rows (falling back to the seed if the API is empty).
   const [allProducts, setAllProducts] = useState<Cut[]>(PRODUCTS)
   const [activeCat, setActiveCat]     = useState<Category | null>(null)
-  const [selections, setSelections]   = useState<CutSelection[]>([])
-  const [form, setForm]               = useState<FormData>({ unit: '', firstName: '', lastName: '', email: '', phone: '' })
+  // Seeded from the parent so "Back to Details" from Step 3 doesn't wipe the order.
+  const [selections, setSelections]   = useState<CutSelection[]>(initialSelections ?? [])
+  const [form, setForm]               = useState<FormData>(initialForm ?? { unit: '', firstName: '', lastName: '', email: '', phone: '' })
 
   useEffect(() => {
     fetch('/api/products')
       .then(r => r.json())
       .then((rows: Array<{ id: string; name: string; detail: string; img: string; price: number | string; available: boolean; category: Category }>) => {
         if (!Array.isArray(rows) || rows.length === 0) return // keep the static fallback
-        setAllProducts(rows.map(r => ({
+        const live = rows.map(r => ({
           id: r.id,
           name: r.name,
           category: r.category,
@@ -52,7 +59,17 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
           detail: r.detail,
           img: r.img,
           available: r.available,
-        })))
+        }))
+        setAllProducts(live)
+        // Re-point existing selections (seed ids or a previous visit) at the
+        // live rows — matching by name — so cards stay selected and prices are
+        // current; drop anything no longer available.
+        setSelections(prev => prev
+          .map(s => {
+            const match = live.find(p => p.name === s.cut.name)
+            return match && match.available ? { ...s, cut: match } : null
+          })
+          .filter((s): s is CutSelection => s !== null))
       })
       .catch(() => { /* keep the static fallback */ })
   }, [])
@@ -77,7 +94,7 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
   }
 
   const setQty = (cut: Cut, qty: number) => {
-    if (qty < 1) return
+    if (qty < 1 || qty > 20) return // checkout API rejects qty > 20
     setSelections(prev => prev.map(s => s.cut.id === cut.id ? { ...s, qty } : s))
   }
 
@@ -264,6 +281,14 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
             </>
           )}
 
+          {/* How do you want it? Subscribe weekly or buy once. */}
+          <div style={{ margin: '8px 0 14px' }}>
+            <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 8 }}>
+              How would you like it?
+            </div>
+            <PurchaseTypeToggle value={purchaseType} onChange={onPurchaseTypeChange} />
+          </div>
+
           {/* Order mini summary */}
           <div className={styles.omini}>
             {selections.length === 0 ? (
@@ -282,16 +307,16 @@ export default function Page2({ buildingKey, onBack, onContinue }: Page2Props) {
             </div>
             <div className={styles.omRow}>
               <span>Schedule</span>
-              <span style={{ color: 'var(--cream)' }}>Every Saturday</span>
+              <span style={{ color: 'var(--cream)' }}>{isSub ? 'Every Saturday' : 'This Saturday · one-time'}</span>
             </div>
             <div className={styles.omTotal}>
-              <span className={styles.omTotalLbl}>Weekly Total</span>
+              <span className={styles.omTotalLbl}>{isSub ? 'Weekly Total' : 'Order Total'}</span>
               <span className={styles.omTotalVal}>{money(weeklyTotal)}</span>
             </div>
           </div>
 
           <button className={styles.btnPay} onClick={handleContinue}>
-            Proceed to Payment →
+            {isSub ? 'Proceed to Payment →' : 'Proceed to Checkout →'}
           </button>
         </div>
 

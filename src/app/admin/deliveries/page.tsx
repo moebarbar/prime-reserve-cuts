@@ -11,6 +11,7 @@ interface Order {
   cut: string
   price: number
   status: string
+  kind?: 'subscription' | 'one_time'
   next_delivery: string | null
 }
 
@@ -48,7 +49,14 @@ export default function DeliveriesPage() {
     fetch('/api/orders')
       .then(r => r.json())
       .then((data: Order[]) => {
-        setOrders(data.filter(o => o.status === 'active'))
+        // Subscriptions: every active order delivers each Saturday.
+        // One-time orders: only until their single delivery date passes
+        // (the API marks them 'completed' after that).
+        const sat = getNextSaturday()
+        setOrders(data.filter(o =>
+          o.status === 'active' &&
+          (o.kind !== 'one_time' || !o.next_delivery || new Date(o.next_delivery) <= sat)
+        ))
         setLoading(false)
       })
       .catch(() => setLoading(false))
@@ -236,7 +244,14 @@ export default function DeliveriesPage() {
                           </span>
                         </td>
                         <td>
-                          <div style={{ fontWeight: 400 }}>{o.customer}</div>
+                          <div style={{ fontWeight: 400 }}>
+                            {o.customer}
+                            {o.kind === 'one_time' && (
+                              <span style={{ marginLeft: 7, fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold2)', border: '1px solid rgba(184,134,58,0.4)', borderRadius: 4, padding: '1px 5px' }}>
+                                One-time
+                              </span>
+                            )}
+                          </div>
                           <div className="td-dim">{o.email}</div>
                         </td>
                         <td>

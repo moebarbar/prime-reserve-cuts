@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       from: NOTIFY_FROM,
       to: NOTIFY_TO,
       replyTo: email,
-      subject: `New Partner Inquiry — ${property_name}`,
+      subject: `New Partner Inquiry — ${String(property_name).replace(/[\r\n]/g, ' ')}`,
       html: `
         <h2>New Partner Inquiry</h2>
         <p><strong>Property:</strong> ${escapeHtml(property_name)}</p>

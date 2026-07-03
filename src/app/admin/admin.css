@@ -302,6 +302,8 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
 .badge-cancelled::before { background: #e05c4d; }
 .badge-pending   { background: rgba(184,134,58,0.14); color: var(--gold2); }
 .badge-pending::before   { background: var(--gold); }
+.badge-completed { background: rgba(99,91,255,0.12);  color: #9b93ff; }
+.badge-completed::before { background: #9b93ff; }
 
 /* FILTER BAR */
 .filter-bar {
