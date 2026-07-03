@@ -12,6 +12,13 @@ export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET ?? ''
   const body   = await req.text()
 
+  // Fail closed: with an empty secret the HMAC check would be computable by
+  // anyone, letting attackers forge orders/cancellations.
+  if (!secret) {
+    console.error('STRIPE_WEBHOOK_SECRET is not set — rejecting webhook')
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
+  }
+
   let event
   try {
     event = stripe.webhooks.constructEvent(body, sig, secret)
@@ -53,16 +60,19 @@ export async function POST(req: NextRequest) {
         ? session.amount_total / 100
         : 0
 
+      // Upcoming Saturday — the same date the confirmation email promises.
+      // (Previously the SQL stored next ISO week's Saturday, a week late.)
+      const nextDelivery = new Date()
+      const daysUntilSat = (6 - nextDelivery.getDay() + 7) % 7 || 7
+      nextDelivery.setDate(nextDelivery.getDate() + daysUntilSat)
+      const deliveryDate = nextDelivery.toISOString().slice(0, 10)
+
       // Save order
       await query(`
         INSERT INTO orders
           (customer, email, building, unit, cut, price, kind, status, start_date, next_delivery, stripe_session_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, 'active',
-          date_trunc('week', NOW() + interval '7 days'),
-          date_trunc('week', NOW() + interval '7 days') + interval '5 days',
-          $8
-        )
-      `, [name, email, building, unit, cut, price, kind, sessionId])
+        VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', $8, $8, $9)
+      `, [name, email, building, unit, cut, price, kind, deliveryDate, sessionId])
 
       // Mark lead converted
       await query(`
@@ -70,10 +80,7 @@ export async function POST(req: NextRequest) {
         WHERE email = $1 AND status != 'converted'
       `, [email])
 
-      // Send confirmation email
-      const nextDelivery = new Date()
-      const daysUntilSat = (6 - nextDelivery.getDay() + 7) % 7 || 7
-      nextDelivery.setDate(nextDelivery.getDate() + daysUntilSat)
+      // Send confirmation email (same Saturday as stored above)
       const nextDeliveryStr = nextDelivery.toLocaleDateString('en-US', {
         month: 'long', day: 'numeric', year: 'numeric',
       })
@@ -124,9 +131,11 @@ export async function POST(req: NextRequest) {
       }
 
       if (email) {
+        // Only touch subscriptions — a customer's pending one-time order must
+        // survive them cancelling their weekly membership.
         await query(`
           UPDATE orders SET status = 'cancelled', updated_at = NOW()
-          WHERE email = $1 AND status != 'cancelled'
+          WHERE email = $1 AND kind = 'subscription' AND status != 'cancelled'
         `, [email])
         console.log(`✓ Subscription cancelled for ${email}`)
       }
@@ -142,9 +151,11 @@ export async function POST(req: NextRequest) {
       const email   = invoice.customer_email ?? ''
 
       if (email) {
+        // Failed invoices are a subscription concept — never pause a paid
+        // one-time order for the same email.
         await query(`
           UPDATE orders SET status = 'paused', updated_at = NOW()
-          WHERE email = $1 AND status = 'active'
+          WHERE email = $1 AND kind = 'subscription' AND status = 'active'
         `, [email])
         console.log(`✓ Order paused due to failed payment for ${email}`)
       }

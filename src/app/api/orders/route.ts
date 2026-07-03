@@ -3,6 +3,13 @@ import { query } from '@/lib/db'
 
 export async function GET() {
   try {
+    // One-time orders are a single delivery: once the date passes, mark them
+    // completed so they leave the manifest and stop counting as active.
+    // (Subscriptions are untouched — their next_delivery rolls forward.)
+    await query(`
+      UPDATE orders SET status = 'completed', updated_at = NOW()
+      WHERE kind = 'one_time' AND status = 'active' AND next_delivery < CURRENT_DATE
+    `)
     const orders = await query(`SELECT * FROM orders ORDER BY created_at DESC`)
     return NextResponse.json(orders)
   } catch (err) {

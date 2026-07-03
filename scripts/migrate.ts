@@ -142,7 +142,7 @@ async function run() {
       kind               TEXT NOT NULL DEFAULT 'subscription'
                            CHECK (kind IN ('subscription','one_time')),
       status             TEXT NOT NULL DEFAULT 'pending'
-                           CHECK (status IN ('active','paused','cancelled','pending')),
+                           CHECK (status IN ('active','paused','cancelled','pending','completed')),
       start_date         DATE,
       next_delivery      DATE,
       stripe_session_id  TEXT UNIQUE,
@@ -167,6 +167,13 @@ async function run() {
           CHECK (kind IN ('subscription','one_time'));
       END IF;
     END $$;
+  `)
+  // One-time orders finish as 'completed' after delivery — widen the status
+  // CHECK on tables that predate it (drop + re-add is idempotent)
+  await pool.query(`ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_status_check`)
+  await pool.query(`
+    ALTER TABLE orders ADD CONSTRAINT orders_status_check
+      CHECK (status IN ('active','paused','cancelled','pending','completed'))
   `)
   console.log('✓ orders table')
 

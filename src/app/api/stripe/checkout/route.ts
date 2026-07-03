@@ -28,6 +28,10 @@ export async function POST(req: NextRequest) {
   if (!name || !email || !building || !unit || !Array.isArray(selections) || selections.length === 0) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
+  // Cap the array itself — each entry costs a DB lookup below
+  if (selections.length > 20) {
+    return NextResponse.json({ error: 'Too many selections' }, { status: 400 })
+  }
 
   // String length limits
   if (
@@ -86,6 +90,13 @@ export async function POST(req: NextRequest) {
   // Compact cut label for metadata / DB
   const cutLabel = (selections as Selection[]).map(s => `${s.name} ×${s.qty}lb`).join(', ')
   const metadata = { name: name as string, building: building as string, unit: unit as string, cut: cutLabel, kind }
+
+  // Stripe not configured (e.g. local dev without keys) — tell the client
+  // explicitly so it can show its demo confirmation. Every other failure below
+  // is a real error and must NOT look like a successful order.
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return NextResponse.json({ demo: true })
+  }
 
   try {
     const session = await stripe.checkout.sessions.create({

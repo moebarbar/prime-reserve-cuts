@@ -2,7 +2,7 @@
 
 import { Fragment, useState, useEffect } from 'react'
 
-type OrderStatus = 'active' | 'paused' | 'cancelled' | 'pending'
+type OrderStatus = 'active' | 'paused' | 'cancelled' | 'pending' | 'completed'
 
 interface Order {
   id: string
@@ -19,7 +19,7 @@ interface Order {
   created_at: string
 }
 
-const STATUS_OPTS: OrderStatus[] = ['active', 'pending', 'paused', 'cancelled']
+const STATUS_OPTS: OrderStatus[] = ['active', 'pending', 'paused', 'cancelled', 'completed']
 
 function fmtDate(d: string | null) {
   if (!d) return '—'

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import styles from './page3.module.css'
 import { Building } from '@/data/buildings'
 import { CutSelection } from './Page2'
+import PurchaseTypeToggle, { type PurchaseType } from '@/components/PurchaseTypeToggle'
 
 interface FormData {
   unit: string
@@ -17,13 +18,15 @@ interface Page3Props {
   building: Building
   selections: CutSelection[]
   form: FormData
+  purchaseType: PurchaseType
+  onPurchaseTypeChange: (v: PurchaseType) => void
   onBack: () => void
 }
 
-export default function Page3({ building, selections, form, onBack }: Page3Props) {
+export default function Page3({ building, selections, form, purchaseType, onPurchaseTypeChange, onBack }: Page3Props) {
   const [paid, setPaid] = useState(false)
   const [processing, setProcessing] = useState(false)
-  const [purchaseType, setPurchaseType] = useState<'subscription' | 'one_time'>('subscription')
+  const [payError, setPayError] = useState<string | null>(null)
   const isSub = purchaseType === 'subscription'
   const weeklyTotal = selections.reduce((sum, s) => sum + s.cut.pricePerLb * s.qty, 0)
   const money = (n: number) => `$${n.toFixed(2)}`
@@ -31,6 +34,7 @@ export default function Page3({ building, selections, form, onBack }: Page3Props
 
   const handlePay = async () => {
     setProcessing(true)
+    setPayError(null)
 
     // 1. Capture lead in DB (best-effort, don't block checkout)
     try {
@@ -62,15 +66,24 @@ export default function Page3({ building, selections, form, onBack }: Page3Props
           purchaseType,
         }),
       })
-      const data = await res.json()
-      if (data.url) {
+      const data = await res.json().catch(() => ({}))
+      if (res.ok && data.url) {
         window.location.href = data.url
         return
       }
-      // Stripe not configured yet — fall through to demo success
-    } catch { /* Stripe not configured — show demo success */ }
-
-    setPaid(true)
+      if (res.ok && data.demo) {
+        // Stripe not configured yet (dev/demo) — show the demo confirmation
+        setPaid(true)
+        setProcessing(false)
+        return
+      }
+      // Real error (validation, rate limit, Stripe failure) — never fake success
+      setPayError(typeof data.error === 'string' && data.error
+        ? data.error
+        : 'Something went wrong creating your checkout. Please try again.')
+    } catch {
+      setPayError('Network error — please check your connection and try again.')
+    }
     setProcessing(false)
   }
 
@@ -87,44 +100,9 @@ export default function Page3({ building, selections, form, onBack }: Page3Props
           <div className={styles.label}>Step 3 of 3</div>
           <h2 className={styles.title}>Review &amp;<br /><em>check out.</em></h2>
 
-          {/* Purchase type — subscribe weekly or buy once */}
-          <div style={{ display: 'flex', gap: 8, margin: '0 0 18px' }}>
-            {([
-              ['subscription', 'Weekly subscription', 'Delivered every Saturday'],
-              ['one_time', 'One-time order', 'Just this once'],
-            ] as const).map(([val, label, sub]) => {
-              const sel = purchaseType === val
-              return (
-                <button
-                  key={val}
-                  type="button"
-                  onClick={() => setPurchaseType(val)}
-                  style={{
-                    flex: 1,
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    padding: '12px 14px',
-                    borderRadius: 10,
-                    border: `1px solid ${sel ? 'var(--gold)' : 'var(--border)'}`,
-                    background: sel ? 'rgba(184,134,58,0.12)' : 'transparent',
-                    color: 'var(--cream)',
-                    transition: 'border-color .15s, background .15s',
-                  }}
-                >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 500 }}>
-                    <span style={{
-                      width: 14, height: 14, borderRadius: '50%', flex: '0 0 auto',
-                      border: `1px solid ${sel ? 'var(--gold)' : 'var(--border)'}`,
-                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      {sel && <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--gold)' }} />}
-                    </span>
-                    {label}
-                  </span>
-                  <span style={{ display: 'block', fontSize: 10.5, color: 'var(--muted)', marginTop: 4, paddingLeft: 21 }}>{sub}</span>
-                </button>
-              )
-            })}
+          {/* Purchase type — subscribe weekly or buy once (shared with Step 2) */}
+          <div style={{ margin: '0 0 18px' }}>
+            <PurchaseTypeToggle value={purchaseType} onChange={onPurchaseTypeChange} />
           </div>
 
           {/* Order card */}
@@ -220,6 +198,16 @@ export default function Page3({ building, selections, form, onBack }: Page3Props
                     ? 'By subscribing you agree to automatic weekly billing. Cancel any time.'
                     : 'A single charge for this order. No recurring billing.'}
                 </div>
+
+                {payError && (
+                  <div role="alert" style={{
+                    margin: '0 0 12px', padding: '10px 12px', borderRadius: 8,
+                    border: '1px solid rgba(200,80,60,0.45)', background: 'rgba(200,80,60,0.1)',
+                    color: '#e0977f', fontSize: 12, lineHeight: 1.5,
+                  }}>
+                    {payError}
+                  </div>
+                )}
 
                 <button className={styles.spBtn} onClick={handlePay} disabled={processing}>
                   {processing ? '⏳ Processing…' : isSub ? '🔒  Complete Subscription' : '🔒  Place Order'}

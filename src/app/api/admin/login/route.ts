@@ -1,19 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { rateLimit, rateLimitResponse } from '@/lib/rateLimit'
+import { constantTimeEqual, createSessionToken, SESSION_MAX_AGE_S } from '@/lib/adminSession'
 
 const ADMIN_USER = process.env.ADMIN_USER ?? 'admin'
 const ADMIN_PASS = process.env.ADMIN_PASS ?? ''
 
-function constantTimeEqual(a: string, b: string): boolean {
-  const enc = new TextEncoder()
-  const aBytes = enc.encode(a)
-  const bBytes = enc.encode(b)
-  if (aBytes.length !== bBytes.length) return false
-  let diff = 0
-  for (let i = 0; i < aBytes.length; i++) diff |= aBytes[i] ^ bBytes[i]
-  return diff === 0
-}
-
 export async function POST(req: NextRequest) {
+  // 5 attempts per IP per 15 minutes — the 400ms delay alone doesn't stop
+  // parallel brute force.
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
+  if (!rateLimit(`admin-login:${ip}`, 5, 15 * 60 * 1000)) {
+    return rateLimitResponse()
+  }
+
   if (!ADMIN_PASS) {
     return NextResponse.json({ error: 'Admin access not configured.' }, { status: 503 })
   }
@@ -36,14 +35,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
   }
 
-  const token = btoa(`${ADMIN_USER}:${ADMIN_PASS}`)
+  const token = await createSessionToken(ADMIN_USER)
   const res = NextResponse.json({ ok: true })
   res.cookies.set('admin_token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     path: '/',
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge: SESSION_MAX_AGE_S,
   })
   return res
 }
