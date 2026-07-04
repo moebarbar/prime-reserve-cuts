@@ -12,6 +12,8 @@ interface FormData {
   lastName: string
   email: string
   phone: string
+  username: string
+  password: string
 }
 
 export type Cut = Product
@@ -44,7 +46,7 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
   const [activeCat, setActiveCat]     = useState<Category | null>(null)
   // Seeded from the parent so "Back to Details" from Step 3 doesn't wipe the order.
   const [selections, setSelections]   = useState<CutSelection[]>(initialSelections ?? [])
-  const [form, setForm]               = useState<FormData>(initialForm ?? { unit: '', firstName: '', lastName: '', email: '', phone: '' })
+  const [form, setForm]               = useState<FormData>(initialForm ?? { unit: '', firstName: '', lastName: '', email: '', phone: '', username: '', password: '' })
 
   useEffect(() => {
     fetch('/api/products')
@@ -125,6 +127,14 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
       alert('Please enter a valid email address.')
       return
     }
+    if (!/^[a-zA-Z0-9_]{3,30}$/.test(form.username.trim())) {
+      alert('Choose a username: 3–30 letters, numbers, or underscores.')
+      return
+    }
+    if (form.password.length < 8) {
+      alert('Choose a password of at least 8 characters.')
+      return
+    }
 
     onContinue(form, selections)
   }
@@ -184,8 +194,24 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
               value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
           </div>
 
+          {/* Account — so you can manage your deliveries after checkout */}
+          <div className={styles.acctHead}>Your account</div>
+          <div className={styles.fieldRow}>
+            <div className={styles.field}>
+              <label>Username</label>
+              <input type="text" placeholder="james_h" autoComplete="username"
+                value={form.username} onChange={e => setForm({ ...form, username: e.target.value })} />
+            </div>
+            <div className={styles.field}>
+              <label>Password</label>
+              <input type="password" placeholder="••••••••" autoComplete="new-password"
+                value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
+            </div>
+          </div>
+
           <div className={styles.note}>
-            🔒 Used only for residency verification and delivery. Never shared.
+            🔒 Create a login to manage, skip, or cancel deliveries anytime. Already a member?{' '}
+            <a href="/account/login" style={{ color: 'var(--gold)' }}>Sign in</a>.
           </div>
         </div>
 

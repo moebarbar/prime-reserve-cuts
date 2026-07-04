@@ -15,6 +15,8 @@ interface FormData {
   lastName: string
   email: string
   phone: string
+  username: string
+  password: string
 }
 
 export default function Home() {
@@ -25,7 +27,7 @@ export default function Home() {
   const [selections, setSelections] = useState<CutSelection[]>([])
   const [purchaseType, setPurchaseType] = useState<PurchaseType>('subscription')
   const [formData, setFormData] = useState<FormData>({
-    unit: '', firstName: '', lastName: '', email: '', phone: ''
+    unit: '', firstName: '', lastName: '', email: '', phone: '', username: '', password: ''
   })
 
   const [checkoutBanner, setCheckoutBanner] = useState<'success' | 'cancelled' | null>(null)
@@ -106,7 +108,8 @@ export default function Home() {
         >
           <span>
             {checkoutBanner === 'success'
-              ? <>✅ <strong>Payment confirmed.</strong> Your order is in — a confirmation email with your delivery date is on its way.</>
+              ? <>✅ <strong>Payment confirmed.</strong> Your order is in — manage it anytime in your{' '}
+                  <a href="/account" style={{ color: 'var(--gold)', fontWeight: 500 }}>account dashboard</a>.</>
               : <>Checkout cancelled — your card was not charged. Your selections are still here whenever you&apos;re ready.</>}
           </span>
           <button

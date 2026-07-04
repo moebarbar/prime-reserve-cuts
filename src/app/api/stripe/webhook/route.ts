@@ -41,17 +41,9 @@ export async function POST(req: NextRequest) {
       const kind     = meta.kind === 'one_time' ? 'one_time' : 'subscription'
       const oneTime  = kind === 'one_time'
       const sessionId = session.id
-
-      // Idempotency guard — skip if this session was already processed
-      const existing = await query(
-        `SELECT id FROM orders WHERE stripe_session_id = $1`,
-        [sessionId]
-      ).catch(() => [] as { id: string }[])
-
-      if (existing.length > 0) {
-        console.log(`✓ Webhook already processed for session ${sessionId}, skipping`)
-        return NextResponse.json({ received: true })
-      }
+      const customerId = typeof meta.customer_id === 'string' ? meta.customer_id : null
+      // subscription mode → the Stripe subscription id (string); payment mode → null
+      const subscriptionId = typeof session.subscription === 'string' ? session.subscription : null
 
       // The actual amount Stripe charged, in dollars. For a subscription this is
       // the first weekly invoice (= the weekly total); for a one-time order it's
@@ -67,12 +59,34 @@ export async function POST(req: NextRequest) {
       nextDelivery.setDate(nextDelivery.getDate() + daysUntilSat)
       const deliveryDate = nextDelivery.toISOString().slice(0, 10)
 
-      // Save order
-      await query(`
-        INSERT INTO orders
-          (customer, email, building, unit, cut, price, kind, status, start_date, next_delivery, stripe_session_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', $8, $8, $9)
-      `, [name, email, building, unit, cut, price, kind, deliveryDate, sessionId])
+      // The checkout API pre-creates the order as 'pending'. Activate it here.
+      // If it's already active/completed this is a duplicate delivery → skip
+      // (idempotent). If no row exists (legacy path), insert one.
+      const [existing] = await query<{ id: string; status: string }>(
+        `SELECT id, status FROM orders WHERE stripe_session_id = $1`,
+        [sessionId],
+      ).catch(() => [] as { id: string; status: string }[])
+
+      if (existing && existing.status !== 'pending') {
+        console.log(`✓ Webhook already processed for session ${sessionId}, skipping`)
+        return NextResponse.json({ received: true })
+      }
+
+      if (existing) {
+        await query(
+          `UPDATE orders SET status = 'active', price = COALESCE(NULLIF($1, 0), price),
+             next_delivery = $2, start_date = $2, stripe_subscription_id = $3, updated_at = NOW()
+           WHERE id = $4`,
+          [price, deliveryDate, subscriptionId, existing.id],
+        )
+      } else {
+        await query(
+          `INSERT INTO orders
+            (customer, email, building, unit, cut, price, kind, status, start_date, next_delivery, customer_id, stripe_subscription_id, stripe_session_id)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', $8, $8, $9, $10, $11)`,
+          [name, email, building, unit, cut, price, kind, deliveryDate, customerId, subscriptionId, sessionId],
+        )
+      }
 
       // Mark lead converted
       await query(`

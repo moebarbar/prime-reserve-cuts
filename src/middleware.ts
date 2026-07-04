@@ -1,10 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifySessionToken } from '@/lib/adminSession'
+import { verifyCustomerToken, CUSTOMER_COOKIE } from '@/lib/customerSession'
 
 const ADMIN_USER = process.env.ADMIN_USER ?? 'admin'
 const ADMIN_PASS = process.env.ADMIN_PASS ?? ''
 
 const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_URL ?? ''
+
+// Customer self-service area. Login/signup/logout stay public; the account
+// APIs and dashboard pages require a valid customer session.
+function isProtectedCustomerRoute(pathname: string) {
+  if (pathname === '/account/login') return false
+  if (
+    pathname === '/api/account/login' ||
+    pathname === '/api/account/signup' ||
+    pathname === '/api/account/logout'
+  ) return false
+  return pathname.startsWith('/account') || pathname.startsWith('/api/account')
+}
 
 function isAdminRoute(pathname: string, method: string) {
   // Admin pages always protected
@@ -74,6 +87,26 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
+  // Customer self-service area (separate session from admin)
+  if (isProtectedCustomerRoute(pathname)) {
+    const token = req.cookies.get(CUSTOMER_COOKIE)?.value ?? ''
+    const customerId = token ? await verifyCustomerToken(token) : null
+    if (!customerId) {
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ error: 'Please sign in' }, { status: 401 })
+      }
+      const loginUrl = new URL('/account/login', req.url)
+      loginUrl.searchParams.set('next', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+    // CORS headers still applied below for API routes
+    if (pathname.startsWith('/api/')) {
+      const res = NextResponse.next()
+      return withCors(res, origin)
+    }
+    return NextResponse.next()
+  }
+
   // Protect admin pages and admin API routes
   if (isAdminRoute(pathname, req.method)) {
     if (!ADMIN_PASS) {
@@ -107,6 +140,7 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     '/admin/:path*',
+    '/account/:path*',
     '/api/:path*',
   ],
 }

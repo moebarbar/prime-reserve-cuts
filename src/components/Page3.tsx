@@ -12,6 +12,8 @@ interface FormData {
   lastName: string
   email: string
   phone: string
+  username: string
+  password: string
 }
 
 interface Page3Props {
@@ -64,6 +66,8 @@ export default function Page3({ building, selections, form, purchaseType, onPurc
           building:     building.name,
           unit:         form.unit,
           purchaseType,
+          username:     form.username,
+          password:     form.password,
         }),
       })
       const data = await res.json().catch(() => ({}))
