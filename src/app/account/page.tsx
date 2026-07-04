@@ -115,7 +115,14 @@ export default function AccountDashboard() {
     if (data) {
       setOrders(prev => prev.map(x => x.id === o.id ? { ...x, items: data.items ?? x.items, price: data.price ?? x.price, cut: data.cut ?? x.cut } : x))
       clearDirty(o.id)
-      if (!data.warning) setNotice(o.id, { kind: 'ok', text: 'Your delivery has been updated.' })
+      if (!data.warning) {
+        setNotice(o.id, {
+          kind: 'ok',
+          text: data.billingSynced
+            ? 'Updated — your next weekly invoice reflects the change.'
+            : 'Your delivery has been updated.',
+        })
+      }
     }
   }
   const skip = async (o: Order) => {
@@ -164,7 +171,8 @@ export default function AccountDashboard() {
         {manageable.map(o => {
           const total = lineTotal(o.items)
           const isSub = o.kind === 'subscription'
-          const editable = o.status === 'active' || o.status === 'paused'
+          // One-time orders are already paid — read-only (subscriptions are editable).
+          const editable = isSub && (o.status === 'active' || o.status === 'paused')
           const notAdded = products.filter(p => !o.items.some(i => i.name === p.name))
           const notice = notices[o.id]
           const busy = busyId === o.id
@@ -223,6 +231,12 @@ export default function AccountDashboard() {
               {notice && (
                 <div className={`${styles.notice} ${notice.kind === 'ok' ? styles.noticeOk : notice.kind === 'warn' ? styles.noticeWarn : styles.noticeErr}`}>
                   {notice.text}
+                </div>
+              )}
+
+              {!isSub && o.status !== 'pending' && (
+                <div className={`${styles.notice} ${styles.noticeWarn}`} style={{ marginTop: 16 }}>
+                  This is a one-time order and is already paid. Need to change or cancel it? Email us and we’ll sort it out.
                 </div>
               )}
 

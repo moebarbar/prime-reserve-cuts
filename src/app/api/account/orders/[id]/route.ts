@@ -51,48 +51,67 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   switch (action) {
     // ── Edit cuts / quantities ────────────────────────────────────────────────
     case 'setItems': {
+      // One-time orders are already paid — editing them would desync money from
+      // goods. Only recurring subscriptions can be re-sized here.
+      if (order.kind !== 'subscription') {
+        return NextResponse.json({ error: 'One-time orders can’t be edited. Contact us to change or refund it.' }, { status: 400 })
+      }
       if (!Array.isArray(body.items)) return NextResponse.json({ error: 'items must be an array' }, { status: 400 })
       const repriced = await repriceSelections(body.items as Array<{ name: unknown; qty: unknown }>)
       if (!repriced) return NextResponse.json({ error: 'Pick at least one available cut.' }, { status: 400 })
 
-      // Best-effort billing sync: update the live Stripe subscription's amount.
-      // DB stays authoritative so a Stripe hiccup never corrupts the order.
-      if (order.kind === 'subscription' && order.stripe_subscription_id) {
+      // Sync the live Stripe subscription's amount to the new weekly total.
+      // DB stays authoritative so a Stripe hiccup never corrupts the order; the
+      // response reports whether billing actually synced.
+      let billingSynced = false
+      if (order.stripe_subscription_id) {
         try {
           const sub = await stripe.subscriptions.retrieve(order.stripe_subscription_id)
-          const productId = await weeklyProductId()
-          // Replace all existing items with a single line billing the new weekly
-          // total. (Delete the extras, repoint the first.)
-          const [first, ...rest] = sub.items.data
-          if (first) {
-            await stripe.subscriptions.update(order.stripe_subscription_id, {
-              items: [
-                {
-                  id: first.id,
-                  price_data: {
-                    currency: 'usd',
-                    product: productId,
-                    unit_amount: Math.round(repriced.total * 100),
-                    recurring: { interval: 'week' },
+          const SYNCABLE = ['active', 'trialing', 'past_due', 'unpaid']
+          if (!SYNCABLE.includes(sub.status)) {
+            stripeWarning = `Saved. Billing wasn’t updated because the subscription is ${sub.status}.`
+          } else {
+            const productId = await weeklyProductId()
+            // Collapse to a single weekly line billing the new total (repoint the
+            // first item, delete the rest). The amount is what matters for billing.
+            const [first, ...rest] = sub.items.data
+            if (first) {
+              await stripe.subscriptions.update(order.stripe_subscription_id, {
+                items: [
+                  {
+                    id: first.id,
+                    price_data: {
+                      currency: 'usd',
+                      product: productId,
+                      unit_amount: Math.round(repriced.total * 100),
+                      recurring: { interval: 'week' },
+                    },
+                    quantity: 1,
                   },
-                  quantity: 1,
-                },
-                ...rest.map(it => ({ id: it.id, deleted: true as const })),
-              ],
-              proration_behavior: 'none',
-            })
+                  ...rest.map(it => ({ id: it.id, deleted: true as const })),
+                ],
+                proration_behavior: 'none', // new amount applies from the next weekly invoice
+              })
+              billingSynced = true
+            }
           }
         } catch (err) {
           console.error('Stripe subscription update failed:', err)
-          stripeWarning = 'Saved your changes. Billing update is syncing and will apply to your next invoice.'
+          stripeWarning = 'Saved your changes. Billing update didn’t sync — we’ll reconcile it before your next invoice.'
         }
+      } else {
+        // No Stripe subscription on file (e.g. legacy/demo order) — DB only.
+        stripeWarning = 'Saved your changes.'
       }
 
       await query(
         `UPDATE orders SET items = $1, cut = $2, price = $3, updated_at = NOW() WHERE id = $4`,
         [JSON.stringify(repriced.items), repriced.label, repriced.total, id],
       )
-      return NextResponse.json({ ok: true, items: repriced.items, price: repriced.total, cut: repriced.label, warning: stripeWarning })
+      return NextResponse.json({
+        ok: true, items: repriced.items, price: repriced.total, cut: repriced.label,
+        billingSynced, warning: stripeWarning,
+      })
     }
 
     // ── Skip the next delivery (push a week) ─────────────────────────────────
