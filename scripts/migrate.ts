@@ -177,6 +177,28 @@ async function run() {
   `)
   console.log('✓ orders table')
 
+  // ── CUSTOMERS (self-service accounts) ──────────────────────────────────────
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS customers (
+      id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      email         TEXT UNIQUE NOT NULL,
+      username      TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      name          TEXT NOT NULL DEFAULT '',
+      phone         TEXT,
+      building      TEXT NOT NULL DEFAULT '',
+      unit          TEXT NOT NULL DEFAULT '',
+      created_at    TIMESTAMPTZ DEFAULT NOW(),
+      updated_at    TIMESTAMPTZ DEFAULT NOW()
+    )
+  `)
+  // Link orders to accounts + structured, editable line items + the Stripe
+  // subscription id (so the dashboard can manage/cancel it).
+  await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_id UUID`)
+  await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS items JSONB NOT NULL DEFAULT '[]'`)
+  await pool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT`)
+  console.log('✓ customers table + order links')
+
   // ── SEED BUILDINGS ─────────────────────────────────────────────────────────
   await pool.query(`
     INSERT INTO buildings (key, name, name_html, nbhd, img, hero_img) VALUES
