@@ -11,11 +11,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const { name, grade, detail, weight, price, price_per_week, img, available, category } = body
+  const { name, grade, detail, weight, price, price_choice, price_per_week, img, available, category } = body
 
-  const cat = typeof category === 'string' && ['steak', 'slow_cook', 'daily'].includes(category)
+  const cat = typeof category === 'string' && ['automatic', 'special'].includes(category)
     ? category
-    : 'steak'
+    : 'automatic'
+  const choice = cat === 'automatic' && price_choice != null && Number(price_choice) > 0
+    ? Number(price_choice) : null
 
   try {
     const [product] = await query(`
@@ -25,14 +27,15 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
           detail         = $3,
           weight         = $4,
           price          = $5,
-          price_per_week = $6,
-          img            = $7,
-          available      = $8,
-          category       = $9,
+          price_choice   = $6,
+          price_per_week = $7,
+          img            = $8,
+          available      = $9,
+          category       = $10,
           updated_at     = NOW()
-      WHERE id = $10
+      WHERE id = $11
       RETURNING *
-    `, [name, grade, detail, weight ?? '', Number(price) || 0, Number(price_per_week) || 0, img ?? '', available !== false, cat, id])
+    `, [name, grade, detail, weight ?? '', Number(price) || 0, choice, Number(price_per_week) || 0, img ?? '', available !== false, cat, id])
 
     if (!product) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     return NextResponse.json(product)

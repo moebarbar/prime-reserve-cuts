@@ -23,7 +23,7 @@ import { SITE } from '@/data/site'
 const SITE_URL = 'https://automaticcow.com'
 const SITE_NAME = 'Automatic Cow'
 const TITLE = 'Automatic Cow — Weekly Local Beef Delivery in Houston'
-const DESC = 'Houston\'s weekly local beef membership. Steaks (Bone-in Ribeye, NY Strip, Filet, Sirloin, Round, Flank), Roasts & Brisket, and fresh Ground Beef — priced by the pound and delivered to your door every Saturday. Cancel anytime.'
+const DESC = 'Houston\'s weekly local beef membership. Automatic staples (Ground Beef 80/20, Ribeye, NY Strip, Sirloin, Round — Local or USDA Choice) plus special cuts (Filet, Brisket, Short Ribs, Fajita meat & more) — priced by the pound, delivered to your door every Saturday. Cancel anytime.'
 
 export const viewport: Viewport = {
   themeColor: '#0d0b08',
@@ -117,11 +117,11 @@ export const metadata: Metadata = {
 // Structured data is generated from the same canonical catalog the funnel uses
 // (src/data/products.ts) so prices in Google's rich results always match the
 // per-pound prices on the page. Each Product carries an exact-price Offer.
-const prices = PRODUCTS.map(p => p.pricePerLb)
+const prices = PRODUCTS.flatMap(p => p.priceChoice != null ? [p.pricePerLb, p.priceChoice] : [p.pricePerLb])
 const LOW_PRICE = Math.min(...prices).toFixed(2)
 const HIGH_PRICE = Math.max(...prices).toFixed(2)
 
-const catProductOffers = (catKey: 'steak' | 'slow_cook' | 'daily') =>
+const catProductOffers = (catKey: 'automatic' | 'special') =>
   productsByCategory(catKey).map(p => ({
     '@type': 'Offer',
     itemOffered: {

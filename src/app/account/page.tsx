@@ -4,7 +4,8 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './account.module.css'
 
-interface Item { name: string; pricePerLb: number; qty: number }
+type Grade = 'Local' | 'USDA Choice'
+interface Item { name: string; grade: Grade; pricePerLb: number; qty: number }
 interface Order {
   id: string
   kind: 'subscription' | 'one_time'
@@ -18,7 +19,8 @@ interface Order {
   start_date: string | null
 }
 interface Customer { username: string; name: string; email: string; building: string; unit: string }
-interface Product { name: string; pricePerLb: number }
+// One selectable option per (product, grade) — subscriptions only add automatic cuts.
+interface AddOption { key: string; name: string; grade: Grade; pricePerLb: number }
 
 type Notice = { kind: 'ok' | 'warn' | 'err'; text: string }
 
@@ -37,7 +39,7 @@ export default function AccountDashboard() {
   const router = useRouter()
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [orders, setOrders] = useState<Order[]>([])
-  const [products, setProducts] = useState<Product[]>([])
+  const [addOptions, setAddOptions] = useState<AddOption[]>([])
   const [dirty, setDirty] = useState<Set<string>>(new Set())
   const [busyId, setBusyId] = useState<string | null>(null)
   const [notices, setNotices] = useState<Record<string, Notice>>({})
@@ -58,12 +60,19 @@ export default function AccountDashboard() {
 
   useEffect(() => { load() }, [load])
   useEffect(() => {
-    fetch('/api/products').then(r => r.json()).then((rows: Array<{ name: string; price: number | string; available: boolean }>) => {
-      if (Array.isArray(rows)) {
-        setProducts(rows.filter(r => r.available).map(r => ({ name: r.name, pricePerLb: Number(r.price) || 0 })))
-      }
+    fetch('/api/products').then(r => r.json()).then((rows: Array<{ name: string; price: number | string; price_choice: number | string | null; available: boolean; category: string }>) => {
+      if (!Array.isArray(rows)) return
+      // Subscriptions hold only automatic cuts — offer each in Local + USDA Choice.
+      const opts: AddOption[] = []
+      rows.filter(r => r.available && r.category === 'automatic').forEach(r => {
+        opts.push({ key: `${r.name}||Local`, name: r.name, grade: 'Local', pricePerLb: Number(r.price) || 0 })
+        if (r.price_choice != null) opts.push({ key: `${r.name}||USDA Choice`, name: r.name, grade: 'USDA Choice', pricePerLb: Number(r.price_choice) || 0 })
+      })
+      setAddOptions(opts)
     }).catch(() => {})
   }, [])
+
+  const itemKey = (i: { name: string; grade: Grade }) => `${i.name}||${i.grade}`
 
   const markDirty = (id: string) => setDirty(prev => new Set(prev).add(id))
   const clearDirty = (id: string) => setDirty(prev => { const n = new Set(prev); n.delete(id); return n })
@@ -74,18 +83,20 @@ export default function AccountDashboard() {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, items: updater(o.items) } : o))
     markDirty(id); setNotice(id, null)
   }
-  const setQty = (id: string, name: string, qty: number) => {
+  const setQty = (id: string, key: string, qty: number) => {
     if (qty < 1 || qty > 20) return
-    patchItems(id, items => items.map(i => i.name === name ? { ...i, qty } : i))
+    patchItems(id, items => items.map(i => itemKey(i) === key ? { ...i, qty } : i))
   }
-  const removeItem = (id: string, name: string) =>
-    patchItems(id, items => items.filter(i => i.name !== name))
+  const removeItem = (id: string, key: string) =>
+    patchItems(id, items => items.filter(i => itemKey(i) !== key))
   const addItem = (id: string) => {
-    const name = addSel[id]
-    if (!name) return
-    const p = products.find(pr => pr.name === name)
-    if (!p) return
-    patchItems(id, items => items.some(i => i.name === name) ? items : [...items, { name, pricePerLb: p.pricePerLb, qty: 1 }])
+    const key = addSel[id]
+    if (!key) return
+    const opt = addOptions.find(o => o.key === key)
+    if (!opt) return
+    patchItems(id, items => items.some(i => itemKey(i) === key)
+      ? items
+      : [...items, { name: opt.name, grade: opt.grade, pricePerLb: opt.pricePerLb, qty: 1 }])
     setAddSel(prev => ({ ...prev, [id]: '' }))
   }
 
@@ -111,7 +122,7 @@ export default function AccountDashboard() {
   }
 
   const save = async (o: Order) => {
-    const data = await act(o.id, 'setItems', { items: o.items.map(i => ({ name: i.name, qty: i.qty })) })
+    const data = await act(o.id, 'setItems', { items: o.items.map(i => ({ name: i.name, grade: i.grade, qty: i.qty })) })
     if (data) {
       setOrders(prev => prev.map(x => x.id === o.id ? { ...x, items: data.items ?? x.items, price: data.price ?? x.price, cut: data.cut ?? x.cut } : x))
       clearDirty(o.id)
@@ -173,7 +184,7 @@ export default function AccountDashboard() {
           const isSub = o.kind === 'subscription'
           // One-time orders are already paid — read-only (subscriptions are editable).
           const editable = isSub && (o.status === 'active' || o.status === 'paused')
-          const notAdded = products.filter(p => !o.items.some(i => i.name === p.name))
+          const notAdded = addOptions.filter(op => !o.items.some(i => itemKey(i) === op.key))
           const notice = notices[o.id]
           const busy = busyId === o.id
           return (
@@ -193,17 +204,18 @@ export default function AccountDashboard() {
               <div className={styles.items}>
                 {o.items.length === 0 && <div className={styles.meta}>No cuts in this delivery yet — add one below.</div>}
                 {o.items.map(i => (
-                  <div key={i.name} className={styles.item}>
+                  <div key={itemKey(i)} className={styles.item}>
                     <div>
                       <span className={styles.itemName}>{i.name}</span>
+                      {i.grade === 'USDA Choice' && <span className={styles.itemGrade}>USDA Choice</span>}
                       <span className={styles.itemPer}>{money(i.pricePerLb)}/lb</span>
                     </div>
                     {editable ? (
                       <div className={styles.qty}>
-                        <button className={styles.qbtn} onClick={() => setQty(o.id, i.name, i.qty - 1)} disabled={i.qty <= 1} aria-label={`Decrease ${i.name}`}>−</button>
+                        <button className={styles.qbtn} onClick={() => setQty(o.id, itemKey(i), i.qty - 1)} disabled={i.qty <= 1} aria-label={`Decrease ${i.name}`}>−</button>
                         <span className={styles.qval}>{i.qty} lb</span>
-                        <button className={styles.qbtn} onClick={() => setQty(o.id, i.name, i.qty + 1)} disabled={i.qty >= 20} aria-label={`Increase ${i.name}`}>+</button>
-                        <button className={styles.remove} onClick={() => removeItem(o.id, i.name)} aria-label={`Remove ${i.name}`}>×</button>
+                        <button className={styles.qbtn} onClick={() => setQty(o.id, itemKey(i), i.qty + 1)} disabled={i.qty >= 20} aria-label={`Increase ${i.name}`}>+</button>
+                        <button className={styles.remove} onClick={() => removeItem(o.id, itemKey(i))} aria-label={`Remove ${i.name}`}>×</button>
                       </div>
                     ) : (
                       <div className={styles.qval}>{i.qty} lb</div>
@@ -217,7 +229,11 @@ export default function AccountDashboard() {
                 <div className={styles.addRow}>
                   <select className={styles.addSelect} value={addSel[o.id] ?? ''} onChange={e => setAddSel(prev => ({ ...prev, [o.id]: e.target.value }))}>
                     <option value="">+ Add a cut…</option>
-                    {notAdded.map(p => <option key={p.name} value={p.name}>{p.name} — {money(p.pricePerLb)}/lb</option>)}
+                    {notAdded.map(op => (
+                      <option key={op.key} value={op.key}>
+                        {op.name}{op.grade === 'USDA Choice' ? ' · USDA Choice' : ''} — {money(op.pricePerLb)}/lb
+                      </option>
+                    ))}
                   </select>
                   <button className={styles.addBtn} onClick={() => addItem(o.id)} disabled={!addSel[o.id]}>Add</button>
                 </div>

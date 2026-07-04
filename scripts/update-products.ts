@@ -1,15 +1,16 @@
 /**
  * One-shot product refresh — point an EXISTING database at the current
- * per-pound catalog (the exact lineup the client signed off on).
+ * two-collection catalog.
  *
  *   npx tsx scripts/update-products.ts
  *
  * What it does:
- *   1. Widens the price / price_per_week columns to NUMERIC (decimals for $/lb)
- *   2. Replaces every product row with the 9-item per-pound catalog below
+ *   1. Ensures decimal price columns + the price_choice (USDA Choice) column
+ *   2. Moves the category CHECK to ('automatic','special')
+ *   3. Replaces every product row with the catalog below
  *
- * Safe to run more than once — it always converges to exactly these 9 products.
- * Orders reference cuts by text (no foreign key), so replacing products is safe.
+ * Prices are market-competitive PLACEHOLDERS — adjust in the admin before launch.
+ * Safe to re-run; orders reference cuts by text (no FK), so replacing is safe.
  */
 import { Pool } from 'pg'
 import * as dotenv from 'dotenv'
@@ -22,40 +23,51 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 })
 
-// name, grade, detail, price/lb, img, category
-const PRODUCTS: [string, string, string, number, string, string][] = [
-  ['Bone-in Ribeye',        'Local Beef', 'Bone-in · richly marbled',              31.99, '/ribeye-raw.jpg',                                                                              'steak'],
-  ['New York Strip',        'Local Beef', 'Firm, classic steakhouse cut',          27.99, '/ny-strip-raw.jpg',                                                                            'steak'],
-  ['Filet',                 'Local Beef', 'Center-cut tenderloin · butter-tender', 39.99, '/tenderloin-raw.jpg',                                                                          'steak'],
-  ['Sirloin',               'Local Beef', 'Lean & beefy · quick weeknight sear',   19.99, 'https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80&fit=crop&crop=center',    'steak'],
-  ['Round Steak / Cutlets', 'Local Beef', 'Thin-sliced · cutlets & milanesa',      14.99, 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80&fit=crop&crop=center', 'steak'],
-  ['Flank / Skirt',         'Local Beef', 'Bold grain · fajitas & stir-fry',       24.99, 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop&crop=center',    'steak'],
-  ['Roasts',                'Local Beef', 'Sunday pot roast · low and slow',       14.99, '/roasts-raw.jpg',                                                              'slow_cook'],
-  ['Brisket',               'Local Beef', 'The heart of Texas BBQ',                14.99, '/brisket-raw.jpg',                                                              'slow_cook'],
-  ['Ground Beef',           'Local Beef', 'Fresh-ground · the everyday staple',    12.99, '/ground-beef-raw.jpg',                                                              'daily'],
+// name, detail, priceLocal, priceChoice (null = Local-only), img, category
+type Row = [string, string, number, number | null, string, 'automatic' | 'special']
+const UNSPLASH_SIRLOIN = 'https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80&fit=crop&crop=center'
+const UNSPLASH_ROUND   = 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80&fit=crop&crop=center'
+const UNSPLASH_FLANK   = 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop&crop=center'
+
+const PRODUCTS: Row[] = [
+  ['Ground Beef 80/20',     'Fresh-ground 80/20 · the everyday staple',  8.99, 10.99, '/ground-beef-raw.jpg', 'automatic'],
+  ['Ribeye',                'Richly marbled · the weekend centerpiece', 18.99, 23.99, '/ribeye-raw.jpg',      'automatic'],
+  ['New York Strip',        'Firm, classic steakhouse cut',             16.99, 20.99, '/ny-strip-raw.jpg',    'automatic'],
+  ['Sirloin',               'Lean & beefy · quick weeknight sear',      11.99, 14.99, UNSPLASH_SIRLOIN,       'automatic'],
+  ['Round Steak / Cutlets', 'Thin-sliced · cutlets & milanesa',          9.99, 11.99, UNSPLASH_ROUND,        'automatic'],
+  ['Filet',                 'Center-cut tenderloin · butter-tender',    26.99, null,  '/tenderloin-raw.jpg',  'special'],
+  ['Roasts',                'Sunday pot roast · low and slow',          10.99, null,  '/roasts-raw.jpg',      'special'],
+  ['Burger Patties',        'Hand-pressed · grill-ready',                9.99, null,  '/ground-beef-raw.jpg', 'special'],
+  ['Stew Meat',             'Cubed & trimmed · low-and-slow braises',    8.99, null,  '/brisket-raw.jpg',     'special'],
+  ['Fajita Steak Meat',     'Marinade-ready · sizzling fajitas',        12.99, null,  UNSPLASH_FLANK,         'special'],
+  ['Beef Short Ribs',       'Meaty & rich · braise or BBQ',             11.99, null,  '/roasts-raw.jpg',      'special'],
+  ['Brisket',               'The heart of Texas BBQ',                    9.99, null,  '/brisket-raw.jpg',     'special'],
+  ['Flank / Skirt',         'Bold grain · fajitas & stir-fry',          15.99, null,  UNSPLASH_FLANK,         'special'],
 ]
 
 async function run() {
-  console.log('🐄 Automatic Cow — refreshing products to the per-pound catalog...\n')
+  console.log('🐄 Automatic Cow — refreshing products to the two-collection catalog...\n')
 
-  // 1. Decimal-safe price columns
   await pool.query(`ALTER TABLE products ALTER COLUMN price TYPE NUMERIC(8,2)`)
   await pool.query(`ALTER TABLE products ALTER COLUMN price_per_week TYPE NUMERIC(8,2)`)
-  console.log('✓ price columns are NUMERIC')
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS price_choice NUMERIC(8,2)`)
+  console.log('✓ price columns ready (incl. price_choice)')
 
-  // 2. Replace all products with the canonical lineup (transactional)
   const client = await pool.connect()
   try {
     await client.query('BEGIN')
+    await client.query(`ALTER TABLE products DROP CONSTRAINT IF EXISTS products_category_check`)
     await client.query('DELETE FROM products')
-    for (const [name, grade, detail, price, img, category] of PRODUCTS) {
+    for (const [name, detail, price, priceChoice, img, category] of PRODUCTS) {
       await client.query(
-        `INSERT INTO products (name, grade, detail, weight, price, price_per_week, img, available, category)
-         VALUES ($1, $2, $3, '', $4, $4, $5, TRUE, $6)`,
-        [name, grade, detail, price, img, category],
+        `INSERT INTO products (name, grade, detail, weight, price, price_choice, price_per_week, img, available, category)
+         VALUES ($1, 'Local', $2, '', $3, $4, $3, $5, TRUE, $6)`,
+        [name, detail, price, priceChoice, img, category],
       )
-      console.log(`  + ${name} — $${price.toFixed(2)}/lb (${category})`)
+      const tag = priceChoice != null ? `$${price.toFixed(2)}/$${priceChoice.toFixed(2)}` : `$${price.toFixed(2)}`
+      console.log(`  + ${name} — ${tag}/lb (${category})`)
     }
+    await client.query(`ALTER TABLE products ADD CONSTRAINT products_category_check CHECK (category IN ('automatic','special'))`)
     await client.query('COMMIT')
   } catch (err) {
     await client.query('ROLLBACK')
@@ -64,7 +76,7 @@ async function run() {
     client.release()
   }
 
-  console.log(`\n✅ Done. ${PRODUCTS.length} products live, priced per pound.`)
+  console.log(`\n✅ Done. ${PRODUCTS.length} products live (placeholder pricing).`)
   await pool.end()
 }
 

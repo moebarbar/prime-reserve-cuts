@@ -109,7 +109,18 @@
 .ccName { font-family: var(--font-cormorant), serif; font-size: 17px; font-weight: 300; color: var(--cream); margin-bottom: 2px; }
 .ccDetail { font-size: 10px; color: var(--muted); line-height: 1.5; }
 .ccWeight { font-size: 9px; color: var(--gold); opacity: .8; margin-top: 4px; }
-.ccRight { padding: 13px 14px; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; flex-shrink: 0; min-width: 90px; }
+.ccRight { padding: 13px 14px; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 6px; flex-shrink: 0; min-width: 116px; }
+.ccFrom { font-size: 8px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); text-align: right; }
+
+/* Local / USDA Choice grade toggle (automatic products) */
+.gradeToggle { display: flex; gap: 4px; }
+.gradeBtn {
+  font-size: 8.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  padding: 5px 8px; border: 1px solid var(--border); background: transparent; color: var(--muted);
+  border-radius: 6px; cursor: pointer; transition: all .15s; touch-action: manipulation;
+}
+.gradeBtn:hover { border-color: rgba(184,134,58,.5); }
+.gradeBtnOn { border-color: var(--gold); color: var(--gold); background: rgba(184,134,58,.12); }
 
 /* qty control */
 .qtyCtrl { display: flex; align-items: center; gap: 8px; }

@@ -7,28 +7,35 @@ const OPTIONS: { val: PurchaseType; label: string; sub: string }[] = [
   { val: 'one_time', label: 'One-time order', sub: 'Just this once' },
 ]
 
-/** Clean segmented control: subscribe weekly vs buy once. Shared by Step 2 + Step 3. */
+/** Clean segmented control: subscribe weekly vs buy once. Shared by Step 2 + Step 3.
+ *  `disableSubscription` greys out the weekly option (used when the cart holds a
+ *  Special cut, which is one-time only). */
 export default function PurchaseTypeToggle({
   value,
   onChange,
+  disableSubscription = false,
 }: {
   value: PurchaseType
   onChange: (v: PurchaseType) => void
+  disableSubscription?: boolean
 }) {
   return (
     <div style={{ display: 'flex', gap: 8 }}>
       {OPTIONS.map(({ val, label, sub }) => {
         const sel = value === val
+        const disabled = disableSubscription && val === 'subscription'
         return (
           <button
             key={val}
             type="button"
-            onClick={() => onChange(val)}
+            onClick={() => { if (!disabled) onChange(val) }}
             aria-pressed={sel}
+            disabled={disabled}
             style={{
               flex: 1,
               textAlign: 'left',
-              cursor: 'pointer',
+              cursor: disabled ? 'not-allowed' : 'pointer',
+              opacity: disabled ? 0.4 : 1,
               padding: '12px 14px',
               borderRadius: 10,
               border: `1px solid ${sel ? 'var(--gold)' : 'var(--border)'}`,

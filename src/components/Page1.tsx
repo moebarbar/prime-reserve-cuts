@@ -15,37 +15,26 @@ interface Page1Props {
 
 const CATEGORIES = [
   {
-    key: 'slow_cook',
-    src: '/brisket-raw.jpg',
-    name: 'Roasts / Slow Cuts',
-    sub: 'Roasts · Brisket',
-    grade: 'Local Beef',
-    price: 'from $14.99/lb',
-    featured: false,
-    intro: 'Low. Slow. Worth the wait.',
-    items: ['Roasts', 'Brisket'],
-  },
-  {
-    key: 'steak',
+    key: 'automatic',
     src: '/ribeye-raw.jpg',
-    name: 'Steaks',
-    sub: 'Ribeye · NY Strip · Filet · Sirloin',
-    grade: 'Local Beef',
-    price: 'from $14.99/lb',
+    name: 'Automatic',
+    sub: 'Subscribe weekly or buy once',
+    grade: 'Local or USDA Choice',
+    price: 'from $8.99/lb',
     featured: true,
-    intro: 'Sear hot. Rest patient. Serve proud.',
-    items: ['Bone-in Ribeye', 'New York Strip', 'Filet', 'Sirloin', 'Round Steak / Cutlets', 'Flank / Skirt'],
+    intro: 'Your weekly staples, on repeat. Set it and forget it.',
+    items: ['Ground Beef 80/20', 'Ribeye', 'New York Strip', 'Sirloin', 'Round Steak / Cutlets'],
   },
   {
-    key: 'ground',
-    src: '/ground-beef-raw.jpg',
-    name: 'Ground Beef',
-    sub: 'Fresh-ground, by the pound',
-    grade: 'Local Beef',
-    price: '$12.99/lb',
+    key: 'special',
+    src: '/brisket-raw.jpg',
+    name: 'Special Cuts',
+    sub: 'One-time only · Local',
+    grade: 'Local',
+    price: 'from $8.99/lb',
     featured: false,
-    intro: 'Always in the fridge. Always reaching for it.',
-    items: ['Ground Beef'],
+    intro: 'The à-la-carte cuts — order them whenever the craving hits.',
+    items: ['Filet', 'Roasts', 'Burger Patties', 'Stew Meat', 'Fajita Steak Meat', 'Beef Short Ribs', 'Brisket', 'Flank / Skirt'],
   },
 ] as const
 
@@ -181,7 +170,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
           The Selection
         </div>
         <h2 className={styles.cutsTitle}>
-          Three categories.<br /><em>One standard.</em>
+          Two collections.<br /><em>One standard.</em>
         </h2>
         <p className={styles.cutsLead}>
           From the weekend ribeye to the everyday ground beef — local beef, priced by the

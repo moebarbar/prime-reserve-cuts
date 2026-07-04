@@ -7,7 +7,7 @@ import { itemsLabel, itemsTotal, type OrderItem } from '@/lib/orderItems'
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL ?? 'http://localhost:3000'
 
-interface Selection { name: string; qty: number }
+interface Selection { name: string; qty: number; grade?: 'Local' | 'USDA Choice' }
 
 // The upcoming Saturday (delivery day) as YYYY-MM-DD.
 function nextSaturday(): string {
@@ -124,25 +124,39 @@ export async function POST(req: NextRequest) {
     quantity: number
   }[] = []
   const items: OrderItem[] = []
+  let hasSpecial = false
   for (const sel of selections as Selection[]) {
-    const [product] = await query<{ price: number | string }>(
-      `SELECT price FROM products WHERE name = $1 AND available = true LIMIT 1`,
+    const [product] = await query<{ price: number | string; price_choice: number | string | null; category: string }>(
+      `SELECT price, price_choice, category FROM products WHERE name = $1 AND available = true LIMIT 1`,
       [sel.name],
-    ).catch(() => [] as { price: number | string }[])
-    const pricePerLb = product ? Number(product.price) : NaN
+    ).catch(() => [] as { price: number | string; price_choice: number | string | null; category: string }[])
+    if (!product) {
+      return NextResponse.json({ error: `Unavailable product "${sel.name}"` }, { status: 400 })
+    }
+    const local = Number(product.price)
+    const choice = product.price_choice != null ? Number(product.price_choice) : NaN
+    // USDA Choice only when the product offers it (automatic products).
+    const grade = sel.grade === 'USDA Choice' && Number.isFinite(choice) && choice > 0 ? 'USDA Choice' : 'Local'
+    const pricePerLb = grade === 'USDA Choice' ? choice : local
     if (!Number.isFinite(pricePerLb) || pricePerLb <= 0) {
       return NextResponse.json({ error: `Unavailable product "${sel.name}"` }, { status: 400 })
     }
-    items.push({ name: sel.name, pricePerLb, qty: sel.qty })
+    if (product.category === 'special') hasSpecial = true
+    items.push({ name: sel.name, grade, pricePerLb, qty: sel.qty })
     line_items.push({
       price_data: {
         currency: 'usd',
-        product_data: { name: `${sel.name} (per lb)` },
+        product_data: { name: `${sel.name}${grade === 'USDA Choice' ? ' (USDA Choice)' : ''} (per lb)` },
         unit_amount: Math.round(pricePerLb * 100),
         ...(isSubscription ? { recurring: { interval: 'week' as const } } : {}),
       },
       quantity: sel.qty,
     })
+  }
+
+  // Special cuts are one-time only — never let one ride on a weekly subscription.
+  if (hasSpecial && isSubscription) {
+    return NextResponse.json({ error: 'Special cuts are one-time only. Switch to a one-time order to include them.' }, { status: 400 })
   }
 
   const cutLabel = itemsLabel(items)

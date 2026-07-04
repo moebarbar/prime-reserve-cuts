@@ -70,7 +70,7 @@
 
 /* STEAK STRIP */
 .steakStrip {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  display: grid; grid-template-columns: 1fr 1fr;
   height: 440px; background: #0a0806;
   border-top: 1px solid rgba(184,134,58,0.08);
   border-bottom: 1px solid rgba(184,134,58,0.08);
@@ -318,7 +318,7 @@
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   .heroContent { padding: 0 24px 32px; }
-  .steakStrip { grid-template-columns: 1fr 1fr 1fr; height: auto; }
+  .steakStrip { grid-template-columns: 1fr 1fr; height: auto; }
   .sc { height: 320px; }
   .scFeatured { height: 320px; }
   .scFeatured .scName { font-size: 22px; }

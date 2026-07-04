@@ -4,6 +4,7 @@ import { useState } from 'react'
 import styles from './page3.module.css'
 import { Building } from '@/data/buildings'
 import { CutSelection } from './Page2'
+import { priceFor } from '@/data/products'
 import PurchaseTypeToggle, { type PurchaseType } from '@/components/PurchaseTypeToggle'
 
 interface FormData {
@@ -30,7 +31,9 @@ export default function Page3({ building, selections, form, purchaseType, onPurc
   const [processing, setProcessing] = useState(false)
   const [payError, setPayError] = useState<string | null>(null)
   const isSub = purchaseType === 'subscription'
-  const weeklyTotal = selections.reduce((sum, s) => sum + s.cut.pricePerLb * s.qty, 0)
+  const effPrice = (s: CutSelection) => priceFor(s.cut, s.grade)
+  const hasSpecial = selections.some(s => s.cut.category === 'special')
+  const weeklyTotal = selections.reduce((sum, s) => sum + effPrice(s) * s.qty, 0)
   const money = (n: number) => `$${n.toFixed(2)}`
   const firstCut = selections[0]?.cut
 
@@ -62,7 +65,7 @@ export default function Page3({ building, selections, form, purchaseType, onPurc
         body: JSON.stringify({
           name:         `${form.firstName} ${form.lastName}`.trim(),
           email:        form.email,
-          selections:   selections.map(s => ({ name: s.cut.name, qty: s.qty })),
+          selections:   selections.map(s => ({ name: s.cut.name, qty: s.qty, grade: s.grade })),
           building:     building.name,
           unit:         form.unit,
           purchaseType,
@@ -106,7 +109,7 @@ export default function Page3({ building, selections, form, purchaseType, onPurc
 
           {/* Purchase type — subscribe weekly or buy once (shared with Step 2) */}
           <div style={{ margin: '0 0 18px' }}>
-            <PurchaseTypeToggle value={purchaseType} onChange={onPurchaseTypeChange} />
+            <PurchaseTypeToggle value={purchaseType} onChange={onPurchaseTypeChange} disableSubscription={hasSpecial} />
           </div>
 
           {/* Order card */}
@@ -119,7 +122,7 @@ export default function Page3({ building, selections, form, purchaseType, onPurc
               <div className={styles.ocInfo}>
                 <div className={styles.ocBld}>{building.name}</div>
                 <div className={styles.ocCut}>
-                  {selections.map(s => `${s.cut.name} ×${s.qty}lb`).join(', ')}
+                  {selections.map(s => `${s.cut.name}${s.grade === 'USDA Choice' ? ' (Choice)' : ''} ×${s.qty}lb`).join(', ')}
                 </div>
                 <div className={styles.ocDetail}>
                   {isSub ? 'Local beef · weekly delivery · cancel anytime' : 'Local beef · one-time delivery'}
@@ -133,8 +136,8 @@ export default function Page3({ building, selections, form, purchaseType, onPurc
             <div className={styles.ocRows}>
               {selections.map(s => (
                 <div key={s.cut.name} className={styles.orow}>
-                  <span>{s.cut.name} × {s.qty} lb <span style={{ color: 'var(--muted)', fontSize: 10 }}>({money(s.cut.pricePerLb)}/lb)</span></span>
-                  <span>{money(s.cut.pricePerLb * s.qty)}</span>
+                  <span>{s.cut.name}{s.grade === 'USDA Choice' ? ' (USDA Choice)' : ''} × {s.qty} lb <span style={{ color: 'var(--muted)', fontSize: 10 }}>({money(effPrice(s))}/lb)</span></span>
+                  <span>{money(effPrice(s) * s.qty)}</span>
                 </div>
               ))}
               <div className={styles.orow}><span>Unit</span><span>{form.unit || '—'}</span></div>

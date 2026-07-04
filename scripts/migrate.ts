@@ -43,10 +43,11 @@ async function run() {
       detail         TEXT NOT NULL,
       weight         TEXT NOT NULL DEFAULT '',
       price          NUMERIC(8,2) NOT NULL,
+      price_choice   NUMERIC(8,2),
       price_per_week NUMERIC(8,2) NOT NULL DEFAULT 0,
       img            TEXT NOT NULL DEFAULT '',
-      category       TEXT NOT NULL DEFAULT 'steak'
-                       CHECK (category IN ('steak','slow_cook','daily')),
+      category       TEXT NOT NULL DEFAULT 'automatic'
+                       CHECK (category IN ('automatic','special')),
       available      BOOLEAN DEFAULT TRUE,
       created_at     TIMESTAMPTZ DEFAULT NOW(),
       updated_at     TIMESTAMPTZ DEFAULT NOW()
@@ -54,21 +55,18 @@ async function run() {
   `)
   await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS weight TEXT NOT NULL DEFAULT ''`)
   await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS price_per_week NUMERIC(8,2) NOT NULL DEFAULT 0`)
-  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT 'steak'`)
+  // USDA Choice price for automatic products (NULL for Local-only special cuts)
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS price_choice NUMERIC(8,2)`)
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT 'automatic'`)
   // Per-pound pricing needs decimals — widen the legacy INTEGER price columns (idempotent)
   await pool.query(`ALTER TABLE products ALTER COLUMN price TYPE NUMERIC(8,2)`)
   await pool.query(`ALTER TABLE products ALTER COLUMN price_per_week TYPE NUMERIC(8,2)`)
-  // Add the CHECK constraint only if it doesn't already exist (idempotent)
-  await pool.query(`
-    DO $$ BEGIN
-      IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint WHERE conname = 'products_category_check'
-      ) THEN
-        ALTER TABLE products ADD CONSTRAINT products_category_check
-          CHECK (category IN ('steak','slow_cook','daily'));
-      END IF;
-    END $$;
-  `)
+  // Move to the two-collection model: drop the old CHECK, map any legacy
+  // categories to 'special', then assert the new CHECK. (Production refreshes the
+  // catalog via scripts/update-products.sql, which wipes + reinserts.)
+  await pool.query(`ALTER TABLE products DROP CONSTRAINT IF EXISTS products_category_check`)
+  await pool.query(`UPDATE products SET category = 'special' WHERE category NOT IN ('automatic','special')`)
+  await pool.query(`ALTER TABLE products ADD CONSTRAINT products_category_check CHECK (category IN ('automatic','special'))`)
   console.log('✓ products table')
 
   // ── LEADS ──────────────────────────────────────────────────────────────────
@@ -213,28 +211,30 @@ async function run() {
   console.log('✓ buildings seeded')
 
   // ── SEED PRODUCTS ──────────────────────────────────────────────────────────
-  // Per-pound catalog. `price` is the price per pound (also mirrored into
-  // price_per_week). Only seeds a fresh products table; to refresh an existing
-  // database to this exact lineup run scripts/update-products.ts.
+  // Two collections: 'automatic' (Local + USDA Choice via price_choice) and
+  // 'special' (Local only). Prices are market-competitive PLACEHOLDERS. Only
+  // seeds a fresh products table; to refresh an existing DB run
+  // scripts/update-products.ts (or scripts/update-products.sql).
   await pool.query(`
-    INSERT INTO products (name, grade, detail, weight, price, price_per_week, img, available, category)
+    INSERT INTO products (name, grade, detail, weight, price, price_choice, price_per_week, img, available, category)
     SELECT * FROM (VALUES
-      ('Bone-in Ribeye',        'Local Beef', 'Bone-in · richly marbled',             '', 31.99, 31.99, '/ribeye-raw.jpg',                                                                                  TRUE, 'steak'),
-      ('New York Strip',        'Local Beef', 'Firm, classic steakhouse cut',         '', 27.99, 27.99, '/ny-strip-raw.jpg',                                                                                TRUE, 'steak'),
-      ('Filet',                 'Local Beef', 'Center-cut tenderloin · butter-tender','', 39.99, 39.99, '/tenderloin-raw.jpg',                                                                              TRUE, 'steak'),
-      ('Sirloin',               'Local Beef', 'Lean & beefy · quick weeknight sear',  '', 19.99, 19.99, 'https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80&fit=crop&crop=center',        TRUE, 'steak'),
-      ('Round Steak / Cutlets', 'Local Beef', 'Thin-sliced · cutlets & milanesa',     '', 14.99, 14.99, 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80&fit=crop&crop=center',     TRUE, 'steak'),
-      ('Flank / Skirt',         'Local Beef', 'Bold grain · fajitas & stir-fry',      '', 24.99, 24.99, 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop&crop=center',        TRUE, 'steak'),
-      ('Roasts',                'Local Beef', 'Sunday pot roast · low and slow',      '', 14.99, 14.99, '/roasts-raw.jpg',                                                                  TRUE, 'slow_cook'),
-      ('Brisket',               'Local Beef', 'The heart of Texas BBQ',               '', 14.99, 14.99, '/brisket-raw.jpg',                                                                  TRUE, 'slow_cook'),
-      ('Ground Beef',           'Local Beef', 'Fresh-ground · the everyday staple',   '', 12.99, 12.99, '/ground-beef-raw.jpg',                                                                  TRUE, 'daily')
-    ) AS v(name, grade, detail, weight, price, price_per_week, img, available, category)
+      ('Ground Beef 80/20',     'Local', 'Fresh-ground 80/20 · the everyday staple', '',  8.99, 10.99,  8.99, '/ground-beef-raw.jpg',                                                                            TRUE, 'automatic'),
+      ('Ribeye',                'Local', 'Richly marbled · the weekend centerpiece', '', 18.99, 23.99, 18.99, '/ribeye-raw.jpg',                                                                                 TRUE, 'automatic'),
+      ('New York Strip',        'Local', 'Firm, classic steakhouse cut',             '', 16.99, 20.99, 16.99, '/ny-strip-raw.jpg',                                                                               TRUE, 'automatic'),
+      ('Sirloin',               'Local', 'Lean & beefy · quick weeknight sear',      '', 11.99, 14.99, 11.99, 'https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80&fit=crop&crop=center',       TRUE, 'automatic'),
+      ('Round Steak / Cutlets', 'Local', 'Thin-sliced · cutlets & milanesa',         '',  9.99, 11.99,  9.99, 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80&fit=crop&crop=center',    TRUE, 'automatic'),
+      ('Filet',                 'Local', 'Center-cut tenderloin · butter-tender',    '', 26.99, NULL,  26.99, '/tenderloin-raw.jpg',                                                                             TRUE, 'special'),
+      ('Roasts',                'Local', 'Sunday pot roast · low and slow',          '', 10.99, NULL,  10.99, '/roasts-raw.jpg',                                                                                 TRUE, 'special'),
+      ('Burger Patties',        'Local', 'Hand-pressed · grill-ready',               '',  9.99, NULL,   9.99, '/ground-beef-raw.jpg',                                                                            TRUE, 'special'),
+      ('Stew Meat',             'Local', 'Cubed & trimmed · low-and-slow braises',   '',  8.99, NULL,   8.99, '/brisket-raw.jpg',                                                                                TRUE, 'special'),
+      ('Fajita Steak Meat',     'Local', 'Marinade-ready · sizzling fajitas',        '', 12.99, NULL,  12.99, 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop&crop=center',       TRUE, 'special'),
+      ('Beef Short Ribs',       'Local', 'Meaty & rich · braise or BBQ',             '', 11.99, NULL,  11.99, '/roasts-raw.jpg',                                                                                 TRUE, 'special'),
+      ('Brisket',               'Local', 'The heart of Texas BBQ',                   '',  9.99, NULL,   9.99, '/brisket-raw.jpg',                                                                                TRUE, 'special'),
+      ('Flank / Skirt',         'Local', 'Bold grain · fajitas & stir-fry',          '', 15.99, NULL,  15.99, 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop&crop=center',       TRUE, 'special')
+    ) AS v(name, grade, detail, weight, price, price_choice, price_per_week, img, available, category)
     WHERE NOT EXISTS (SELECT 1 FROM products LIMIT 1)
   `)
   console.log('✓ products seeded')
-
-  // Backfill: any pre-existing rows from before category column existed
-  await pool.query(`UPDATE products SET category = 'steak' WHERE category IS NULL OR category = ''`)
 
   console.log('\n✅ All migrations complete.')
   await pool.end()

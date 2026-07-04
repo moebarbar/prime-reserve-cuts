@@ -3,11 +3,15 @@ import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import { SITE } from '@/data/site'
-import { productsByCategory } from '@/data/products'
+import { PRODUCTS } from '@/data/products'
 import styles from '../blog/blog.module.css'
 
 const URL = `${SITE.url}/steak-delivery-houston`
-const steaks = productsByCategory('steak')
+// Curated steak lineup across both collections (this page is steak-focused SEO).
+const STEAK_NAMES = ['Ribeye', 'New York Strip', 'Sirloin', 'Filet', 'Flank / Skirt', 'Round Steak / Cutlets']
+const steaks = STEAK_NAMES
+  .map(n => PRODUCTS.find(p => p.name === n))
+  .filter((p): p is (typeof PRODUCTS)[number] => !!p && p.available)
 
 export const metadata: Metadata = {
   title: 'Steak Delivery in Houston — Local Beef, Priced by the Pound',

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import styles from './page2.module.css'
 import { BUILDINGS } from '@/data/buildings'
-import { PRODUCTS, CATEGORY_META, type Category, type Product } from '@/data/products'
+import { PRODUCTS, CATEGORY_META, priceFor, gradesFor, type Category, type Product, type Grade } from '@/data/products'
 import PurchaseTypeToggle, { type PurchaseType } from '@/components/PurchaseTypeToggle'
 
 interface FormData {
@@ -22,6 +22,7 @@ export type { Category }
 export interface CutSelection {
   cut: Cut
   qty: number
+  grade: Grade
 }
 
 interface Page2Props {
@@ -51,13 +52,14 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
   useEffect(() => {
     fetch('/api/products')
       .then(r => r.json())
-      .then((rows: Array<{ id: string; name: string; detail: string; img: string; price: number | string; available: boolean; category: Category }>) => {
+      .then((rows: Array<{ id: string; name: string; detail: string; img: string; price: number | string; price_choice: number | string | null; available: boolean; category: Category }>) => {
         if (!Array.isArray(rows) || rows.length === 0) return // keep the static fallback
-        const live = rows.map(r => ({
+        const live: Cut[] = rows.map(r => ({
           id: r.id,
           name: r.name,
           category: r.category,
           pricePerLb: Number(r.price) || 0,
+          priceChoice: r.price_choice != null ? Number(r.price_choice) : undefined,
           detail: r.detail,
           img: r.img,
           available: r.available,
@@ -86,12 +88,13 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
   }, {} as Record<Category, number>)
 
   const getSelection = (cut: Cut) => selections.find(s => s.cut.id === cut.id)
+  const effPrice = (s: CutSelection) => priceFor(s.cut, s.grade)
 
   const toggleCut = (cut: Cut) => {
     setSelections(prev => {
       const exists = prev.find(s => s.cut.id === cut.id)
       if (exists) return prev.filter(s => s.cut.id !== cut.id)
-      return [...prev, { cut, qty: 1 }]
+      return [...prev, { cut, qty: 1, grade: 'Local' as Grade }]
     })
   }
 
@@ -100,7 +103,17 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
     setSelections(prev => prev.map(s => s.cut.id === cut.id ? { ...s, qty } : s))
   }
 
-  const weeklyTotal = selections.reduce((sum, s) => sum + s.cut.pricePerLb * s.qty, 0)
+  const setGrade = (cut: Cut, grade: Grade) =>
+    setSelections(prev => prev.map(s => s.cut.id === cut.id ? { ...s, grade } : s))
+
+  // Special cuts are one-time only. If the cart has one, force one-time and
+  // disable the subscription option.
+  const hasSpecial = selections.some(s => s.cut.category === 'special')
+  useEffect(() => {
+    if (hasSpecial && purchaseType === 'subscription') onPurchaseTypeChange('one_time')
+  }, [hasSpecial, purchaseType, onPurchaseTypeChange])
+
+  const weeklyTotal = selections.reduce((sum, s) => sum + effPrice(s) * s.qty, 0)
   const money = (n: number) => `$${n.toFixed(2)}`
 
   const handleContinue = () => {
@@ -268,6 +281,9 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
                   </div>
                 ) : productsForActive.map(cut => {
                   const sel = getSelection(cut)
+                  const grades = gradesFor(cut)
+                  const hasChoice = grades.length > 1
+                  const shownPrice = sel ? effPrice(sel) : cut.pricePerLb
                   const thumb = (
                     <>
                       <div className={styles.ccThumb}>
@@ -276,7 +292,7 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
                           onError={e => { (e.target as HTMLImageElement).style.opacity = '0' }} />
                       </div>
                       <div className={styles.ccBody}>
-                        <div className={styles.ccGrade}>Local Beef</div>
+                        <div className={styles.ccGrade}>{sel?.grade ?? 'Local'}</div>
                         <div className={styles.ccName}>{cut.name}</div>
                         <div className={styles.ccDetail}>{cut.detail}</div>
                       </div>
@@ -291,11 +307,12 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
                         className={styles.cc}
                         onClick={() => toggleCut(cut)}
                         aria-pressed={false}
-                        aria-label={`Add ${cut.name}, ${money(cut.pricePerLb)} per pound, to your order`}
+                        aria-label={`Add ${cut.name}, from ${money(cut.pricePerLb)} per pound, to your order`}
                       >
                         {thumb}
                         <div className={styles.ccRight}>
                           <div>
+                            {hasChoice && <div className={styles.ccFrom}>from</div>}
                             <span className={styles.ccPrice}>{money(cut.pricePerLb)}</span>
                             <div className={styles.ccMo}>/lb</div>
                           </div>
@@ -319,9 +336,21 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
                       </button>
                       <div className={styles.ccRight}>
                         <div>
-                          <span className={styles.ccPrice}>{money(cut.pricePerLb)}</span>
+                          <span className={styles.ccPrice}>{money(shownPrice)}</span>
                           <div className={styles.ccMo}>/lb</div>
                         </div>
+                        {hasChoice && (
+                          <div className={styles.gradeToggle} role="group" aria-label={`${cut.name} grade`}>
+                            {grades.map(g => (
+                              <button key={g} type="button"
+                                className={`${styles.gradeBtn} ${sel.grade === g ? styles.gradeBtnOn : ''}`}
+                                aria-pressed={sel.grade === g}
+                                onClick={() => setGrade(cut, g)}>
+                                {g === 'USDA Choice' ? 'Choice' : 'Local'}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                         <div className={styles.qtyCtrl}>
                           <button className={styles.qtyBtn} onClick={() => setQty(cut, sel.qty - 1)}
                             aria-label={`Decrease ${cut.name} pounds`}>−</button>
@@ -342,7 +371,12 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
             <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 8 }}>
               How would you like it?
             </div>
-            <PurchaseTypeToggle value={purchaseType} onChange={onPurchaseTypeChange} />
+            <PurchaseTypeToggle value={purchaseType} onChange={onPurchaseTypeChange} disableSubscription={hasSpecial} />
+            {hasSpecial && (
+              <div style={{ fontSize: 11, color: 'var(--gold2)', marginTop: 8, lineHeight: 1.5 }}>
+                Your cart has a Special cut — those are one-time only. Remove it to subscribe weekly.
+              </div>
+            )}
           </div>
 
           {/* Order mini summary */}
@@ -352,8 +386,8 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
             ) : (
               selections.map(s => (
                 <div key={s.cut.id} className={styles.omRow}>
-                  <span>{s.cut.name} × {s.qty} lb</span>
-                  <span>{money(s.cut.pricePerLb * s.qty)}</span>
+                  <span>{s.cut.name}{s.grade === 'USDA Choice' ? ' (Choice)' : ''} × {s.qty} lb</span>
+                  <span>{money(effPrice(s) * s.qty)}</span>
                 </div>
               ))
             )}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
-type Category = 'steak' | 'slow_cook' | 'daily'
+type Category = 'automatic' | 'special'
 
 interface Product {
   id: string
@@ -11,6 +11,7 @@ interface Product {
   detail: string
   weight: string
   price: number
+  price_choice: number | null
   price_per_week: number
   img: string
   available: boolean
@@ -19,16 +20,14 @@ interface Product {
 
 const GRADES = ['Local', 'USDA Choice', 'Grass-Fed']
 const CATEGORIES: { value: Category; label: string }[] = [
-  { value: 'steak',     label: 'Steaks' },
-  { value: 'slow_cook', label: 'Roasts / Slow Cuts' },
-  { value: 'daily',     label: 'Ground Beef' },
+  { value: 'automatic', label: 'Automatic (Local + USDA Choice)' },
+  { value: 'special',   label: 'Special Cuts (one-time)' },
 ]
 const CATEGORY_LABEL: Record<Category, string> = {
-  steak: 'Steaks',
-  slow_cook: 'Roasts / Slow Cuts',
-  daily: 'Ground Beef',
+  automatic: 'Automatic',
+  special: 'Special Cuts',
 }
-const empty: Omit<Product, 'id'> = { name: '', grade: 'Local Beef', detail: '', weight: '', price: 0, price_per_week: 0, img: '', available: true, category: 'steak' }
+const empty: Omit<Product, 'id'> = { name: '', grade: 'Local', detail: '', weight: '', price: 0, price_choice: null, price_per_week: 0, img: '', available: true, category: 'automatic' }
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -51,7 +50,7 @@ export default function ProductsPage() {
 
   const openEdit = (p: Product) => {
     setEditing(p)
-    setForm({ name: p.name, grade: p.grade, detail: p.detail, weight: p.weight ?? '', price: p.price, price_per_week: p.price_per_week ?? 0, img: p.img, available: p.available, category: p.category ?? 'steak' })
+    setForm({ name: p.name, grade: p.grade, detail: p.detail, weight: p.weight ?? '', price: p.price, price_choice: p.price_choice ?? null, price_per_week: p.price_per_week ?? 0, img: p.img, available: p.available, category: p.category ?? 'automatic' })
     setImgErr(false)
     setModal('edit')
   }
@@ -246,10 +245,17 @@ export default function ProductsPage() {
                 </div>
               </div>
               <div className="f-field">
-                <label className="f-label">Price per lb ($) * <span style={{ opacity: 0.5, fontSize: 9 }}>shown on the site · billed weekly × pounds</span></label>
+                <label className="f-label">Local price per lb ($) * <span style={{ opacity: 0.5, fontSize: 9 }}>shown on the site · billed weekly × pounds</span></label>
                 <input className="f-input" type="number" min={0} step="0.01" placeholder="14.99" value={form.price || ''}
                   onChange={e => setForm(f => ({ ...f, price: parseFloat(e.target.value) || 0 }))} />
               </div>
+              {form.category === 'automatic' && (
+                <div className="f-field">
+                  <label className="f-label">USDA Choice price per lb ($) <span style={{ opacity: 0.5, fontSize: 9 }}>automatic products · leave blank for Local-only</span></label>
+                  <input className="f-input" type="number" min={0} step="0.01" placeholder="e.g. 20.99" value={form.price_choice ?? ''}
+                    onChange={e => setForm(f => ({ ...f, price_choice: e.target.value === '' ? null : (parseFloat(e.target.value) || 0) }))} />
+                </div>
+              )}
               <div className="f-field">
                 <label className="f-label">Visibility</label>
                 <div style={{ display:'flex', alignItems:'center', gap:10, paddingTop:10 }}>
