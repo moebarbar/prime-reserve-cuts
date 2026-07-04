@@ -1,7 +1,7 @@
 /* RANCHERS PAGE */
 
 .eyebrow {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-jost), sans-serif;
   font-size: 9px; font-weight: 600; letter-spacing: .44em; text-transform: uppercase;
   color: var(--gold); margin-bottom: 16px;
 }
@@ -17,7 +17,7 @@
 }
 .heroInner { max-width: 760px; }
 .heroTitle {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(36px, 6vw, 76px);
   font-weight: 300;
   line-height: 1.05;
@@ -33,7 +33,7 @@
 .heroCta {
   display: inline-flex; align-items: center; gap: 10px;
   background: var(--gold); color: var(--dark);
-  font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600;
+  font-family: var(--font-jost), sans-serif; font-size: 11px; font-weight: 600;
   letter-spacing: 0.2em; text-transform: uppercase;
   padding: 16px 40px; text-decoration: none;
   transition: background .2s, transform .18s;
@@ -42,7 +42,7 @@
 
 /* ── SECTION HEADING ──────────────────────────────────────────────────────── */
 .sectionHeading {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(30px, 4.5vw, 52px);
   font-weight: 300;
   line-height: 1.1;
@@ -62,9 +62,9 @@
   padding: 36px 32px; transition: border-color .2s;
 }
 .benefitCard:hover { border-color: rgba(184,134,58,0.4); }
-.benefitIcon { font-family: 'Cormorant', serif; font-size: 32px; color: var(--gold); margin-bottom: 18px; line-height: 1; }
+.benefitIcon { font-family: var(--font-cormorant), serif; font-size: 32px; color: var(--gold); margin-bottom: 18px; line-height: 1; }
 .benefitTitle {
-  font-family: 'Cormorant', serif; font-size: 22px; font-weight: 300;
+  font-family: var(--font-cormorant), serif; font-size: 22px; font-weight: 300;
   color: var(--cream); margin-bottom: 12px; line-height: 1.2;
 }
 .benefitBody { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.85; }
@@ -76,7 +76,7 @@
 }
 .quoteInner { max-width: 800px; margin: 0 auto; }
 .quoteText {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(24px, 3.4vw, 42px);
   font-weight: 300;
   color: var(--cream);
@@ -94,7 +94,7 @@
 }
 .criteriaList li:last-child { border-bottom: none; }
 .criteriaNum {
-  font-family: 'Cormorant', serif; font-size: 24px; font-weight: 300;
+  font-family: var(--font-cormorant), serif; font-size: 24px; font-weight: 300;
   color: var(--gold); min-width: 44px; opacity: 0.7;
 }
 .criteriaText { font-size: 15px; font-weight: 300; color: var(--cream); line-height: 1.5; }
@@ -113,7 +113,7 @@
 }
 .formLeft {}
 .formHeading {
-  font-family: 'Cormorant', serif; font-size: clamp(32px, 5vw, 56px);
+  font-family: var(--font-cormorant), serif; font-size: clamp(32px, 5vw, 56px);
   font-weight: 300; line-height: 1.05; color: var(--cream); margin: 0 0 24px;
 }
 .formHeading em { font-style: italic; color: var(--gold); }
@@ -146,7 +146,7 @@
 .formField textarea,
 .formField select {
   width: 100%; background: transparent; border: none; outline: none; color: var(--cream);
-  font-family: 'Jost', sans-serif; font-size: max(16px, 16px); font-weight: 300;
+  font-family: var(--font-jost), sans-serif; font-size: max(16px, 16px); font-weight: 300;
   padding-bottom: 11px; caret-color: var(--gold); resize: vertical;
 }
 .formField select { cursor: pointer; appearance: none; -webkit-appearance: none; }
@@ -156,7 +156,7 @@
 .formRow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .formSubmit {
   margin-top: 28px; padding: 16px; background: var(--gold); border: none; color: var(--dark);
-  font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600;
+  font-family: var(--font-jost), sans-serif; font-size: 11px; font-weight: 600;
   letter-spacing: 0.2em; text-transform: uppercase;
   cursor: pointer; transition: background .2s; min-height: 48px;
 }
@@ -174,7 +174,7 @@
   display: flex; align-items: center; justify-content: center; margin-bottom: 18px;
 }
 .successTitle {
-  font-family: 'Cormorant', serif; font-size: 32px; font-weight: 300;
+  font-family: var(--font-cormorant), serif; font-size: 32px; font-weight: 300;
   color: var(--cream); margin: 0 0 12px;
 }
 .successBody { font-size: 13px; color: var(--muted); line-height: 1.85; }

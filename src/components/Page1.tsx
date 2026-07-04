@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import styles from './page1.module.css'
 import { BUILDINGS } from '@/data/buildings'
@@ -15,7 +16,7 @@ interface Page1Props {
 const CATEGORIES = [
   {
     key: 'slow_cook',
-    src: 'https://i.imgur.com/2SI0S49.jpg',
+    src: '/brisket-raw.jpg',
     name: 'Roasts / Slow Cuts',
     sub: 'Roasts · Brisket',
     grade: 'Local Beef',
@@ -37,7 +38,7 @@ const CATEGORIES = [
   },
   {
     key: 'ground',
-    src: 'https://i.imgur.com/n2wjXBV.jpg',
+    src: '/ground-beef-raw.jpg',
     name: 'Ground Beef',
     sub: 'Fresh-ground, by the pound',
     grade: 'Local Beef',
@@ -142,10 +143,13 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
 
         <div className={styles.bldGrid} id="bld-grid">
           {BUILDINGS.map((b) => (
-            <div
+            <button
               key={b.key}
+              type="button"
               className={`${styles.bc} ${selectedKey === b.key ? styles.bcSel : ''}`}
               onClick={() => onSelect(b.key)}
+              aria-pressed={selectedKey === b.key}
+              aria-label={`Select ${b.name}, ${b.nbhd}`}
             >
               <div
                 className={styles.bcBg}
@@ -164,7 +168,7 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
                   Select
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
 
@@ -181,7 +185,11 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
         </h2>
         <p className={styles.cutsLead}>
           From the weekend ribeye to the everyday ground beef — local beef, priced by the
-          pound, delivered to your door every Saturday. Cancel anytime.
+          pound, delivered to your door every Saturday. Cancel anytime. See how our{' '}
+          <Link href="/steak-delivery-houston" className={styles.cutsLink}>
+            steak delivery in Houston
+          </Link>{' '}
+          works.
         </p>
       </div>
 
@@ -257,7 +265,8 @@ export default function Page1({ selectedKey, onSelect, onContinue }: Page1Props)
           </div>
 
           <div className={styles.sourceImgWrap}>
-            <img src="/source-ranch.jpg" alt="Open pasture cattle" className={styles.sourceImg} />
+            <Image src="/source-ranch.jpg" alt="Open pasture cattle" fill sizes="100vw"
+              className={styles.sourceImg} style={{ objectFit: 'cover', objectPosition: 'center 40%' }} />
             <div className={styles.sourceImgOverlay} />
             <div className={styles.sourceImgCaption}>Open pasture · Texas High Plains</div>
           </div>

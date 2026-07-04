@@ -246,7 +246,7 @@ export default function OrdersPage() {
                         {o.kind === 'one_time' ? 'One-time' : 'Subscription'}
                       </span>
                     </td>
-                    <td style={{ fontFamily: 'Cormorant, serif', fontSize: 17, color: 'var(--gold2)' }}>${o.price}</td>
+                    <td style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 17, color: 'var(--gold2)' }}>${o.price}</td>
                     <td className="td-dim">{fmtDate(o.start_date)}</td>
                     <td onClick={e => e.stopPropagation()}>
                       <input

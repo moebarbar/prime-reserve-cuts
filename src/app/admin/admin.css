@@ -28,7 +28,7 @@
   border-bottom: 1px solid var(--border);
 }
 .admin-logo-name {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 19px;
   font-style: italic;
   color: var(--cream);
@@ -36,7 +36,7 @@
 }
 .admin-logo-name span { color: var(--gold); }
 .admin-logo-tag {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-jost), sans-serif;
   font-size: 7.5px;
   font-weight: 600;
   letter-spacing: 0.44em;
@@ -62,7 +62,7 @@
   gap: 11px;
   padding: 10px 20px;
   color: var(--muted);
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-jost), sans-serif;
   font-size: 13px;
   font-weight: 400;
   letter-spacing: 0.04em;
@@ -124,7 +124,7 @@
   z-index: 100;
 }
 .admin-topbar-title {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 19px;
   font-weight: 300;
   color: var(--cream);
@@ -196,7 +196,7 @@
   margin-bottom: 10px;
 }
 .stat-value {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 38px;
   font-weight: 300;
   color: var(--cream);
@@ -222,7 +222,7 @@
   margin-bottom: 14px;
 }
 .sec-title {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 20px;
   font-weight: 300;
   color: var(--cream);
@@ -319,7 +319,7 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
   background: var(--panel);
   border: 1px solid var(--border);
   color: var(--cream);
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-jost), sans-serif;
   font-size: 12px;
   padding: 9px 14px;
   outline: none;
@@ -331,7 +331,7 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
   background: var(--panel);
   border: 1px solid var(--border);
   color: var(--cream);
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-jost), sans-serif;
   font-size: 12px;
   padding: 9px 32px 9px 14px;
   outline: none;
@@ -349,7 +349,7 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
   display: inline-flex; align-items: center; gap: 7px;
   background: var(--gold); color: var(--dark);
   border: none;
-  font-family: 'Jost', sans-serif; font-size: 10px; font-weight: 600;
+  font-family: var(--font-jost), sans-serif; font-size: 10px; font-weight: 600;
   letter-spacing: 0.2em; text-transform: uppercase;
   padding: 10px 20px; cursor: pointer;
   transition: background 0.18s, transform 0.15s;
@@ -361,7 +361,7 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
   display: inline-flex; align-items: center; gap: 6px;
   background: none; border: 1px solid var(--border);
   color: var(--muted);
-  font-family: 'Jost', sans-serif; font-size: 10px; font-weight: 500;
+  font-family: var(--font-jost), sans-serif; font-size: 10px; font-weight: 500;
   letter-spacing: 0.15em; text-transform: uppercase;
   padding: 9px 15px; cursor: pointer;
   transition: all 0.18s; white-space: nowrap;
@@ -381,7 +381,7 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
 /* INLINE STATUS SELECT */
 .inline-sel {
   background: transparent; border: none;
-  font-family: 'Jost', sans-serif; font-size: 8.5px;
+  font-family: var(--font-jost), sans-serif; font-size: 8.5px;
   font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
   cursor: pointer; outline: none; padding: 0;
 }
@@ -417,7 +417,7 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
   z-index: 1;
 }
 .modal-title {
-  font-family: 'Cormorant', serif; font-size: 22px;
+  font-family: var(--font-cormorant), serif; font-size: 22px;
   font-weight: 300; color: var(--cream);
 }
 .modal-title em { color: var(--gold); font-style: italic; }
@@ -443,7 +443,7 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
   border: none;
   border-bottom: 1px solid rgba(184,134,58,0.25);
   color: var(--cream);
-  font-family: 'Jost', sans-serif; font-size: 15px; font-weight: 300;
+  font-family: var(--font-jost), sans-serif; font-size: 15px; font-weight: 300;
   padding: 9px 4px;
   outline: none;
   transition: border-color 0.2s;
@@ -516,11 +516,11 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
 }
 .prod-body { padding: 14px 16px; }
 .prod-grade { font-size: 7px; font-weight: 700; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold); background: rgba(184,134,58,0.1); padding: 2px 6px; display: inline-block; margin-bottom: 5px; }
-.prod-name { font-family: 'Cormorant', serif; font-size: 20px; font-weight: 300; color: var(--cream); margin-bottom: 2px; }
+.prod-name { font-family: var(--font-cormorant), serif; font-size: 20px; font-weight: 300; color: var(--cream); margin-bottom: 2px; }
 .prod-detail { font-size: 10px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
-.prod-price { font-family: 'Cormorant', serif; font-size: 26px; font-weight: 300; color: var(--gold2); line-height: 1; }
+.prod-price { font-family: var(--font-cormorant), serif; font-size: 26px; font-weight: 300; color: var(--gold2); line-height: 1; }
 .prod-price sup { font-size: 13px; vertical-align: super; }
-.prod-price sub { font-size: 11px; color: var(--muted); font-family: 'Jost', sans-serif; font-weight: 300; }
+.prod-price sub { font-size: 11px; color: var(--muted); font-family: var(--font-jost), sans-serif; font-weight: 300; }
 .prod-foot {
   padding: 10px 16px; border-top: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between;
@@ -557,7 +557,7 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
   border-bottom: none;
 }
 .delivery-bld-name {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 20px; font-weight: 300; color: var(--cream);
 }
 
@@ -624,7 +624,7 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
 }
 .bld-admin-body { padding: 16px 18px 18px; }
 .bld-admin-name {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 20px; font-weight: 300; color: var(--cream);
   margin-bottom: 14px;
 }
@@ -635,7 +635,7 @@ table.adm tr:hover td { background: rgba(244,239,230,0.025); }
   border: none;
   border-bottom: 1px solid rgba(184,134,58,0.25);
   color: var(--muted);
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-jost), sans-serif;
   font-size: 11px;
   padding: 2px 0;
   outline: none;

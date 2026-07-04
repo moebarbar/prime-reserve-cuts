@@ -34,7 +34,7 @@ function FunnelBar({ label, value, total, color }: { label: string; value: numbe
       <div style={{ flex: 1, height: 6, background: 'var(--border)', position: 'relative' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${pct}%`, background: color, transition: 'width 0.8s ease' }} />
       </div>
-      <div style={{ width: 36, fontSize: 14, fontFamily: 'Cormorant, serif', fontWeight: 300, color: 'var(--cream)', textAlign: 'right', flexShrink: 0 }}>{value}</div>
+      <div style={{ width: 36, fontSize: 14, fontFamily: 'var(--font-cormorant), serif', fontWeight: 300, color: 'var(--cream)', textAlign: 'right', flexShrink: 0 }}>{value}</div>
       <div style={{ width: 38, fontSize: 9, color: 'var(--muted)', flexShrink: 0 }}>{pct.toFixed(0)}%</div>
     </div>
   )
@@ -129,7 +129,7 @@ export default function AdminDashboard() {
         <div className="table-wrap" style={{ marginBottom: 0, padding: '20px 22px' }}>
           <div style={{ marginBottom: 18 }}>
             <div style={{ fontSize: 7.5, fontWeight: 700, letterSpacing: '0.44em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 4 }}>Lead Pipeline</div>
-            <div style={{ fontFamily: 'Cormorant, serif', fontSize: 20, fontWeight: 300, color: 'var(--cream)' }}>
+            <div style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 20, fontWeight: 300, color: 'var(--cream)' }}>
               Conversion <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>Funnel</em>
             </div>
           </div>
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
           <FunnelBar label="Lost"      value={lostLeads}      total={leads.length} color="#e05c4d" />
           <div style={{ marginTop: 18, padding: '12px 14px', background: 'rgba(58,138,90,0.07)', border: '1px solid rgba(58,138,90,0.18)' }}>
             <div style={{ fontSize: 9, color: 'var(--muted)', letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: 4 }}>Conversion Rate</div>
-            <div style={{ fontFamily: 'Cormorant, serif', fontSize: 28, color: '#4db376', fontWeight: 300 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 28, color: '#4db376', fontWeight: 300 }}>
               {leads.length > 0 ? ((convertedLeads / leads.length) * 100).toFixed(1) : '0.0'}%
             </div>
             <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 2 }}>
@@ -152,7 +152,7 @@ export default function AdminDashboard() {
         <div className="table-wrap" style={{ marginBottom: 0 }}>
           <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
             <div style={{ fontSize: 7.5, fontWeight: 700, letterSpacing: '0.44em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 2 }}>Live Feed</div>
-            <div style={{ fontFamily: 'Cormorant, serif', fontSize: 20, fontWeight: 300, color: 'var(--cream)' }}>
+            <div style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 20, fontWeight: 300, color: 'var(--cream)' }}>
               Recent <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>Activity</em>
             </div>
           </div>
@@ -207,9 +207,9 @@ export default function AdminDashboard() {
                 <tr><td colSpan={4} className="td-dim" style={{ textAlign: 'center', padding: 20 }}>No data yet</td></tr>
               ) : topCuts.map(([cut, { count, rev }]) => (
                 <tr key={cut}>
-                  <td style={{ fontFamily: 'Cormorant, serif', fontSize: 16 }}>{cut}</td>
+                  <td style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 16 }}>{cut}</td>
                   <td className="td-dim">{count}</td>
-                  <td style={{ color: 'var(--gold2)', fontFamily: 'Cormorant, serif', fontSize: 16 }}>${rev}</td>
+                  <td style={{ color: 'var(--gold2)', fontFamily: 'var(--font-cormorant), serif', fontSize: 16 }}>${rev}</td>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <div style={{ flex: 1, height: 3, background: 'var(--border)' }}>
@@ -248,7 +248,7 @@ export default function AdminDashboard() {
                     </div>
                   </td>
                   <td className="td-dim">{activeOrders.filter(o => o.building === bld).length}</td>
-                  <td style={{ color: 'var(--gold2)', fontFamily: 'Cormorant, serif', fontSize: 16 }}>${rev}</td>
+                  <td style={{ color: 'var(--gold2)', fontFamily: 'var(--font-cormorant), serif', fontSize: 16 }}>${rev}</td>
                 </tr>
               ))}
             </tbody>
@@ -262,7 +262,7 @@ export default function AdminDashboard() {
           <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.44em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 4 }}>
             {daysLeft === 0 ? '🚚 Delivering Today' : daysLeft === 1 ? '🚚 Delivering Tomorrow' : `🗓 Saturday Delivery · ${daysLeft} Days Away`}
           </div>
-          <div style={{ fontFamily: 'Cormorant, serif', fontSize: 22, fontWeight: 300, color: 'var(--cream)' }}>
+          <div style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 22, fontWeight: 300, color: 'var(--cream)' }}>
             {activeOrders.length} packages · {Object.keys(bldRevenue).length} buildings
           </div>
           <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 3 }}>

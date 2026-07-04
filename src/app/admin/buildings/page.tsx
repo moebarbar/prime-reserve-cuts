@@ -204,7 +204,7 @@ export default function BuildingsPage() {
                     <td className="td-dim">{b.nbhd}</td>
                     <td className="td-mono">{b.key}</td>
                     <td>{stats.active}</td>
-                    <td style={{ fontFamily: 'Cormorant, serif', fontSize: 17, color: 'var(--gold2)' }}>${stats.mrr}</td>
+                    <td style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 17, color: 'var(--gold2)' }}>${stats.mrr}</td>
                     <td>
                       <label className="toggle" title={b.active ? 'Hide' : 'Show'}>
                         <input type="checkbox" checked={b.active} onChange={() => toggleActive(b)} />

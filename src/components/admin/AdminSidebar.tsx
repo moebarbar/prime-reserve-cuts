@@ -145,10 +145,10 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
             <div style={{ fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 2 }}>
               Next Delivery
             </div>
-            <div style={{ color: daysLeft <= 2 ? 'var(--gold)' : 'var(--cream)', fontFamily: 'Cormorant, serif', fontSize: 15 }}>
+            <div style={{ color: daysLeft <= 2 ? 'var(--gold)' : 'var(--cream)', fontFamily: 'var(--font-cormorant), serif', fontSize: 15 }}>
               {saturday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
               {' '}
-              <span style={{ fontFamily: 'Jost, sans-serif', fontSize: 9, color: 'var(--muted)' }}>
+              <span style={{ fontFamily: 'var(--font-jost), sans-serif', fontSize: 9, color: 'var(--muted)' }}>
                 {daysLeft === 0 ? '· Today' : daysLeft === 1 ? '· Tomorrow' : `· ${daysLeft} days`}
               </span>
             </div>
