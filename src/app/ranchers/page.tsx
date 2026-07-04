@@ -43,7 +43,7 @@ const DIFFERENTIATORS = [
 ]
 
 const LOOKING_FOR = [
-  'Small-batch ranches raising USDA Prime or higher',
+  'Small-batch ranches raising USDA Choice or higher',
   'Grass-finished, regenerative, or heritage-breed operations',
   'Texas, Oklahoma, or Louisiana preferred (proximity matters for cold chain)',
   'Capacity for 50+ subprimals per week, scaling',

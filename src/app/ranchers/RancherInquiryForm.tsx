@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import styles from './page.module.css'
 
-const GRADE_OPTS = ['', 'USDA Prime', 'USDA Choice', 'Wagyu / Kobe', 'Heritage', 'Grass-Fed', 'Other']
+const GRADE_OPTS = ['', 'USDA Choice', 'Wagyu / Kobe', 'Heritage', 'Grass-Fed', 'Other']
 
 export default function RancherInquiryForm() {
   const [form, setForm] = useState({

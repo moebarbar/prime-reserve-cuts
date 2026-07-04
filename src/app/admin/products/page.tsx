@@ -17,7 +17,7 @@ interface Product {
   category: Category
 }
 
-const GRADES = ['Local Beef', 'Grass-Fed', 'USDA Choice', 'USDA Prime']
+const GRADES = ['Local', 'USDA Choice', 'Grass-Fed']
 const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'steak',     label: 'Steaks' },
   { value: 'slow_cook', label: 'Roasts / Slow Cuts' },
