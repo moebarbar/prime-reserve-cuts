@@ -140,7 +140,7 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
           </button>
 
           <div className={styles.label}>Step 2 of 3</div>
-          <h2 className={styles.title}>Your details<br />&amp; <em>cut.</em></h2>
+          <h1 className={styles.title}>Your details<br />&amp; <em>cut.</em></h1>
           <p className={styles.sub}>
             Confirm your address, pick your cuts and set how many pounds you want each
             week. Local beef, weekly delivery, <strong>cancel anytime</strong>.
@@ -242,13 +242,8 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
                   </div>
                 ) : productsForActive.map(cut => {
                   const sel = getSelection(cut)
-                  const isSelected = !!sel
-                  return (
-                    <div
-                      key={cut.id}
-                      className={`${styles.cc} ${isSelected ? styles.ccSel : ''}`}
-                      onClick={() => toggleCut(cut)}
-                    >
+                  const thumb = (
+                    <>
                       <div className={styles.ccThumb}>
                         <img src={cut.img} alt={cut.name} loading="lazy"
                           style={cut.name === 'Ribeye' ? { transform: 'scaleX(-1)' } : undefined}
@@ -259,20 +254,55 @@ export default function Page2({ buildingKey, purchaseType, onPurchaseTypeChange,
                         <div className={styles.ccName}>{cut.name}</div>
                         <div className={styles.ccDetail}>{cut.detail}</div>
                       </div>
+                    </>
+                  )
+                  // Unselected: the whole card is one button (no nested controls).
+                  if (!sel) {
+                    return (
+                      <button
+                        key={cut.id}
+                        type="button"
+                        className={styles.cc}
+                        onClick={() => toggleCut(cut)}
+                        aria-pressed={false}
+                        aria-label={`Add ${cut.name}, ${money(cut.pricePerLb)} per pound, to your order`}
+                      >
+                        {thumb}
+                        <div className={styles.ccRight}>
+                          <div>
+                            <span className={styles.ccPrice}>{money(cut.pricePerLb)}</span>
+                            <div className={styles.ccMo}>/lb</div>
+                          </div>
+                          <div className={styles.ccRadio} />
+                        </div>
+                      </button>
+                    )
+                  }
+                  // Selected: card is a div so the qty +/- buttons are valid HTML;
+                  // thumb+body becomes a separate deselect button.
+                  return (
+                    <div key={cut.id} className={`${styles.cc} ${styles.ccSel}`}>
+                      <button
+                        type="button"
+                        className={styles.ccSelectArea}
+                        onClick={() => toggleCut(cut)}
+                        aria-pressed={true}
+                        aria-label={`Remove ${cut.name} from your order`}
+                      >
+                        {thumb}
+                      </button>
                       <div className={styles.ccRight}>
                         <div>
                           <span className={styles.ccPrice}>{money(cut.pricePerLb)}</span>
                           <div className={styles.ccMo}>/lb</div>
                         </div>
-                        {isSelected ? (
-                          <div className={styles.qtyCtrl} onClick={e => e.stopPropagation()}>
-                            <button className={styles.qtyBtn} onClick={() => setQty(cut, sel.qty - 1)}>−</button>
-                            <span className={styles.qtyVal}>{sel.qty} lb</span>
-                            <button className={styles.qtyBtn} onClick={() => setQty(cut, sel.qty + 1)}>+</button>
-                          </div>
-                        ) : (
-                          <div className={styles.ccRadio} />
-                        )}
+                        <div className={styles.qtyCtrl}>
+                          <button className={styles.qtyBtn} onClick={() => setQty(cut, sel.qty - 1)}
+                            aria-label={`Decrease ${cut.name} pounds`}>−</button>
+                          <span className={styles.qtyVal}>{sel.qty} lb</span>
+                          <button className={styles.qtyBtn} onClick={() => setQty(cut, sel.qty + 1)}
+                            aria-label={`Increase ${cut.name} pounds`}>+</button>
+                        </div>
                       </div>
                     </div>
                   )

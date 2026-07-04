@@ -6,7 +6,6 @@ const nextConfig = {
       { protocol: 'https', hostname: 'upload.wikimedia.org' },
       { protocol: 'https', hostname: 'cdn.jsdelivr.net' },
       { protocol: 'https', hostname: 'images.pexels.com' },
-      { protocol: 'https', hostname: 'i.imgur.com' },
     ],
   },
   async headers() {

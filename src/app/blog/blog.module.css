@@ -36,7 +36,7 @@
 
 /* ── Index ── */
 .indexTitle {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-weight: 500;
   font-size: clamp(38px, 7vw, 64px);
   line-height: 1.02;
@@ -87,7 +87,7 @@
   margin-bottom: 10px;
 }
 .cardTitle {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 25px;
   font-weight: 500;
   line-height: 1.15;
@@ -99,7 +99,7 @@
 /* ── Article ── */
 .articleHead { margin-bottom: 36px; }
 .title {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-weight: 500;
   font-size: clamp(32px, 6vw, 52px);
   line-height: 1.06;
@@ -135,7 +135,7 @@
   margin: 0 0 22px;
 }
 .prose h2 {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 30px;
   font-weight: 500;
   line-height: 1.15;
@@ -175,7 +175,7 @@
   border-left: 2px solid var(--gold);
   margin: 26px 0;
   padding: 4px 0 4px 22px;
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 22px;
   font-style: italic;
   line-height: 1.4;
@@ -201,7 +201,7 @@
   background: linear-gradient(180deg, rgba(184,134,58,0.08), rgba(17,16,9,0.4));
   text-align: center;
 }
-.ctaTitle { font-family: 'Cormorant', serif; font-size: 27px; font-weight: 500; margin: 0 0 8px; }
+.ctaTitle { font-family: var(--font-cormorant), serif; font-size: 27px; font-weight: 500; margin: 0 0 8px; }
 .ctaText { font-size: 14px; color: var(--muted); margin: 0 0 20px; }
 .ctaBtn {
   display: inline-block;

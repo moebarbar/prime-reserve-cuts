@@ -50,7 +50,7 @@ export const CATEGORY_META: CategoryMeta[] = [
     key: 'daily',
     title: 'Ground Beef',
     tagline: 'Fresh-ground, by the pound',
-    img: 'https://i.imgur.com/n2wjXBV.jpg',
+    img: '/ground-beef-raw.jpg',
     intro: 'Always in the fridge. Always reaching for it.',
   },
 ]
@@ -65,11 +65,11 @@ export const PRODUCTS: Product[] = [
   { id: 'flank',   name: 'Flank / Skirt',         category: 'steak', pricePerLb: 24.99, detail: 'Bold grain · fajitas & stir-fry',       img: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop&crop=center', available: true },
 
   // ── Roasts / Slow Cuts ──────────────────────────────────────────────────
-  { id: 'roasts',  name: 'Roasts',                category: 'slow_cook', pricePerLb: 14.99, detail: 'Sunday pot roast · low and slow', img: 'https://i.imgur.com/16gBTVR.jpg', available: true },
-  { id: 'brisket', name: 'Brisket',               category: 'slow_cook', pricePerLb: 14.99, detail: 'The heart of Texas BBQ',           img: 'https://i.imgur.com/2SI0S49.jpg', available: true },
+  { id: 'roasts',  name: 'Roasts',                category: 'slow_cook', pricePerLb: 14.99, detail: 'Sunday pot roast · low and slow', img: '/roasts-raw.jpg', available: true },
+  { id: 'brisket', name: 'Brisket',               category: 'slow_cook', pricePerLb: 14.99, detail: 'The heart of Texas BBQ',           img: '/brisket-raw.jpg', available: true },
 
   // ── Ground Beef (DB category 'daily') ───────────────────────────────────
-  { id: 'ground',  name: 'Ground Beef',           category: 'daily', pricePerLb: 12.99, detail: 'Fresh-ground · the everyday staple', img: 'https://i.imgur.com/n2wjXBV.jpg', available: true },
+  { id: 'ground',  name: 'Ground Beef',           category: 'daily', pricePerLb: 12.99, detail: 'Fresh-ground · the everyday staple', img: '/ground-beef-raw.jpg', available: true },
 ]
 
 export const productsByCategory = (cat: Category): Product[] =>

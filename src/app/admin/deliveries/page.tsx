@@ -104,7 +104,7 @@ export default function DeliveriesPage() {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
         <div>
           <div className="stat-eyebrow" style={{ marginBottom: 6 }}>Delivery Manifest</div>
-          <h2 style={{ fontFamily: 'Cormorant, serif', fontSize: 28, fontWeight: 300, color: 'var(--cream)', lineHeight: 1 }}>
+          <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 28, fontWeight: 300, color: 'var(--cream)', lineHeight: 1 }}>
             {fmtSat(saturday)}
           </h2>
           <div style={{ marginTop: 6, fontSize: 11, color: 'var(--muted)' }}>
@@ -239,7 +239,7 @@ export default function DeliveriesPage() {
                           </label>
                         </td>
                         <td>
-                          <span style={{ fontFamily: 'Cormorant, serif', fontSize: 18, fontWeight: 300, color: 'var(--cream)' }}>
+                          <span style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 18, fontWeight: 300, color: 'var(--cream)' }}>
                             {o.unit}
                           </span>
                         </td>
@@ -257,7 +257,7 @@ export default function DeliveriesPage() {
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                             <span style={{ fontSize: 15 }}>{CUT_ICONS[o.cut] ?? '◆'}</span>
-                            <span style={{ fontFamily: 'Cormorant, serif', fontSize: 16, color: 'var(--cream)' }}>{o.cut}</span>
+                            <span style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 16, color: 'var(--cream)' }}>{o.cut}</span>
                           </div>
                         </td>
                         <td className="td-dim" style={{ fontSize: 11 }}>Vacuum-sealed · chilled</td>

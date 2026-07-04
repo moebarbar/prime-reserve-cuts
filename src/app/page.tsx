@@ -118,34 +118,36 @@ export default function Home() {
           </button>
         </div>
       )}
-      {step === 1 && (
-        <Page1
-          selectedKey={selectedKey}
-          onSelect={handleSelectBuilding}
-          onContinue={goTo2}
-        />
-      )}
-      {step === 2 && selectedKey && (
-        <Page2
-          buildingKey={selectedKey}
-          purchaseType={purchaseType}
-          onPurchaseTypeChange={setPurchaseType}
-          initialSelections={selections}
-          initialForm={formData}
-          onBack={goTo1}
-          onContinue={goTo3}
-        />
-      )}
-      {step === 3 && selectedBuilding && selections.length > 0 && (
-        <Page3
-          building={selectedBuilding}
-          selections={selections}
-          form={formData}
-          purchaseType={purchaseType}
-          onPurchaseTypeChange={setPurchaseType}
-          onBack={goTo2Back}
-        />
-      )}
+      <main>
+        {step === 1 && (
+          <Page1
+            selectedKey={selectedKey}
+            onSelect={handleSelectBuilding}
+            onContinue={goTo2}
+          />
+        )}
+        {step === 2 && selectedKey && (
+          <Page2
+            buildingKey={selectedKey}
+            purchaseType={purchaseType}
+            onPurchaseTypeChange={setPurchaseType}
+            initialSelections={selections}
+            initialForm={formData}
+            onBack={goTo1}
+            onContinue={goTo3}
+          />
+        )}
+        {step === 3 && selectedBuilding && selections.length > 0 && (
+          <Page3
+            building={selectedBuilding}
+            selections={selections}
+            form={formData}
+            purchaseType={purchaseType}
+            onPurchaseTypeChange={setPurchaseType}
+            onBack={goTo2Back}
+          />
+        )}
+      </main>
     </>
   )
 }

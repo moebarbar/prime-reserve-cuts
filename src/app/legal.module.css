@@ -18,7 +18,7 @@
 .backBtn:hover { color: var(--gold); }
 
 .title {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(34px, 5vw, 56px);
   font-weight: 300;
   color: var(--cream);
@@ -39,7 +39,7 @@
 }
 .section:last-child { border-bottom: none; }
 .section h2 {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-jost), sans-serif;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.28em;

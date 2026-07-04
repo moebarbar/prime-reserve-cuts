@@ -98,7 +98,7 @@ export default function Page3({ building, selections, form, purchaseType, onPurc
           </button>
 
           <div className={styles.label}>Step 3 of 3</div>
-          <h2 className={styles.title}>Review &amp;<br /><em>check out.</em></h2>
+          <h1 className={styles.title}>Review &amp;<br /><em>check out.</em></h1>
 
           {/* Purchase type — subscribe weekly or buy once (shared with Step 2) */}
           <div style={{ margin: '0 0 18px' }}>

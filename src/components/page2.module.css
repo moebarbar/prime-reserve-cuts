@@ -8,7 +8,7 @@
 
 .left {}
 .label { font-size: 9px; font-weight: 600; letter-spacing: .44em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
-.title { font-family: 'Cormorant', serif; font-size: clamp(32px, 3.5vw, 44px); font-weight: 300; line-height: 1.05; margin-bottom: 7px; }
+.title { font-family: var(--font-cormorant), serif; font-size: clamp(32px, 3.5vw, 44px); font-weight: 300; line-height: 1.05; margin-bottom: 7px; }
 .title em { font-style: italic; color: var(--gold); }
 .sub { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.75; margin-bottom: 32px; }
 .sub strong { color: var(--cream); font-weight: 400; }
@@ -33,7 +33,7 @@
 .field:focus-within label { color: var(--gold); }
 .field input {
   width: 100%; background: transparent; border: none; outline: none; color: var(--cream);
-  font-family: 'Jost', sans-serif; font-size: 17px; font-weight: 300; padding-bottom: 11px;
+  font-family: var(--font-jost), sans-serif; font-size: 17px; font-weight: 300; padding-bottom: 11px;
   caret-color: var(--gold); cursor: text;
   /* prevent iOS zoom on focus (font-size must be >= 16px) */
   font-size: max(16px, 17px);
@@ -44,7 +44,7 @@
 
 /* RIGHT - cuts */
 .right { position: sticky; top: 76px; align-self: start; }
-.cutsTitle { font-family: 'Cormorant', serif; font-size: clamp(28px, 2.8vw, 36px); font-weight: 300; line-height: 1.1; margin-bottom: 24px; }
+.cutsTitle { font-family: var(--font-cormorant), serif; font-size: clamp(28px, 2.8vw, 36px); font-weight: 300; line-height: 1.1; margin-bottom: 24px; }
 .cutsTitle em { font-style: italic; color: var(--gold); }
 
 /* category grid (two-tap entry) */
@@ -64,13 +64,13 @@
 .catThumb { width: 88px; height: 88px; flex-shrink: 0; overflow: hidden; background: #1c1208; }
 .catThumb img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(.7) saturate(.85); transition: filter .3s; }
 .catBody { padding: 13px 16px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
-.catTitle { font-family: 'Cormorant', serif; font-size: 22px; font-weight: 300; color: var(--cream); line-height: 1.1; }
+.catTitle { font-family: var(--font-cormorant), serif; font-size: 22px; font-weight: 300; color: var(--cream); line-height: 1.1; }
 .catTagline { font-size: 11px; color: var(--muted); line-height: 1.5; }
 .catMeta { font-size: 9px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; color: var(--gold); margin-top: 4px; }
 .catSoon { color: var(--muted); }
 .catBackBtn {
   display: inline-flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer;
-  font-family: 'Jost', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+  font-family: var(--font-jost), sans-serif; font-size: 10px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
   color: var(--gold); padding: 4px 0; margin-bottom: 14px; transition: color .2s;
   touch-action: manipulation;
 }
@@ -84,15 +84,28 @@
   border: 1.5px solid var(--border); background: var(--panel);
   transition: border-color .2s; overflow: hidden;
   touch-action: manipulation;
+  /* rendered as a <button> for keyboard access — strip native chrome */
+  width: 100%; padding: 0; margin: 0; font-family: inherit; color: inherit;
+  text-align: left; -webkit-appearance: none; appearance: none;
 }
 .cc:hover { border-color: rgba(184,134,58,.38); }
+.cc:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+/* Selected cards keep the qty +/- buttons, so the card can't itself be a
+   <button>; this spans thumb+body as the deselect control instead. */
+.ccSelectArea {
+  grid-column: 1 / 3; display: grid; grid-template-columns: 88px 1fr;
+  align-items: stretch; cursor: pointer; overflow: hidden;
+  border: none; padding: 0; margin: 0; background: none; color: inherit;
+  font-family: inherit; text-align: left; -webkit-appearance: none; appearance: none;
+}
+.ccSelectArea:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .ccSel { border-color: var(--gold) !important; }
 .ccThumb { width: 88px; height: 88px; flex-shrink: 0; overflow: hidden; background: #1c1208; }
 .ccThumb img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(.75) saturate(.85); transition: filter .3s; }
 .cc:hover .ccThumb img, .ccSel .ccThumb img { filter: brightness(.92) saturate(1.05); }
 .ccBody { padding: 13px 14px; }
 .ccGrade { font-size: 7px; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); background: rgba(184,134,58,.1); padding: 2px 6px; display: inline-block; margin-bottom: 5px; }
-.ccName { font-family: 'Cormorant', serif; font-size: 17px; font-weight: 300; color: var(--cream); margin-bottom: 2px; }
+.ccName { font-family: var(--font-cormorant), serif; font-size: 17px; font-weight: 300; color: var(--cream); margin-bottom: 2px; }
 .ccDetail { font-size: 10px; color: var(--muted); line-height: 1.5; }
 .ccWeight { font-size: 9px; color: var(--gold); opacity: .8; margin-top: 4px; }
 .ccRight { padding: 13px 14px; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; flex-shrink: 0; min-width: 90px; }
@@ -100,16 +113,16 @@
 /* qty control */
 .qtyCtrl { display: flex; align-items: center; gap: 8px; }
 .qtyBtn {
-  width: 26px; height: 26px; border-radius: 50%;
+  width: 34px; height: 34px; border-radius: 50%;
   border: 1.5px solid var(--gold); background: transparent;
-  color: var(--gold); font-size: 16px; line-height: 1;
+  color: var(--gold); font-size: 18px; line-height: 1;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: background .15s;
   touch-action: manipulation;
 }
 .qtyBtn:hover { background: rgba(184,134,58,.15); }
-.qtyVal { font-family: 'Cormorant', serif; font-size: 20px; font-weight: 300; color: var(--cream); min-width: 16px; text-align: center; }
-.ccPrice { font-family: 'Cormorant', serif; font-size: 22px; font-weight: 300; color: var(--cream); line-height: 1; }
+.qtyVal { font-family: var(--font-cormorant), serif; font-size: 20px; font-weight: 300; color: var(--cream); min-width: 16px; text-align: center; }
+.ccPrice { font-family: var(--font-cormorant), serif; font-size: 22px; font-weight: 300; color: var(--cream); line-height: 1; }
 .ccMo { font-size: 9px; color: var(--muted); }
 .ccQty { font-size: 8px; color: var(--gold); opacity: 0.7; margin-top: 3px; white-space: nowrap; }
 .ccRadio { width: 19px; height: 19px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; transition: all .2s; }
@@ -122,10 +135,10 @@
 .omRow:last-child { margin-bottom: 0; }
 .omTotal { border-top: 1px solid var(--border); padding-top: 13px; margin-top: 3px; display: flex; justify-content: space-between; align-items: baseline; }
 .omTotalLbl { font-size: 12px; font-weight: 500; color: var(--cream); }
-.omTotalVal { font-family: 'Cormorant', serif; font-size: 28px; font-weight: 300; color: var(--gold); line-height: 1; }
+.omTotalVal { font-family: var(--font-cormorant), serif; font-size: 28px; font-weight: 300; color: var(--gold); line-height: 1; }
 .btnPay {
   margin-top: 14px; width: 100%; padding: 16px; background: var(--gold); border: none; color: var(--dark);
-  font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase;
+  font-family: var(--font-jost), sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase;
   cursor: pointer; transition: background .2s;
   display: flex; align-items: center; justify-content: center; gap: 9px;
   min-height: 44px; touch-action: manipulation;

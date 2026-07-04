@@ -203,9 +203,9 @@ async function run() {
       ('Sirloin',               'Local Beef', 'Lean & beefy · quick weeknight sear',  '', 19.99, 19.99, 'https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80&fit=crop&crop=center',        TRUE, 'steak'),
       ('Round Steak / Cutlets', 'Local Beef', 'Thin-sliced · cutlets & milanesa',     '', 14.99, 14.99, 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80&fit=crop&crop=center',     TRUE, 'steak'),
       ('Flank / Skirt',         'Local Beef', 'Bold grain · fajitas & stir-fry',      '', 24.99, 24.99, 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop&crop=center',        TRUE, 'steak'),
-      ('Roasts',                'Local Beef', 'Sunday pot roast · low and slow',      '', 14.99, 14.99, 'https://i.imgur.com/16gBTVR.jpg',                                                                  TRUE, 'slow_cook'),
-      ('Brisket',               'Local Beef', 'The heart of Texas BBQ',               '', 14.99, 14.99, 'https://i.imgur.com/2SI0S49.jpg',                                                                  TRUE, 'slow_cook'),
-      ('Ground Beef',           'Local Beef', 'Fresh-ground · the everyday staple',   '', 12.99, 12.99, 'https://i.imgur.com/n2wjXBV.jpg',                                                                  TRUE, 'daily')
+      ('Roasts',                'Local Beef', 'Sunday pot roast · low and slow',      '', 14.99, 14.99, '/roasts-raw.jpg',                                                                  TRUE, 'slow_cook'),
+      ('Brisket',               'Local Beef', 'The heart of Texas BBQ',               '', 14.99, 14.99, '/brisket-raw.jpg',                                                                  TRUE, 'slow_cook'),
+      ('Ground Beef',           'Local Beef', 'Fresh-ground · the everyday staple',   '', 12.99, 12.99, '/ground-beef-raw.jpg',                                                                  TRUE, 'daily')
     ) AS v(name, grade, detail, weight, price, price_per_week, img, available, category)
     WHERE NOT EXISTS (SELECT 1 FROM products LIMIT 1)
   `)

@@ -131,7 +131,7 @@ export default function SubscribersPage() {
                 <tr key={cut}>
                   <td>{cut}</td>
                   <td className="td-dim">{count}</td>
-                  <td style={{ color: 'var(--gold2)', fontFamily: 'Cormorant, serif', fontSize: 16 }}>${rev}</td>
+                  <td style={{ color: 'var(--gold2)', fontFamily: 'var(--font-cormorant), serif', fontSize: 16 }}>${rev}</td>
                 </tr>
               ))}
             </tbody>
@@ -148,7 +148,7 @@ export default function SubscribersPage() {
               ) : buildingBreakdown.map(([bld, rev]) => (
                 <tr key={bld}>
                   <td style={{ whiteSpace: 'normal', lineHeight: 1.4, fontSize: 11 }}>{bld}</td>
-                  <td style={{ color: 'var(--gold2)', fontFamily: 'Cormorant, serif', fontSize: 16 }}>${rev}</td>
+                  <td style={{ color: 'var(--gold2)', fontFamily: 'var(--font-cormorant), serif', fontSize: 16 }}>${rev}</td>
                 </tr>
               ))}
             </tbody>
@@ -172,7 +172,7 @@ export default function SubscribersPage() {
                 border: 'none',
                 borderRight: t !== 'all' ? '1px solid var(--border)' : 'none',
                 color: tab === t ? 'var(--gold)' : 'var(--muted)',
-                fontFamily: 'Jost, sans-serif',
+                fontFamily: 'var(--font-jost), sans-serif',
                 fontSize: 10, fontWeight: 600, letterSpacing: '0.18em',
                 textTransform: 'uppercase', padding: '9px 16px', cursor: 'pointer',
               }}
@@ -230,7 +230,7 @@ export default function SubscribersPage() {
                       <div className="td-dim">Unit {o.unit}</div>
                     </td>
                     <td>{o.cut}</td>
-                    <td style={{ fontFamily: 'Cormorant, serif', fontSize: 17, color: 'var(--gold2)' }}>${o.price}</td>
+                    <td style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 17, color: 'var(--gold2)' }}>${o.price}</td>
                     <td className="td-dim">{fmtDate(o.start_date)}</td>
                     <td className="td-dim">{fmtDate(o.next_delivery)}</td>
                     <td><span className={`badge badge-${o.status}`}>{o.status}</span></td>

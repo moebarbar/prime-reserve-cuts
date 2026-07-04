@@ -12,7 +12,7 @@
 .counter {
   position: fixed; top: 24px; right: 32px; z-index: 100;
   display: flex; align-items: center; gap: 12px;
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   color: var(--cream); padding: 8px 16px;
   background: rgba(13,11,8,0.55); backdrop-filter: blur(8px);
   border: 1px solid rgba(184,134,58,0.2);
@@ -49,12 +49,12 @@
   max-width: 1080px; width: 100%;
 }
 .eyebrow {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-jost), sans-serif;
   font-size: 9px; font-weight: 600; letter-spacing: .44em;
   text-transform: uppercase; color: var(--gold); margin-bottom: 20px;
 }
 .h2 {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(38px, 5.5vw, 68px);
   font-weight: 300; line-height: 1.05;
   color: var(--cream); margin: 0 0 44px;
@@ -77,13 +77,13 @@
 }
 .coverInner { text-align: center; }
 .brand {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 24px; font-weight: 300; letter-spacing: 0.18em;
   color: var(--cream); margin-bottom: 64px;
 }
 .brand em { color: var(--gold); font-style: italic; }
 .coverTitle {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(54px, 9vw, 120px);
   font-weight: 300; line-height: 1.0;
   margin: 0 0 56px; letter-spacing: -0.02em;
@@ -91,7 +91,7 @@
 .coverTitle em { color: var(--gold); font-style: italic; }
 .coverMeta {
   display: flex; align-items: center; justify-content: center; gap: 16px;
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-jost), sans-serif;
   font-size: 10px; font-weight: 600; letter-spacing: 0.3em;
   text-transform: uppercase; color: var(--muted);
 }
@@ -118,7 +118,7 @@
   padding: 36px 28px;
 }
 .problemStat {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(48px, 6vw, 72px);
   font-weight: 300; color: var(--gold);
   line-height: 1; margin-bottom: 16px;
@@ -137,7 +137,7 @@
 }
 .problemList li::before {
   content: '×'; color: #c93a3a; margin-right: 14px;
-  font-family: 'Cormorant', serif; font-size: 20px;
+  font-family: var(--font-cormorant), serif; font-size: 20px;
   line-height: 1; font-weight: 400;
 }
 
@@ -152,12 +152,12 @@
   padding: 36px 28px;
 }
 .solutionNum {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 36px; font-weight: 300; color: var(--gold);
   margin-bottom: 12px; line-height: 1;
 }
 .solutionTitle {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 22px; font-weight: 400; color: var(--cream);
   margin-bottom: 10px;
 }
@@ -175,7 +175,7 @@
   text-transform: uppercase; color: var(--gold); margin-bottom: 24px;
 }
 .whyBig {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(36px, 4vw, 52px);
   font-weight: 300; color: var(--cream);
   line-height: 1.05; margin-bottom: 20px;
@@ -196,13 +196,13 @@
 .tierSam { width: 70%; }
 .tierSom { width: 40%; background: linear-gradient(90deg, rgba(184,134,58,0.18) 0%, var(--panel) 100%); }
 .tierLabel {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-jost), sans-serif;
   font-size: 10px; font-weight: 700; letter-spacing: 0.32em;
   text-transform: uppercase; color: var(--gold);
   min-width: 50px;
 }
 .tierValue {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(28px, 3.6vw, 44px); font-weight: 300;
   color: var(--cream); min-width: 120px;
 }
@@ -230,11 +230,11 @@
   transform: translateY(-50%); color: var(--gold); font-size: 16px;
 }
 .howIcon {
-  font-family: 'Cormorant', serif; font-size: 28px;
+  font-family: var(--font-cormorant), serif; font-size: 28px;
   color: var(--gold); margin-bottom: 18px; line-height: 1;
 }
 .howTitle {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 19px; font-weight: 400; color: var(--cream);
   margin-bottom: 12px; line-height: 1.2;
 }
@@ -251,13 +251,13 @@
   padding: 32px 28px;
 }
 .tractionNum {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(44px, 5vw, 64px);
   font-weight: 300; color: var(--gold);
   line-height: 1; margin-bottom: 16px;
 }
 .tractionLbl {
-  font-family: 'Jost', sans-serif;
+  font-family: var(--font-jost), sans-serif;
   font-size: 10px; font-weight: 600; letter-spacing: 0.26em;
   text-transform: uppercase; color: var(--cream); margin-bottom: 14px;
 }
@@ -275,7 +275,7 @@
   padding: 28px 22px;
 }
 .ueVal {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(28px, 3vw, 40px);
   font-weight: 300; color: var(--cream);
   line-height: 1.05; margin-bottom: 12px;
@@ -295,13 +295,13 @@
   position: relative;
 }
 .modelPercent {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 18px; font-weight: 500; color: var(--gold);
   letter-spacing: 0.08em;
   margin-bottom: 8px;
 }
 .modelTitle {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 22px; font-weight: 400; color: var(--cream);
   margin-bottom: 16px; line-height: 1.2;
 }
@@ -368,13 +368,13 @@
   text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
 }
 .gtmCity {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(22px, 2.4vw, 30px);
   font-weight: 300; color: var(--cream); margin-bottom: 12px;
 }
 .gtmTarget { font-size: 11px; color: var(--cream); opacity: 0.72; line-height: 1.6; }
 .gtmArrow {
-  font-family: 'Cormorant', serif; font-size: 32px;
+  font-family: var(--font-cormorant), serif; font-size: 32px;
   color: var(--gold); opacity: 0.6;
 }
 
@@ -387,7 +387,7 @@
   border-bottom: 1px solid var(--border);
 }
 .roadmapQ {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 22px; font-weight: 300;
   color: var(--gold); padding-top: 2px;
 }
@@ -417,12 +417,12 @@
   width: 64px; height: 64px; border-radius: 50%;
   background: rgba(184,134,58,0.14);
   border: 1.5px solid var(--gold); color: var(--gold);
-  font-family: 'Cormorant', serif; font-size: 28px;
+  font-family: var(--font-cormorant), serif; font-size: 28px;
   display: flex; align-items: center; justify-content: center;
   margin: 0 auto 18px;
 }
 .teamName {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 22px; font-weight: 400; color: var(--cream);
   margin-bottom: 6px;
 }
@@ -452,7 +452,7 @@
   text-transform: uppercase; color: var(--gold); margin-bottom: 18px;
 }
 .askVal {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(64px, 8vw, 96px);
   font-weight: 300; color: var(--cream);
   line-height: 1; margin-bottom: 18px;
@@ -472,7 +472,7 @@
   align-items: center; gap: 14px; margin-bottom: 14px;
 }
 .askPct {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 18px; color: var(--gold); font-weight: 400;
 }
 .askBar {
@@ -500,7 +500,7 @@
 }
 .closingInner { max-width: 820px; }
 .closingHeadline {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: clamp(44px, 6.5vw, 84px);
   font-weight: 300; line-height: 1.05;
   margin: 24px 0 36px; letter-spacing: -0.01em;
@@ -520,7 +520,7 @@
   text-transform: uppercase; color: var(--gold); margin-bottom: 10px;
 }
 .contactVal {
-  font-family: 'Cormorant', serif;
+  font-family: var(--font-cormorant), serif;
   font-size: 22px; font-weight: 300; color: var(--cream);
   text-decoration: none; border-bottom: 1px solid rgba(184,134,58,0.3);
   transition: border-color .2s;

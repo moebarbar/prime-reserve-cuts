@@ -1,6 +1,22 @@
 import type { Metadata, Viewport } from 'next'
-import Script from 'next/script'
+import { Cormorant, Jost } from 'next/font/google'
 import './globals.css'
+
+// Self-hosted + preloaded via next/font — replaces the render-blocking
+// Google Fonts @import. Exposed as CSS vars the rest of the app references.
+const cormorant = Cormorant({
+  subsets: ['latin'],
+  weight: ['300', '400'],
+  style: ['normal', 'italic'],
+  variable: '--font-cormorant',
+  display: 'swap',
+})
+const jost = Jost({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-jost',
+  display: 'swap',
+})
 import { PRODUCTS, CATEGORY_META, productsByCategory } from '@/data/products'
 import { SITE } from '@/data/site'
 
@@ -208,68 +224,28 @@ const jsonLd = {
         })),
       },
     },
-    {
-      '@type': 'FAQPage',
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'How does Automatic Cow delivery work?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Pick your building, choose your cuts (Steaks, Roasts & Brisket, or Ground Beef), set how many pounds you want each week, and we deliver vacuum-sealed local beef to your door every Saturday. Cancel anytime.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What cuts of beef do you offer?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Steaks (Bone-in Ribeye $31.99/lb, New York Strip $27.99/lb, Filet $39.99/lb, Sirloin $19.99/lb, Round Steak / Cutlets $14.99/lb, Flank / Skirt $24.99/lb), Roasts $14.99/lb and Brisket $14.99/lb, and fresh Ground Beef $12.99/lb. Everything is priced by the pound.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Which Houston buildings do you deliver to?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'We currently serve Pearl 21Eleven, Aspire Post Oak, The Driscoll, Market Square Tower, Parkside at Discovery Green, and Elev8 Downtown, with more luxury high-rises joining each quarter.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'How is the meat sourced?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Local beef sourced directly from partner ranches, processed whole-animal under USDA-inspected facilities. No middlemen — which is how we keep prices in a local, farmers-market range.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Can I pause or cancel my subscription?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Yes — pause, skip, or cancel any week through the member portal. No commitments.',
-          },
-        },
-      ],
-    },
+    // NOTE: FAQPage is intentionally NOT global. Google's policy requires the
+    // Q&A to be visibly on the page; the homepage funnel doesn't render them.
+    // The /steak-delivery-houston route emits its own FAQPage backed by
+    // visible content — that's the correct home for it.
   ],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${cormorant.variable} ${jost.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.pexels.com" />
       </head>
       <body>
+        {/* Inlined into the SSR HTML (not afterInteractive) so non-JS crawlers
+            and AI bots see the Organization/LocalBusiness/Product markup. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         {children}
-        <Script id="schema-org" type="application/ld+json" strategy="afterInteractive">
-          {JSON.stringify(jsonLd)}
-        </Script>
       </body>
     </html>
   )

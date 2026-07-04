@@ -52,7 +52,7 @@ export default function AdminLoginPage() {
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{
-            fontFamily: 'Cormorant, serif',
+            fontFamily: 'var(--font-cormorant), serif',
             fontSize: 28,
             fontStyle: 'italic',
             color: 'var(--cream)',
@@ -61,7 +61,7 @@ export default function AdminLoginPage() {
             Automatic <span style={{ color: 'var(--gold)' }}>Cow</span>
           </div>
           <div style={{
-            fontFamily: 'Jost, sans-serif',
+            fontFamily: 'var(--font-jost), sans-serif',
             fontSize: 7.5,
             fontWeight: 600,
             letterSpacing: '0.44em',
@@ -80,7 +80,7 @@ export default function AdminLoginPage() {
           padding: '36px 32px 32px',
         }}>
           <div style={{
-            fontFamily: 'Cormorant, serif',
+            fontFamily: 'var(--font-cormorant), serif',
             fontSize: 22,
             fontWeight: 300,
             color: 'var(--cream)',
@@ -127,7 +127,7 @@ export default function AdminLoginPage() {
                   border: 'none',
                   borderBottom: '1px solid rgba(184,134,58,0.3)',
                   color: 'var(--cream)',
-                  fontFamily: 'Jost, sans-serif',
+                  fontFamily: 'var(--font-jost), sans-serif',
                   fontSize: 15,
                   fontWeight: 300,
                   padding: '8px 0',
@@ -161,7 +161,7 @@ export default function AdminLoginPage() {
                   border: 'none',
                   borderBottom: '1px solid rgba(184,134,58,0.3)',
                   color: 'var(--cream)',
-                  fontFamily: 'Jost, sans-serif',
+                  fontFamily: 'var(--font-jost), sans-serif',
                   fontSize: 15,
                   fontWeight: 300,
                   padding: '8px 0',
@@ -181,7 +181,7 @@ export default function AdminLoginPage() {
                 background: loading ? 'rgba(184,134,58,0.5)' : 'var(--gold)',
                 color: 'var(--dark)',
                 border: 'none',
-                fontFamily: 'Jost, sans-serif',
+                fontFamily: 'var(--font-jost), sans-serif',
                 fontSize: 10,
                 fontWeight: 700,
                 letterSpacing: '0.24em',

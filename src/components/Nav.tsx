@@ -21,7 +21,7 @@ export default function Nav({ step, hideSteps, onLogoClick }: NavProps) {
         />
         <div style={{ marginLeft: 10, display: 'flex', flexDirection: 'column', gap: 1 }}>
           <span style={{
-            fontFamily: "'Cormorant', serif",
+            fontFamily: "var(--font-cormorant), serif",
             fontSize: 18,
             fontWeight: 300,
             color: 'var(--cream)',
@@ -29,7 +29,7 @@ export default function Nav({ step, hideSteps, onLogoClick }: NavProps) {
             lineHeight: 1.2,
           }}>Automatic Cow</span>
           <span style={{
-            fontFamily: "'Jost', sans-serif",
+            fontFamily: "var(--font-jost), sans-serif",
             fontSize: 8,
             fontWeight: 500,
             color: 'var(--gold)',
@@ -41,16 +41,19 @@ export default function Nav({ step, hideSteps, onLogoClick }: NavProps) {
       </Link>
       {!hideSteps && (
         <div className="nav-right">
-          <div className="steps">
-            <div className={`step ${step === 1 ? 'active' : step > 1 ? 'done' : ''}`}>
+          <div className="steps" role="list" aria-label={`Checkout step ${step} of 3`}>
+            <div className={`step ${step === 1 ? 'active' : step > 1 ? 'done' : ''}`}
+              role="listitem" aria-current={step === 1 ? 'step' : undefined}>
               <span className="step-num">{step > 1 ? '✓' : '1'}</span>
             </div>
             <div className="step-sep" />
-            <div className={`step ${step === 2 ? 'active' : step > 2 ? 'done' : ''}`}>
+            <div className={`step ${step === 2 ? 'active' : step > 2 ? 'done' : ''}`}
+              role="listitem" aria-current={step === 2 ? 'step' : undefined}>
               <span className="step-num">{step > 2 ? '✓' : '2'}</span>
             </div>
             <div className="step-sep" />
-            <div className={`step ${step === 3 ? 'active' : ''}`}>
+            <div className={`step ${step === 3 ? 'active' : ''}`}
+              role="listitem" aria-current={step === 3 ? 'step' : undefined}>
               <span className="step-num">3</span>
             </div>
           </div>
