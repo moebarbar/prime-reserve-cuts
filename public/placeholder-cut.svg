@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400" role="img" aria-label="Product photo coming soon">
+  <rect width="400" height="400" fill="#17110a"/>
+  <rect x="0.5" y="0.5" width="399" height="399" fill="none" stroke="#b8863a" stroke-opacity="0.28"/>
+  <!-- simple cut / steak glyph -->
+  <g transform="translate(200 176)" fill="none" stroke="#b8863a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" opacity="0.85">
+    <path d="M-58 -8 C-70 -44 -30 -66 6 -60 C58 -52 76 -8 62 26 C50 56 6 68 -30 58 C-64 48 -50 22 -58 -8 Z"/>
+    <path d="M-18 -30 C-2 -20 6 0 -2 22" stroke-width="3" opacity="0.7"/>
+    <circle cx="30" cy="0" r="12" stroke-width="3" opacity="0.7"/>
+  </g>
+  <text x="200" y="288" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="19" letter-spacing="1.5" fill="#f4efe6" fill-opacity="0.82">Photo coming soon</text>
+  <text x="200" y="316" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" letter-spacing="4" fill="#b8863a" fill-opacity="0.9">AUTOMATIC COW</text>
+</svg>

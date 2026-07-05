@@ -76,10 +76,10 @@ export const PRODUCTS: Product[] = [
   // ── Special Cuts (Local only, one-time only) ──────────────────────────────
   { id: 'filet',    name: 'Filet',              category: 'special', pricePerLb: 26.99, detail: 'Center-cut tenderloin · butter-tender', img: '/tenderloin-raw.jpg', available: true },
   { id: 'roasts',   name: 'Roasts',             category: 'special', pricePerLb: 10.99, detail: 'Sunday pot roast · low and slow',       img: '/roasts-raw.jpg',     available: true },
-  { id: 'burger',   name: 'Burger Patties',     category: 'special', pricePerLb: 9.99,  detail: 'Hand-pressed · grill-ready',            img: '/ground-beef-raw.jpg', available: true },
-  { id: 'stew',     name: 'Stew Meat',          category: 'special', pricePerLb: 8.99,  detail: 'Cubed & trimmed · low-and-slow braises', img: '/brisket-raw.jpg',   available: true },
-  { id: 'fajita',   name: 'Fajita Steak Meat',  category: 'special', pricePerLb: 12.99, detail: 'Marinade-ready · sizzling fajitas',      img: UNSPLASH_FLANK,       available: true },
-  { id: 'shortrib', name: 'Beef Short Ribs',    category: 'special', pricePerLb: 11.99, detail: 'Meaty & rich · braise or BBQ',           img: '/roasts-raw.jpg',    available: true },
+  { id: 'burger',   name: 'Burger Patties',     category: 'special', pricePerLb: 9.99,  detail: 'Hand-pressed · grill-ready',            img: '/placeholder-cut.svg', available: true },
+  { id: 'stew',     name: 'Stew Meat',          category: 'special', pricePerLb: 8.99,  detail: 'Cubed & trimmed · low-and-slow braises', img: '/placeholder-cut.svg', available: true },
+  { id: 'fajita',   name: 'Fajita Steak Meat',  category: 'special', pricePerLb: 12.99, detail: 'Marinade-ready · sizzling fajitas',      img: '/placeholder-cut.svg', available: true },
+  { id: 'shortrib', name: 'Beef Short Ribs',    category: 'special', pricePerLb: 11.99, detail: 'Meaty & rich · braise or BBQ',           img: '/placeholder-cut.svg', available: true },
   { id: 'brisket',  name: 'Brisket',            category: 'special', pricePerLb: 9.99,  detail: 'The heart of Texas BBQ',                 img: '/brisket-raw.jpg',   available: true },
   { id: 'flank',    name: 'Flank / Skirt',      category: 'special', pricePerLb: 15.99, detail: 'Bold grain · fajitas & stir-fry',        img: UNSPLASH_FLANK,       available: true },
 ]

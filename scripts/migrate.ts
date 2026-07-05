@@ -225,10 +225,10 @@ async function run() {
       ('Round Steak / Cutlets', 'Local', 'Thin-sliced · cutlets & milanesa',         '',  9.99, 11.99,  9.99, 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80&fit=crop&crop=center',    TRUE, 'automatic'),
       ('Filet',                 'Local', 'Center-cut tenderloin · butter-tender',    '', 26.99, NULL,  26.99, '/tenderloin-raw.jpg',                                                                             TRUE, 'special'),
       ('Roasts',                'Local', 'Sunday pot roast · low and slow',          '', 10.99, NULL,  10.99, '/roasts-raw.jpg',                                                                                 TRUE, 'special'),
-      ('Burger Patties',        'Local', 'Hand-pressed · grill-ready',               '',  9.99, NULL,   9.99, '/ground-beef-raw.jpg',                                                                            TRUE, 'special'),
-      ('Stew Meat',             'Local', 'Cubed & trimmed · low-and-slow braises',   '',  8.99, NULL,   8.99, '/brisket-raw.jpg',                                                                                TRUE, 'special'),
-      ('Fajita Steak Meat',     'Local', 'Marinade-ready · sizzling fajitas',        '', 12.99, NULL,  12.99, 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop&crop=center',       TRUE, 'special'),
-      ('Beef Short Ribs',       'Local', 'Meaty & rich · braise or BBQ',             '', 11.99, NULL,  11.99, '/roasts-raw.jpg',                                                                                 TRUE, 'special'),
+      ('Burger Patties',        'Local', 'Hand-pressed · grill-ready',               '',  9.99, NULL,   9.99, '/placeholder-cut.svg', TRUE, 'special'),
+      ('Stew Meat',             'Local', 'Cubed & trimmed · low-and-slow braises',   '',  8.99, NULL,   8.99, '/placeholder-cut.svg', TRUE, 'special'),
+      ('Fajita Steak Meat',     'Local', 'Marinade-ready · sizzling fajitas',        '', 12.99, NULL,  12.99, '/placeholder-cut.svg', TRUE, 'special'),
+      ('Beef Short Ribs',       'Local', 'Meaty & rich · braise or BBQ',             '', 11.99, NULL,  11.99, '/placeholder-cut.svg', TRUE, 'special'),
       ('Brisket',               'Local', 'The heart of Texas BBQ',                   '',  9.99, NULL,   9.99, '/brisket-raw.jpg',                                                                                TRUE, 'special'),
       ('Flank / Skirt',         'Local', 'Bold grain · fajitas & stir-fry',          '', 15.99, NULL,  15.99, 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop&crop=center',       TRUE, 'special')
     ) AS v(name, grade, detail, weight, price, price_choice, price_per_week, img, available, category)
